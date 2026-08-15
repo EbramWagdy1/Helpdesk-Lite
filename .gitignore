@@ -86,6 +86,8 @@ app.*.map.json
 firebase-debug.log*
 firestore-debug.log*
 ui-debug.log*
+firebase_options.dart
+lib/firebase_options.dart
 
 # Sensitive Keys & Environment variables
 *.env

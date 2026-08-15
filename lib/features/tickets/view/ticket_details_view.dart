@@ -551,130 +551,15 @@ class _TicketDetailsViewState extends State<TicketDetailsView> {
                         ),
                         const SizedBox(height: 14),
 
-                        // Workflow Actions Strip (for Agent / Manager)
+                        // Modern Workflow Actions Section (for Agent, Manager, or Ticket Creator)
                         if (isStaff || widget.currentUser.uid == ticket.createdBy.uid) ...[
-                          Container(
-                            padding: const EdgeInsets.all(14),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(14),
-                              border: Border.all(color: const Color(0xFFE2E8F0)),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Text(
-                                  'WORKFLOW ACTIONS',
-                                  style: TextStyle(
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w700,
-                                    color: Color(0xFF94A3B8),
-                                    letterSpacing: 0.8,
-                                  ),
-                                ),
-                                const SizedBox(height: 10),
-                                Wrap(
-                                  spacing: 8,
-                                  runSpacing: 8,
-                                  children: [
-                                    // Claim Ticket
-                                    if (isStaff && ticket.assignedTo == null)
-                                      ElevatedButton.icon(
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor: const Color(0xFF2563EB),
-                                          foregroundColor: Colors.white,
-                                          elevation: 0,
-                                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                                        ),
-                                        icon: const Icon(Icons.person_add_alt_1_rounded, size: 16),
-                                        label: const Text('Claim Ticket', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
-                                        onPressed: () => cubit.claimTicket(widget.currentUser),
-                                      ),
-
-                                    // Reassign (Manager)
-                                    if (isManager)
-                                      OutlinedButton.icon(
-                                        style: OutlinedButton.styleFrom(
-                                          foregroundColor: const Color(0xFF475569),
-                                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                                          side: const BorderSide(color: Color(0xFFCBD5E1)),
-                                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                                        ),
-                                        icon: const Icon(Icons.swap_horiz_rounded, size: 16),
-                                        label: const Text('Reassign', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
-                                        onPressed: () => _showReassignDialog(context, cubit, loaded.availableAgents, ticket),
-                                      ),
-
-                                    // Move to In Progress
-                                    if (isStaff && ticket.status == TicketStatus.open)
-                                      ElevatedButton.icon(
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor: const Color(0xFFD97706),
-                                          foregroundColor: Colors.white,
-                                          elevation: 0,
-                                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                                        ),
-                                        icon: const Icon(Icons.play_arrow_rounded, size: 16),
-                                        label: const Text('Start Working', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
-                                        onPressed: () => cubit.updateStatus(
-                                          newStatus: TicketStatus.inProgress,
-                                          currentUser: widget.currentUser,
-                                        ),
-                                      ),
-
-                                    // Mark as Resolved
-                                    if (isStaff && ticket.status == TicketStatus.inProgress)
-                                      ElevatedButton.icon(
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor: const Color(0xFF16A34A),
-                                          foregroundColor: Colors.white,
-                                          elevation: 0,
-                                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                                        ),
-                                        icon: const Icon(Icons.check_circle_outline_rounded, size: 16),
-                                        label: const Text('Mark Resolved', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
-                                        onPressed: () => cubit.updateStatus(
-                                          newStatus: TicketStatus.resolved,
-                                          currentUser: widget.currentUser,
-                                        ),
-                                      ),
-
-                                    // Close Ticket
-                                    if (ticket.status != TicketStatus.closed)
-                                      OutlinedButton.icon(
-                                        style: OutlinedButton.styleFrom(
-                                          foregroundColor: const Color(0xFF64748B),
-                                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                                          side: const BorderSide(color: Color(0xFFCBD5E1)),
-                                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                                        ),
-                                        icon: const Icon(Icons.lock_outline_rounded, size: 16),
-                                        label: const Text('Close Ticket', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
-                                        onPressed: () => cubit.updateStatus(
-                                          newStatus: TicketStatus.closed,
-                                          currentUser: widget.currentUser,
-                                        ),
-                                      ),
-
-                                    // Delete Ticket
-                                    OutlinedButton.icon(
-                                      style: OutlinedButton.styleFrom(
-                                        foregroundColor: const Color(0xFFDC2626),
-                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                                        side: const BorderSide(color: Color(0xFFFCA5A5)),
-                                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                                      ),
-                                      icon: const Icon(Icons.delete_outline_rounded, size: 16),
-                                      label: const Text('Delete Ticket', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
-                                      onPressed: () => _confirmDeleteTicket(context, cubit),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
+                          _buildWorkflowSection(
+                            context: context,
+                            cubit: cubit,
+                            ticket: ticket,
+                            availableAgents: loaded.availableAgents,
+                            isStaff: isStaff,
+                            isManager: isManager,
                           ),
                           const SizedBox(height: 14),
                         ],
@@ -839,6 +724,512 @@ class _TicketDetailsViewState extends State<TicketDetailsView> {
             ),
           );
           },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildWorkflowSection({
+    required BuildContext context,
+    required TicketDetailsCubit cubit,
+    required TicketModel ticket,
+    required List<UserModel> availableAgents,
+    required bool isStaff,
+    required bool isManager,
+  }) {
+    final status = ticket.status;
+
+    // Define Pipeline stages
+    final stages = [
+      {'status': TicketStatus.open, 'label': 'Open'},
+      {'status': TicketStatus.inProgress, 'label': 'In Progress'},
+      {'status': TicketStatus.resolved, 'label': 'Resolved'},
+      {'status': TicketStatus.closed, 'label': 'Closed'},
+    ];
+
+    final currentStageIndex = stages.indexWhere((s) => s['status'] == status);
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF0F172A).withValues(alpha: 0.03),
+            blurRadius: 10,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Section Title & Active Badge
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(6),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFEEF2FF),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Icon(Icons.alt_route_rounded, size: 16, color: Color(0xFF4F46E5)),
+                  ),
+                  const SizedBox(width: 8),
+                  const Text(
+                    'WORKFLOW PROGRESS',
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w800,
+                      color: Color(0xFF64748B),
+                      letterSpacing: 0.8,
+                    ),
+                  ),
+                ],
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: status.color.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: status.color.withValues(alpha: 0.25)),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: 6,
+                      height: 6,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: status.color,
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      status.label,
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
+                        color: status.color,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+
+          // Lifecycle Stepper Track
+          Row(
+            children: List.generate(stages.length * 2 - 1, (index) {
+              if (index.isOdd) {
+                final stageBefore = index ~/ 2;
+                final isPassed = stageBefore < currentStageIndex;
+                return Expanded(
+                  child: Container(
+                    height: 3,
+                    color: isPassed ? const Color(0xFF2563EB) : const Color(0xFFE2E8F0),
+                  ),
+                );
+              }
+
+              final stageIdx = index ~/ 2;
+              final isCompleted = stageIdx < currentStageIndex;
+              final isCurrent = stageIdx == currentStageIndex;
+
+              Color stepBg = const Color(0xFFF1F5F9);
+              Color stepIconColor = const Color(0xFF94A3B8);
+              Widget iconWidget = Text(
+                '${stageIdx + 1}',
+                style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: stepIconColor),
+              );
+
+              if (isCompleted) {
+                stepBg = const Color(0xFF2563EB);
+                stepIconColor = Colors.white;
+                iconWidget = const Icon(Icons.check_rounded, size: 12, color: Colors.white);
+              } else if (isCurrent) {
+                stepBg = status.color;
+                stepIconColor = Colors.white;
+                iconWidget = const Icon(Icons.circle, size: 8, color: Colors.white);
+              }
+
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 22,
+                    height: 22,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: stepBg,
+                      border: isCurrent
+                          ? Border.all(color: status.color.withValues(alpha: 0.3), width: 3)
+                          : null,
+                    ),
+                    child: Center(child: iconWidget),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    stages[stageIdx]['label'] as String,
+                    style: TextStyle(
+                      fontSize: 10,
+                      fontWeight: isCurrent ? FontWeight.w700 : FontWeight.w500,
+                      color: isCurrent ? const Color(0xFF0F172A) : const Color(0xFF94A3B8),
+                    ),
+                  ),
+                ],
+              );
+            }),
+          ),
+          const SizedBox(height: 18),
+
+          // Primary Contextual CTA
+          _buildPrimaryWorkflowAction(
+            context: context,
+            cubit: cubit,
+            ticket: ticket,
+            isStaff: isStaff,
+            isCreator: widget.currentUser.uid == ticket.createdBy.uid,
+          ),
+
+          // Secondary Quick Actions Row
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              // Reassign (for Managers only)
+              if (isManager) ...[
+                Expanded(
+                  child: _buildSecondaryActionButton(
+                    label: 'Reassign',
+                    icon: Icons.swap_horiz_rounded,
+                    backgroundColor: const Color(0xFFF8FAFC),
+                    foregroundColor: const Color(0xFF334155),
+                    borderColor: const Color(0xFFCBD5E1),
+                    onTap: () => _showReassignDialog(context, cubit, availableAgents, ticket),
+                  ),
+                ),
+                const SizedBox(width: 8),
+              ],
+
+              // Creator can cancel/close their own open ticket
+              if (widget.currentUser.uid == ticket.createdBy.uid && status == TicketStatus.open) ...[
+                Expanded(
+                  child: _buildSecondaryActionButton(
+                    label: 'Cancel Request',
+                    icon: Icons.close_rounded,
+                    backgroundColor: const Color(0xFFF8FAFC),
+                    foregroundColor: const Color(0xFF64748B),
+                    borderColor: const Color(0xFFE2E8F0),
+                    onTap: () => cubit.updateStatus(
+                      newStatus: TicketStatus.closed,
+                      currentUser: widget.currentUser,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+              ],
+
+              // Delete Ticket
+              Expanded(
+                child: _buildSecondaryActionButton(
+                  label: 'Delete',
+                  icon: Icons.delete_outline_rounded,
+                  backgroundColor: const Color(0xFFFEF2F2),
+                  foregroundColor: const Color(0xFFDC2626),
+                  borderColor: const Color(0xFFFECACA),
+                  onTap: () => _confirmDeleteTicket(context, cubit),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPrimaryWorkflowAction({
+    required BuildContext context,
+    required TicketDetailsCubit cubit,
+    required TicketModel ticket,
+    required bool isStaff,
+    required bool isCreator,
+  }) {
+    // 1. Open and Unassigned (Agent/Manager can claim)
+    if (ticket.status == TicketStatus.open && ticket.assignedTo == null && isStaff) {
+      return SizedBox(
+        width: double.infinity,
+        height: 44,
+        child: ElevatedButton.icon(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: const Color(0xFF2563EB),
+            foregroundColor: Colors.white,
+            elevation: 0,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          ),
+          icon: const Icon(Icons.person_add_alt_1_rounded, size: 18),
+          label: const Text(
+            'Claim & Start Ticket',
+            style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
+          ),
+          onPressed: () => cubit.claimTicket(widget.currentUser),
+        ),
+      );
+    }
+
+    // 2. Open and Assigned (Staff starts working)
+    if (ticket.status == TicketStatus.open && isStaff) {
+      return SizedBox(
+        width: double.infinity,
+        height: 44,
+        child: ElevatedButton.icon(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: const Color(0xFFD97706),
+            foregroundColor: Colors.white,
+            elevation: 0,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          ),
+          icon: const Icon(Icons.play_arrow_rounded, size: 20),
+          label: const Text(
+            'Start Working (In Progress)',
+            style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
+          ),
+          onPressed: () => cubit.updateStatus(
+            newStatus: TicketStatus.inProgress,
+            currentUser: widget.currentUser,
+          ),
+        ),
+      );
+    }
+
+    // 3. In Progress (Staff marks as Resolved)
+    if (ticket.status == TicketStatus.inProgress && isStaff) {
+      return SizedBox(
+        width: double.infinity,
+        height: 44,
+        child: ElevatedButton.icon(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: const Color(0xFF16A34A),
+            foregroundColor: Colors.white,
+            elevation: 0,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          ),
+          icon: const Icon(Icons.check_circle_outline_rounded, size: 18),
+          label: const Text(
+            'Mark as Resolved',
+            style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
+          ),
+          onPressed: () => cubit.updateStatus(
+            newStatus: TicketStatus.resolved,
+            currentUser: widget.currentUser,
+          ),
+        ),
+      );
+    }
+
+    // 4. Resolved - ONLY the Employee / Creator verifies and closes the ticket
+    if (ticket.status == TicketStatus.resolved) {
+      if (isCreator) {
+        return Column(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF0FDF4),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: const Color(0xFFBBF7D0)),
+              ),
+              child: const Row(
+                children: [
+                  Icon(Icons.info_outline_rounded, size: 18, color: Color(0xFF16A34A)),
+                  SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'The support team marked this ticket as resolved. Please test and confirm to close it.',
+                      style: TextStyle(fontSize: 12, color: Color(0xFF166534), fontWeight: FontWeight.w500),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 10),
+            Row(
+              children: [
+                // Reopen if still not fixed
+                Expanded(
+                  child: OutlinedButton.icon(
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: const Color(0xFFD97706),
+                      side: const BorderSide(color: Color(0xFFFCD34D)),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      padding: const EdgeInsets.symmetric(vertical: 11),
+                    ),
+                    icon: const Icon(Icons.replay_rounded, size: 16),
+                    label: const Text(
+                      'Not Fixed',
+                      style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
+                    ),
+                    onPressed: () => cubit.updateStatus(
+                      newStatus: TicketStatus.inProgress,
+                      currentUser: widget.currentUser,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                // Accept & Close
+                Expanded(
+                  flex: 2,
+                  child: ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF16A34A),
+                      foregroundColor: Colors.white,
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      padding: const EdgeInsets.symmetric(vertical: 11),
+                    ),
+                    icon: const Icon(Icons.check_circle_rounded, size: 18),
+                    label: const Text(
+                      'Approve & Close',
+                      style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
+                    ),
+                    onPressed: () => cubit.updateStatus(
+                      newStatus: TicketStatus.closed,
+                      currentUser: widget.currentUser,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        );
+      } else {
+        // For Agent / Manager: Inform that it's waiting for Employee confirmation
+        return Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: const Color(0xFFF0FDF4),
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: const Color(0xFFBBF7D0)),
+          ),
+          child: const Row(
+            children: [
+              Icon(Icons.hourglass_top_rounded, size: 20, color: Color(0xFF16A34A)),
+              SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  'Resolved • Awaiting employee testing and confirmation to close.',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF166534),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      }
+    }
+
+    // 5. Closed - Creator can reopen if needed
+    if (ticket.status == TicketStatus.closed) {
+      if (isCreator) {
+        return SizedBox(
+          width: double.infinity,
+          height: 44,
+          child: OutlinedButton.icon(
+            style: OutlinedButton.styleFrom(
+              foregroundColor: const Color(0xFF2563EB),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              side: const BorderSide(color: Color(0xFF93C5FD)),
+            ),
+            icon: const Icon(Icons.replay_rounded, size: 18),
+            label: const Text(
+              'Reopen Ticket',
+              style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
+            ),
+            onPressed: () => cubit.updateStatus(
+              newStatus: TicketStatus.open,
+              currentUser: widget.currentUser,
+            ),
+          ),
+        );
+      } else {
+        return Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: const Color(0xFFF8FAFC),
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: const Color(0xFFE2E8F0)),
+          ),
+          child: const Row(
+            children: [
+              Icon(Icons.lock_outline_rounded, size: 18, color: Color(0xFF64748B)),
+              SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  'This ticket is closed and archived by the employee.',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                    color: Color(0xFF64748B),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      }
+    }
+
+    return const SizedBox.shrink();
+  }
+
+  Widget _buildSecondaryActionButton({
+    required String label,
+    required IconData icon,
+    required Color backgroundColor,
+    required Color foregroundColor,
+    required Color borderColor,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(10),
+      child: Container(
+        height: 38,
+        decoration: BoxDecoration(
+          color: backgroundColor,
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: borderColor),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, size: 16, color: foregroundColor),
+            const SizedBox(width: 6),
+            Flexible(
+              child: Text(
+                label,
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: foregroundColor,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
         ),
       ),
     );

@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:helpdesk/core/services/service_locator.dart';
 import 'package:helpdesk/features/auth/model/user_model.dart';
 import 'package:helpdesk/features/auth/view_model/auth_cubit.dart';
 import 'package:helpdesk/features/profile/view/profile_view.dart';
+import 'package:helpdesk/features/tickets/data/ticket_repository.dart';
 import 'package:helpdesk/features/tickets/model/ticket_model.dart';
 import 'package:helpdesk/features/tickets/view/create_ticket_view.dart';
 import 'package:helpdesk/features/tickets/view/ticket_details_view.dart';
-import 'package:helpdesk/features/tickets/view_model/ticket_list_cubit.dart';
-import 'package:helpdesk/features/tickets/view_model/ticket_list_state.dart';
 import 'package:helpdesk/features/tickets/widgets/ticket_card_widget.dart';
 
 class EmployeePortalView extends StatefulWidget {
@@ -25,6 +24,8 @@ class EmployeePortalView extends StatefulWidget {
 class _EmployeePortalViewState extends State<EmployeePortalView> {
   final _searchController = TextEditingController();
   bool _isSearching = false;
+  String _searchQuery = '';
+  TicketStatus? _selectedStatus;
 
   @override
   void dispose() {
@@ -57,126 +58,148 @@ class _EmployeePortalViewState extends State<EmployeePortalView> {
   Widget build(BuildContext context) {
     final authCubit = AuthCubit.get(context);
     final user = authCubit.currentUser ?? widget.currentUser;
+    final ticketRepo = sl<TicketRepository>();
 
-    return BlocProvider(
-      create: (context) => TicketListCubit()..initializeTicketStream(currentUser: user),
-      child: Scaffold(
-        backgroundColor: const Color(0xFFF8FAFC),
-        appBar: AppBar(
-          backgroundColor: Colors.white,
-          elevation: 0,
-          scrolledUnderElevation: 0,
-          titleSpacing: 16,
-          title: Row(
-            children: [
-              // User Avatar
-              GestureDetector(
-                onTap: () => _openProfile(context),
-                child: CircleAvatar(
-                  radius: 18,
-                  backgroundColor: const Color(0xFF0F172A),
-                  child: Text(
-                    user.name.isNotEmpty ? user.name[0].toUpperCase() : 'U',
-                    style: const TextStyle(
-                      fontWeight: FontWeight.w700,
-                      color: Colors.white,
-                      fontSize: 14,
-                    ),
+    return Scaffold(
+      backgroundColor: const Color(0xFFF8FAFC),
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        titleSpacing: 16,
+        title: Row(
+          children: [
+            // User Avatar
+            GestureDetector(
+              onTap: () => _openProfile(context),
+              child: CircleAvatar(
+                radius: 18,
+                backgroundColor: const Color(0xFF0F172A),
+                child: Text(
+                  user.name.isNotEmpty ? user.name[0].toUpperCase() : 'U',
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white,
+                    fontSize: 14,
                   ),
                 ),
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      user.name,
-                      style: const TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w700,
-                        color: Color(0xFF0F172A),
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    Text(
-                      '${user.department} • Employee',
-                      style: const TextStyle(
-                        fontSize: 11,
-                        color: Color(0xFF64748B),
-                        fontWeight: FontWeight.w500,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          actions: [
-            IconButton(
-              icon: Icon(
-                _isSearching ? Icons.close_rounded : Icons.search_rounded,
-                color: const Color(0xFF334155),
-              ),
-              onPressed: () {
-                setState(() {
-                  _isSearching = !_isSearching;
-                  if (!_isSearching) {
-                    _searchController.clear();
-                  }
-                });
-              },
             ),
-            IconButton(
-              icon: const Icon(Icons.person_outline_rounded, color: Color(0xFF334155)),
-              tooltip: 'Profile',
-              onPressed: () => _openProfile(context),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    user.name,
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w700,
+                      color: Color(0xFF0F172A),
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  Text(
+                    '${user.department} • Employee',
+                    style: const TextStyle(
+                      fontSize: 11,
+                      color: Color(0xFF64748B),
+                      fontWeight: FontWeight.w500,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
             ),
-            const SizedBox(width: 6),
           ],
         ),
-        floatingActionButton: FloatingActionButton.extended(
-          backgroundColor: const Color(0xFF2563EB),
-          foregroundColor: Colors.white,
-          elevation: 3,
-          highlightElevation: 5,
-          icon: const Icon(Icons.add_rounded, size: 20),
-          label: const Text(
-            'New Ticket',
-            style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
+        actions: [
+          IconButton(
+            icon: Icon(
+              _isSearching ? Icons.close_rounded : Icons.search_rounded,
+              color: const Color(0xFF334155),
+            ),
+            onPressed: () {
+              setState(() {
+                _isSearching = !_isSearching;
+                if (!_isSearching) {
+                  _searchController.clear();
+                  _searchQuery = '';
+                }
+              });
+            },
           ),
-          onPressed: () => _openCreateTicket(),
+          IconButton(
+            icon: const Icon(Icons.person_outline_rounded, color: Color(0xFF334155)),
+            tooltip: 'Profile',
+            onPressed: () => _openProfile(context),
+          ),
+          const SizedBox(width: 6),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        backgroundColor: const Color(0xFF2563EB),
+        foregroundColor: Colors.white,
+        elevation: 3,
+        highlightElevation: 5,
+        icon: const Icon(Icons.add_rounded, size: 20),
+        label: const Text(
+          'New Ticket',
+          style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
         ),
-        body: BlocBuilder<TicketListCubit, TicketListState>(
-          builder: (context, state) {
-            final ticketCubit = TicketListCubit.get(context);
+        onPressed: () => _openCreateTicket(),
+      ),
+      body: StreamBuilder<List<TicketModel>>(
+        stream: ticketRepo.streamTickets(createdByUid: user.uid),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting && !snapshot.hasData) {
+            return const Center(
+              child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF2563EB)),
+            );
+          }
 
-            List<TicketModel> allMyTickets = [];
-            List<TicketModel> filteredTickets = [];
-            TicketStatus? selectedStatus;
+          if (snapshot.hasError) {
+            return Center(
+              child: Text(
+                'Failed to load tickets: ${snapshot.error}',
+                style: const TextStyle(color: Color(0xFFDC2626)),
+              ),
+            );
+          }
 
-            if (state is TicketListLoadedState) {
-              allMyTickets = state.allTickets;
-              filteredTickets = state.filteredTickets;
-              selectedStatus = state.selectedStatus;
-            }
+          final List<TicketModel> allMyTickets = snapshot.data ?? [];
 
-            final totalCount = allMyTickets.length;
-            final openCount = allMyTickets.where((t) => t.status == TicketStatus.open).length;
-            final inProgressCount = allMyTickets.where((t) => t.status == TicketStatus.inProgress).length;
-            final resolvedCount = allMyTickets.where((t) => t.status == TicketStatus.resolved).length;
-            final closedCount = allMyTickets.where((t) => t.status == TicketStatus.closed).length;
+          // Apply Status Filter
+          List<TicketModel> filteredTickets = List.from(allMyTickets);
+          if (_selectedStatus != null) {
+            filteredTickets = filteredTickets.where((t) => t.status == _selectedStatus).toList();
+          }
 
-            return GestureDetector(
-              behavior: HitTestBehavior.opaque,
-              onTap: () => FocusScope.of(context).unfocus(),
-              child: CustomScrollView(
-                physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
-                slivers: [
+          // Apply Search Query
+          if (_searchQuery.trim().isNotEmpty) {
+            final q = _searchQuery.toLowerCase().trim();
+            filteredTickets = filteredTickets.where((t) {
+              return t.title.toLowerCase().contains(q) ||
+                  t.ticketNumber.toLowerCase().contains(q) ||
+                  t.description.toLowerCase().contains(q);
+            }).toList();
+          }
+
+          final totalCount = allMyTickets.length;
+          final openCount = allMyTickets.where((t) => t.status == TicketStatus.open).length;
+          final inProgressCount = allMyTickets.where((t) => t.status == TicketStatus.inProgress).length;
+          final resolvedCount = allMyTickets.where((t) => t.status == TicketStatus.resolved).length;
+          final closedCount = allMyTickets.where((t) => t.status == TicketStatus.closed).length;
+
+          return GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTap: () => FocusScope.of(context).unfocus(),
+            child: CustomScrollView(
+              physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+              slivers: [
                 // Collapsible Search Bar
                 if (_isSearching)
                   SliverToBoxAdapter(
@@ -192,7 +215,11 @@ class _EmployeePortalViewState extends State<EmployeePortalView> {
                         child: TextField(
                           controller: _searchController,
                           autofocus: true,
-                          onChanged: (val) => ticketCubit.search(val),
+                          onChanged: (val) {
+                            setState(() {
+                              _searchQuery = val;
+                            });
+                          },
                           style: const TextStyle(fontSize: 14, color: Color(0xFF0F172A)),
                           decoration: const InputDecoration(
                             hintText: 'Search tickets by title, description or ID...',
@@ -222,48 +249,48 @@ class _EmployeePortalViewState extends State<EmployeePortalView> {
                               _buildFilterChip(
                                 label: 'All',
                                 count: totalCount,
-                                isSelected: selectedStatus == null,
-                                onTap: () => ticketCubit.filterByStatus(null),
+                                isSelected: _selectedStatus == null,
+                                onTap: () => setState(() => _selectedStatus = null),
                               ),
                               const SizedBox(width: 8),
                               _buildFilterChip(
                                 label: 'Open',
                                 count: openCount,
-                                isSelected: selectedStatus == TicketStatus.open,
+                                isSelected: _selectedStatus == TicketStatus.open,
                                 color: const Color(0xFF2563EB),
-                                onTap: () => ticketCubit.filterByStatus(
-                                  selectedStatus == TicketStatus.open ? null : TicketStatus.open,
-                                ),
+                                onTap: () => setState(() {
+                                  _selectedStatus = _selectedStatus == TicketStatus.open ? null : TicketStatus.open;
+                                }),
                               ),
                               const SizedBox(width: 8),
                               _buildFilterChip(
                                 label: 'In Progress',
                                 count: inProgressCount,
-                                isSelected: selectedStatus == TicketStatus.inProgress,
+                                isSelected: _selectedStatus == TicketStatus.inProgress,
                                 color: const Color(0xFFD97706),
-                                onTap: () => ticketCubit.filterByStatus(
-                                  selectedStatus == TicketStatus.inProgress ? null : TicketStatus.inProgress,
-                                ),
+                                onTap: () => setState(() {
+                                  _selectedStatus = _selectedStatus == TicketStatus.inProgress ? null : TicketStatus.inProgress;
+                                }),
                               ),
                               const SizedBox(width: 8),
                               _buildFilterChip(
                                 label: 'Resolved',
                                 count: resolvedCount,
-                                isSelected: selectedStatus == TicketStatus.resolved,
+                                isSelected: _selectedStatus == TicketStatus.resolved,
                                 color: const Color(0xFF16A34A),
-                                onTap: () => ticketCubit.filterByStatus(
-                                  selectedStatus == TicketStatus.resolved ? null : TicketStatus.resolved,
-                                ),
+                                onTap: () => setState(() {
+                                  _selectedStatus = _selectedStatus == TicketStatus.resolved ? null : TicketStatus.resolved;
+                                }),
                               ),
                               const SizedBox(width: 8),
                               _buildFilterChip(
                                 label: 'Closed',
                                 count: closedCount,
-                                isSelected: selectedStatus == TicketStatus.closed,
+                                isSelected: _selectedStatus == TicketStatus.closed,
                                 color: const Color(0xFF64748B),
-                                onTap: () => ticketCubit.filterByStatus(
-                                  selectedStatus == TicketStatus.closed ? null : TicketStatus.closed,
-                                ),
+                                onTap: () => setState(() {
+                                  _selectedStatus = _selectedStatus == TicketStatus.closed ? null : TicketStatus.closed;
+                                }),
                               ),
                             ],
                           ),
@@ -282,11 +309,14 @@ class _EmployeePortalViewState extends State<EmployeePortalView> {
                                 color: Color(0xFF0F172A),
                               ),
                             ),
-                            if (selectedStatus != null || _searchController.text.isNotEmpty)
+                            if (_selectedStatus != null || _searchQuery.isNotEmpty)
                               GestureDetector(
                                 onTap: () {
                                   _searchController.clear();
-                                  ticketCubit.resetFilters();
+                                  setState(() {
+                                    _selectedStatus = null;
+                                    _searchQuery = '';
+                                  });
                                 },
                                 child: const Text(
                                   'Clear filter',
@@ -305,13 +335,7 @@ class _EmployeePortalViewState extends State<EmployeePortalView> {
                 ),
 
                 // Tickets List / Empty State
-                if (state is TicketListLoadingState)
-                  const SliverFillRemaining(
-                    child: Center(
-                      child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF2563EB)),
-                    ),
-                  )
-                else if (filteredTickets.isEmpty)
+                if (filteredTickets.isEmpty)
                   SliverFillRemaining(
                     hasScrollBody: false,
                     child: Padding(
@@ -396,12 +420,11 @@ class _EmployeePortalViewState extends State<EmployeePortalView> {
                     ),
                   ),
 
-                  const SliverToBoxAdapter(child: SizedBox(height: 80)),
-                ],
-              ),
-            );
-          },
-        ),
+                const SliverToBoxAdapter(child: SizedBox(height: 80)),
+              ],
+            ),
+          );
+        },
       ),
     );
   }

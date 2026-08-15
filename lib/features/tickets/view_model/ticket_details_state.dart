@@ -22,6 +22,8 @@ class TicketDetailsLoadedState extends TicketDetailsState {
   });
 }
 
+class TicketDetailsDeletedState extends TicketDetailsState {}
+
 class TicketDetailsErrorState extends TicketDetailsState {
   final String errorMessage;
   TicketDetailsErrorState(this.errorMessage);

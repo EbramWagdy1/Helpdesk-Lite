@@ -87,7 +87,39 @@ class AuthRepository {
 
     final doc = await _firestore.collection('users').doc(user.uid).get();
     if (doc.exists && doc.data() != null) {
-      return UserModel.fromMap(doc.data()!, user.uid);
+      final userModel = UserModel.fromMap(doc.data()!, user.uid);
+      await _cacheUserSession(userModel);
+      return userModel;
+    }
+    return null;
+  }
+
+  /// Instantly returns cached user data from local storage with zero delay
+  UserModel? getCachedUser() {
+    final uid = CacheHelper.getString(key: CacheKeys.userId);
+    final email = CacheHelper.getString(key: CacheKeys.userEmail);
+    final name = CacheHelper.getString(key: CacheKeys.userName);
+    final roleStr = CacheHelper.getString(key: CacheKeys.userRole);
+    final department = CacheHelper.getString(key: CacheKeys.userDepartment) ?? 'General';
+    final phone = CacheHelper.getString(key: CacheKeys.userPhone) ?? '';
+    final avatarUrl = CacheHelper.getString(key: CacheKeys.userPhotoUrl);
+    final isVerified = CacheHelper.getBool(key: CacheKeys.userIsVerified) ?? false;
+
+    if (uid != null && email != null && name != null && roleStr != null) {
+      return UserModel(
+        uid: uid,
+        name: name,
+        email: email,
+        phone: phone,
+        department: department,
+        avatarUrl: avatarUrl,
+        role: UserRole.values.firstWhere(
+          (e) => e.name == roleStr,
+          orElse: () => UserRole.employee,
+        ),
+        isVerified: isVerified,
+        createdAt: DateTime.now(),
+      );
     }
     return null;
   }
@@ -105,7 +137,7 @@ class AuthRepository {
       'department': department,
     };
     if (photoUrl != null) {
-      updateData['photoUrl'] = photoUrl;
+      updateData['avatarUrl'] = photoUrl;
     }
 
     await _firestore.collection('users').doc(uid).update(updateData);
@@ -164,18 +196,26 @@ class AuthRepository {
   Future<void> signOut() async {
     await _auth.signOut();
     await CacheHelper.saveData(key: CacheKeys.isLoggedIn, value: false);
+    await CacheHelper.removeData(key: CacheKeys.userId);
     await CacheHelper.removeData(key: CacheKeys.userEmail);
     await CacheHelper.removeData(key: CacheKeys.userName);
-    await CacheHelper.removeData(key: 'user_role');
-    await CacheHelper.removeData(key: 'user_id');
+    await CacheHelper.removeData(key: CacheKeys.userPhone);
+    await CacheHelper.removeData(key: CacheKeys.userRole);
+    await CacheHelper.removeData(key: CacheKeys.userDepartment);
+    await CacheHelper.removeData(key: CacheKeys.userPhotoUrl);
+    await CacheHelper.removeData(key: CacheKeys.userIsVerified);
   }
 
   Future<void> _cacheUserSession(UserModel user) async {
     await CacheHelper.saveData(key: CacheKeys.isLoggedIn, value: true);
     await CacheHelper.saveData(key: CacheKeys.isVisited, value: true);
+    await CacheHelper.saveData(key: CacheKeys.userId, value: user.uid);
     await CacheHelper.saveData(key: CacheKeys.userEmail, value: user.email);
     await CacheHelper.saveData(key: CacheKeys.userName, value: user.name);
-    await CacheHelper.saveData(key: 'user_role', value: user.role.name);
-    await CacheHelper.saveData(key: 'user_id', value: user.uid);
+    await CacheHelper.saveData(key: CacheKeys.userPhone, value: user.phone);
+    await CacheHelper.saveData(key: CacheKeys.userRole, value: user.role.name);
+    await CacheHelper.saveData(key: CacheKeys.userDepartment, value: user.department);
+    await CacheHelper.saveData(key: CacheKeys.userPhotoUrl, value: user.avatarUrl);
+    await CacheHelper.saveData(key: CacheKeys.userIsVerified, value: user.isVerified);
   }
 }

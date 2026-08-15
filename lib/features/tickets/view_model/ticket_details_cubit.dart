@@ -25,6 +25,8 @@ class TicketDetailsCubit extends Cubit<TicketDetailsState> {
         _authRepository = authRepository ?? sl<AuthRepository>(),
         super(TicketDetailsInitialState());
 
+  bool isDeleting = false;
+
   void init(String ticketId) {
     emit(TicketDetailsLoadingState());
     _loadAgents();
@@ -33,6 +35,7 @@ class TicketDetailsCubit extends Cubit<TicketDetailsState> {
     _ticketSubscription?.cancel();
     _ticketSubscription = _ticketRepository.streamTicketById(ticketId).listen(
       (ticket) {
+        if (isDeleting) return;
         if (ticket == null) {
           emit(TicketDetailsErrorState('Ticket not found or has been removed.'));
           return;
@@ -40,17 +43,24 @@ class TicketDetailsCubit extends Cubit<TicketDetailsState> {
         _currentTicket = ticket;
         _emitLoaded();
       },
-      onError: (err) => emit(TicketDetailsErrorState('Error loading ticket: $err')),
+      onError: (err) {
+        if (isDeleting) return;
+        emit(TicketDetailsErrorState('Error loading ticket: $err'));
+      },
     );
 
     // Stream comments
     _commentsSubscription?.cancel();
     _commentsSubscription = _ticketRepository.streamComments(ticketId).listen(
       (comments) {
+        if (isDeleting) return;
         _currentComments = comments;
         _emitLoaded();
       },
-      onError: (err) => emit(TicketDetailsErrorState('Error loading comments: $err')),
+      onError: (err) {
+        if (isDeleting) return;
+        emit(TicketDetailsErrorState('Error loading comments: $err'));
+      },
     );
   }
 
@@ -151,6 +161,26 @@ class TicketDetailsCubit extends Cubit<TicketDetailsState> {
     } catch (e) {
       _emitLoaded(isSubmittingComment: false);
       emit(TicketDetailsErrorState('Failed to send comment: $e'));
+    }
+  }
+
+  Future<void> deleteTicket() async {
+    if (_currentTicket == null || isDeleting) return;
+    isDeleting = true;
+    final ticketId = _currentTicket!.id;
+    final attachments = _currentTicket!.attachmentUrls;
+
+    // Immediately cancel Firestore subscriptions so null snapshot doesn't trigger error state
+    await _ticketSubscription?.cancel();
+    await _commentsSubscription?.cancel();
+
+    emit(TicketDetailsLoadingState());
+    try {
+      await _ticketRepository.deleteTicket(ticketId, attachments);
+      emit(TicketDetailsDeletedState());
+    } catch (e) {
+      isDeleting = false;
+      emit(TicketDetailsErrorState('Failed to delete ticket: $e'));
     }
   }
 

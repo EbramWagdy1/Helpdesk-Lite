@@ -7,6 +7,7 @@ import 'package:helpdesk/core/utils/app_assets.dart';
 import 'package:helpdesk/core/utils/app_colors.dart';
 import 'package:helpdesk/core/utils/app_strings.dart';
 import 'package:helpdesk/core/utils/app_text_style.dart';
+import 'package:helpdesk/features/auth/view_model/auth_cubit.dart';
 
 class SplashView extends StatefulWidget {
   const SplashView({super.key});
@@ -66,7 +67,18 @@ class _SplashViewState extends State<SplashView> with SingleTickerProviderStateM
     } else {
       // User has visited before: check login state
       if (isLoggedIn == true) {
-        if (mounted) context.go(AppRoutes.tasks);
+        final authCubit = AuthCubit.get(context);
+        if (authCubit.currentUser != null) {
+          if (mounted) context.go(AppRoutes.tasks);
+        } else {
+          final user = await authCubit.checkCurrentUser();
+          if (!mounted) return;
+          if (user != null) {
+            context.go(AppRoutes.tasks);
+          } else {
+            context.go(AppRoutes.login);
+          }
+        }
       } else {
         if (mounted) context.go(AppRoutes.login);
       }

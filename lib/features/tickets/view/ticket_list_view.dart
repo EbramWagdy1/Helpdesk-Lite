@@ -9,8 +9,24 @@ import 'package:helpdesk/features/auth/view_model/auth_state.dart';
 import 'package:helpdesk/features/employee_portal/view/employee_portal_view.dart';
 import 'package:helpdesk/features/manager_dashboard/view/manager_executive_view.dart';
 
-class TicketListView extends StatelessWidget {
+import 'package:helpdesk/core/utils/app_colors.dart';
+
+class TicketListView extends StatefulWidget {
   const TicketListView({super.key});
+
+  @override
+  State<TicketListView> createState() => _TicketListViewState();
+}
+
+class _TicketListViewState extends State<TicketListView> {
+  @override
+  void initState() {
+    super.initState();
+    final authCubit = AuthCubit.get(context);
+    if (authCubit.currentUser == null) {
+      authCubit.checkCurrentUser();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -22,14 +38,18 @@ class TicketListView extends StatelessWidget {
       },
       builder: (context, authState) {
         final authCubit = AuthCubit.get(context);
-        final currentUser = authCubit.currentUser ??
-            UserModel(
-              uid: 'guest',
-              name: 'Workspace User',
-              email: 'user@helpdesk.com',
-              role: UserRole.employee,
-              createdAt: DateTime.now(),
-            );
+        final currentUser = authCubit.currentUser;
+
+        if (currentUser == null) {
+          return const Scaffold(
+            backgroundColor: AppColors.background,
+            body: Center(
+              child: CircularProgressIndicator(
+                color: AppColors.primary,
+              ),
+            ),
+          );
+        }
 
         // Intelligently render the tailored view according to user role
         switch (currentUser.role) {

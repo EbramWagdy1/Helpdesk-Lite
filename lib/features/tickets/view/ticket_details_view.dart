@@ -42,6 +42,45 @@ class _TicketDetailsViewState extends State<TicketDetailsView> {
     }
   }
 
+  void _confirmDeleteTicket(BuildContext context, TicketDetailsCubit cubit) {
+    showDialog(
+      context: context,
+      builder: (dialogCtx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: const Row(
+          children: [
+            Icon(Icons.delete_outline_rounded, color: Color(0xFFDC2626)),
+            SizedBox(width: 8),
+            Text('Delete Ticket', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 17)),
+          ],
+        ),
+        content: const Text(
+          'Are you sure you want to permanently delete this ticket and all of its conversation history? This action cannot be undone.',
+          style: TextStyle(fontSize: 14, color: Color(0xFF475569)),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogCtx),
+            child: const Text('Cancel', style: TextStyle(color: Color(0xFF64748B))),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFFDC2626),
+              foregroundColor: Colors.white,
+              elevation: 0,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            ),
+            onPressed: () {
+              Navigator.pop(dialogCtx);
+              cubit.deleteTicket();
+            },
+            child: const Text('Delete Permanently', style: TextStyle(fontWeight: FontWeight.w600)),
+          ),
+        ],
+      ),
+    );
+  }
+
   void _showReassignDialog(
     BuildContext context,
     TicketDetailsCubit cubit,
@@ -275,6 +314,9 @@ class _TicketDetailsViewState extends State<TicketDetailsView> {
           listener: (context, state) {
             if (state is TicketDetailsErrorState) {
               CustomSnackBar.showError(context, message: state.errorMessage);
+            } else if (state is TicketDetailsDeletedState) {
+              CustomSnackBar.showSuccess(context, message: 'Ticket deleted successfully');
+              Navigator.pop(context);
             }
           },
           builder: (context, state) {
@@ -300,7 +342,11 @@ class _TicketDetailsViewState extends State<TicketDetailsView> {
               );
             }
 
-            final loaded = state as TicketDetailsLoadedState;
+            if (state is! TicketDetailsLoadedState) {
+              return const SizedBox.shrink();
+            }
+
+            final loaded = state;
             final ticket = loaded.ticket;
             final cubit = BlocProvider.of<TicketDetailsCubit>(context);
 
@@ -612,6 +658,19 @@ class _TicketDetailsViewState extends State<TicketDetailsView> {
                                           currentUser: widget.currentUser,
                                         ),
                                       ),
+
+                                    // Delete Ticket
+                                    OutlinedButton.icon(
+                                      style: OutlinedButton.styleFrom(
+                                        foregroundColor: const Color(0xFFDC2626),
+                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                        side: const BorderSide(color: Color(0xFFFCA5A5)),
+                                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                      ),
+                                      icon: const Icon(Icons.delete_outline_rounded, size: 16),
+                                      label: const Text('Delete Ticket', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
+                                      onPressed: () => _confirmDeleteTicket(context, cubit),
+                                    ),
                                   ],
                                 ),
                               ],

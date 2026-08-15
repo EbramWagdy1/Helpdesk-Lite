@@ -1,6 +1,8 @@
 import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:helpdesk/core/services/firebase_service.dart';
+import 'package:helpdesk/core/services/service_locator.dart';
+import 'package:helpdesk/core/services/storage_service.dart';
 import 'package:helpdesk/features/tickets/model/comment_model.dart';
 import 'package:helpdesk/features/tickets/model/ticket_model.dart';
 
@@ -209,8 +211,29 @@ class TicketRepository {
     });
   }
 
-  /// Delete a ticket
-  Future<void> deleteTicket(String ticketId) async {
-    await _ticketsCollection.doc(ticketId).delete();
+  /// Delete a ticket and all associated data
+  Future<void> deleteTicket(String ticketId, [List<String>? attachmentUrls]) async {
+    try {
+      // 1. Delete comments subcollection
+      final commentsSnapshot = await _ticketsCollection.doc(ticketId).collection('comments').get();
+      for (final doc in commentsSnapshot.docs) {
+        await doc.reference.delete();
+      }
+
+      // 2. Delete attachments from Storage if available
+      if (attachmentUrls != null && attachmentUrls.isNotEmpty) {
+        try {
+          final storage = sl<StorageService>();
+          for (final url in attachmentUrls) {
+            await storage.deleteFile(url);
+          }
+        } catch (_) {}
+      }
+
+      // 3. Delete parent ticket document
+      await _ticketsCollection.doc(ticketId).delete();
+    } catch (e) {
+      throw Exception('Failed to delete ticket: $e');
+    }
   }
 }

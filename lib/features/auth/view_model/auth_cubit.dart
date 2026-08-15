@@ -11,6 +11,9 @@ class AuthCubit extends Cubit<AuthState> {
   AuthCubit({AuthRepository? authRepository})
       : _authRepository = authRepository ?? sl<AuthRepository>(),
         super(AuthInitialState()) {
+    // 1. Instantly populate currentUser from local cache (0ms delay)
+    currentUser = _authRepository.getCachedUser();
+    // 2. Fetch latest data from Firestore in background
     checkCurrentUser();
   }
 
@@ -59,14 +62,19 @@ class AuthCubit extends Cubit<AuthState> {
     emit(AuthRememberMeToggledState(rememberMe));
   }
 
-  Future<void> checkCurrentUser() async {
+  Future<UserModel?> checkCurrentUser() async {
     try {
       final user = await _authRepository.getCurrentUserProfile();
       if (user != null) {
         currentUser = user;
         emit(AuthSuccessState(message: 'User profile loaded', user: user));
+      } else {
+        currentUser = null;
       }
-    } catch (_) {}
+      return user;
+    } catch (_) {
+      return null;
+    }
   }
 
   Future<void> updateProfile({

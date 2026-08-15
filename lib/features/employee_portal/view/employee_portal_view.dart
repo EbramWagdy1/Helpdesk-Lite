@@ -168,7 +168,8 @@ class _EmployeePortalViewState extends State<EmployeePortalView> {
             final totalCount = allMyTickets.length;
             final openCount = allMyTickets.where((t) => t.status == TicketStatus.open).length;
             final inProgressCount = allMyTickets.where((t) => t.status == TicketStatus.inProgress).length;
-            final resolvedCount = allMyTickets.where((t) => t.status == TicketStatus.resolved || t.status == TicketStatus.closed).length;
+            final resolvedCount = allMyTickets.where((t) => t.status == TicketStatus.resolved).length;
+            final closedCount = allMyTickets.where((t) => t.status == TicketStatus.closed).length;
 
             return GestureDetector(
               behavior: HitTestBehavior.opaque,
@@ -212,7 +213,7 @@ class _EmployeePortalViewState extends State<EmployeePortalView> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Clean Segmented Filter Chips (All, Open, In Progress, Resolved)
+                        // Clean Segmented Filter Chips (All, Open, In Progress, Resolved, Closed)
                         SingleChildScrollView(
                           scrollDirection: Axis.horizontal,
                           physics: const BouncingScrollPhysics(),
@@ -252,6 +253,16 @@ class _EmployeePortalViewState extends State<EmployeePortalView> {
                                 color: const Color(0xFF16A34A),
                                 onTap: () => ticketCubit.filterByStatus(
                                   selectedStatus == TicketStatus.resolved ? null : TicketStatus.resolved,
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              _buildFilterChip(
+                                label: 'Closed',
+                                count: closedCount,
+                                isSelected: selectedStatus == TicketStatus.closed,
+                                color: const Color(0xFF64748B),
+                                onTap: () => ticketCubit.filterByStatus(
+                                  selectedStatus == TicketStatus.closed ? null : TicketStatus.closed,
                                 ),
                               ),
                             ],

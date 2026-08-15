@@ -1,0 +1,132 @@
+import 'package:flutter/material.dart';
+import 'package:helpdesk/core/utils/app_colors.dart';
+import 'package:helpdesk/core/utils/app_text_style.dart';
+import 'package:helpdesk/features/tickets/model/ticket_model.dart';
+
+class TicketStatsCard extends StatelessWidget {
+  final List<TicketModel> tickets;
+  final TicketStatus? selectedStatus;
+  final Function(TicketStatus?) onStatusSelected;
+
+  const TicketStatsCard({
+    super.key,
+    required this.tickets,
+    required this.selectedStatus,
+    required this.onStatusSelected,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final totalCount = tickets.length;
+    final openCount = tickets.where((t) => t.status == TicketStatus.open).length;
+    final inProgressCount = tickets.where((t) => t.status == TicketStatus.inProgress).length;
+    final resolvedCount = tickets.where((t) => t.status == TicketStatus.resolved || t.status == TicketStatus.closed).length;
+
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        children: [
+          _buildStatPill(
+            label: 'All',
+            count: totalCount,
+            color: AppColors.primary,
+            bgColor: AppColors.primary.withValues(alpha: 0.08),
+            isSelected: selectedStatus == null,
+            onTap: () => onStatusSelected(null),
+          ),
+          const SizedBox(width: 8),
+          _buildStatPill(
+            label: 'Open',
+            count: openCount,
+            color: AppColors.statusOpen,
+            bgColor: AppColors.statusOpenBg,
+            isSelected: selectedStatus == TicketStatus.open,
+            onTap: () => onStatusSelected(TicketStatus.open),
+          ),
+          const SizedBox(width: 8),
+          _buildStatPill(
+            label: 'In Progress',
+            count: inProgressCount,
+            color: AppColors.statusInProgress,
+            bgColor: AppColors.statusInProgressBg,
+            isSelected: selectedStatus == TicketStatus.inProgress,
+            onTap: () => onStatusSelected(TicketStatus.inProgress),
+          ),
+          const SizedBox(width: 8),
+          _buildStatPill(
+            label: 'Resolved',
+            count: resolvedCount,
+            color: AppColors.statusResolved,
+            bgColor: AppColors.statusResolvedBg,
+            isSelected: selectedStatus == TicketStatus.resolved,
+            onTap: () => onStatusSelected(TicketStatus.resolved),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatPill({
+    required String label,
+    required int count,
+    required Color color,
+    required Color bgColor,
+    required bool isSelected,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+        decoration: BoxDecoration(
+          color: isSelected ? color : bgColor,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: isSelected ? color : color.withValues(alpha: 0.3),
+            width: 1.5,
+          ),
+          boxShadow: isSelected
+              ? [
+                  BoxShadow(
+                    color: color.withValues(alpha: 0.3),
+                    blurRadius: 8,
+                    offset: const Offset(0, 3),
+                  )
+                ]
+              : [],
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              label,
+              style: AppTextStyles.labelMedium.copyWith(
+                color: isSelected ? Colors.white : AppColors.textPrimary,
+                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
+              ),
+            ),
+            const SizedBox(width: 8),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+              decoration: BoxDecoration(
+                color: isSelected
+                    ? Colors.white.withValues(alpha: 0.25)
+                    : color.withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Text(
+                '$count',
+                style: AppTextStyles.labelSmall.copyWith(
+                  color: isSelected ? Colors.white : color,
+                  fontWeight: FontWeight.w800,
+                  fontSize: 11,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

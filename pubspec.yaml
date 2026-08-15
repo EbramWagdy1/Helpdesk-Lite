@@ -1,0 +1,90 @@
+name: helpdesk
+description: "A new Flutter project."
+# The following line prevents the package from being accidentally published to
+# pub.dev using `flutter pub publish`. This is preferred for private packages.
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+
+# The following defines the version and build number for your application.
+# A version number is three numbers separated by dots, like 1.2.43
+# followed by an optional build number separated by a +.
+# Both the version and the builder number may be overridden in flutter
+# build by specifying --build-name and --build-number, respectively.
+# In Android, build-name is used as versionName while build-number used as versionCode.
+# Read more about Android versioning at https://developer.android.com/studio/publish/versioning
+# In iOS, build-name is used as CFBundleShortVersionString while build-number is used as CFBundleVersion.
+# Read more about iOS versioning at
+# https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
+# In Windows, build-name is used as the major, minor, and patch parts
+# of the product and file versions while build-number is used as the build suffix.
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.10.7
+
+# Dependencies specify other packages that your package needs in order to work.
+# To automatically upgrade your package dependencies to the latest versions
+# consider running `flutter pub upgrade --major-versions`. Alternatively,
+# dependencies can be manually updated by changing the version numbers below to
+# the latest version available on pub.dev. To see which dependencies have newer
+# versions available, run `flutter pub outdated`.
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_web_plugins:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.8
+
+  # State Management & DI
+  flutter_bloc: ^9.1.1
+  get_it: ^9.2.1
+
+  # Navigation & Storage
+  go_router: ^17.3.0
+  shared_preferences: ^2.5.5
+
+  # UI, Icons, Animations & Utilities
+  flutter_svg: ^2.3.0
+  font_awesome_flutter: ^11.0.0
+  smooth_page_indicator: ^2.0.1
+  lottie: ^3.3.3
+  url_launcher: ^6.3.2
+  image_picker: ^1.2.3
+  glaze_nav_bar: ^1.2.1
+
+  # Analytics & Charts (Optional)
+  syncfusion_flutter_charts: ^34.2.2
+  qr_flutter: ^4.1.0
+
+  # Firebase (Optional)
+  firebase_core: ^4.12.1
+  firebase_auth: ^6.5.6
+  firebase_storage: ^13.4.5
+  cloud_firestore: ^6.7.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+  flutter_launcher_icons: ^0.14.4
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/images/
+    - assets/svgs/
+    - assets/lottie/
+
+flutter_assets:
+  assets_path: assets/
+  output_path: lib/core/utils/
+  filename: app_assets.dart
+  field_prefix: null
+
+flutter_launcher_icons:
+  android: "ic_launcher"
+  ios: true
+  image_path: "assets/images/logo.png"
+  adaptive_icon_background: "#FFFFFF"
+  adaptive_icon_foreground: "assets/images/logo.png"
+  min_sdk_android: 21

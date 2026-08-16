@@ -4,7 +4,7 @@
 [![Dart](https://img.shields.io/badge/Dart-0175C2?style=for-the-badge&logo=dart&logoColor=white)](https://dart.dev/)
 [![Firebase](https://img.shields.io/badge/Firebase-FFCA28?style=for-the-badge&logo=firebase&logoColor=black)](https://firebase.google.com/)
 [![State Management](https://img.shields.io/badge/State_Management-Bloc%20%2F%20Cubit-blueviolet?style=for-the-badge)](https://bloclibrary.dev/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](LICENSE)
+[![License: Proprietary](https://img.shields.io/badge/License-Proprietary-red.svg?style=for-the-badge)](LICENSE)
 
 > A modern, lightweight, role-based internal helpdesk workspace engineered to streamline support requests, eliminate duplicate communications, ensure task accountability, and provide management with real-time operational visibility.
 
@@ -214,4 +214,17 @@ firebase deploy --only firestore:rules,storage:rules
 
 ## 📄 License
 
-This project is licensed under the [MIT License](LICENSE).
+**Copyright (c) 2026 Ebram Wagdy Samy Zaki**
+
+**PROPRIETARY SOFTWARE — ALL RIGHTS RESERVED.**
+
+This software and its source code are the exclusive property of Ebram Wagdy Samy Zaki.
+
+No permission is granted to copy, modify, reproduce, distribute, publish, sublicense, sell, or use this software or any part of it for commercial or non-commercial purposes without prior written permission from the copyright holder.
+
+Unauthorized use, reproduction, modification, distribution, or commercial use of this software is strictly prohibited.
+
+The software is provided "AS IS", without warranty of any kind, express or implied.
+
+For licensing or permission requests, please contact **Ebram Wagdy Samy Zaki through GitHub**.
+

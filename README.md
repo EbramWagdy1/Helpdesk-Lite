@@ -1,5 +1,6 @@
 # 🎫 HelpDesk Lite — Internal Support Ticketing Workspace
 
+[![Try APK](https://img.shields.io/badge/Download-Try%20APK-3DDC84?style=for-the-badge&logo=android&logoColor=white)](https://betadrop.app/install/?i=VbrYPg)
 [![Flutter](https://img.shields.io/badge/Flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white)](https://flutter.dev/)
 [![Dart](https://img.shields.io/badge/Dart-0175C2?style=for-the-badge&logo=dart&logoColor=white)](https://dart.dev/)
 [![Firebase](https://img.shields.io/badge/Firebase-FFCA28?style=for-the-badge&logo=firebase&logoColor=black)](https://firebase.google.com/)
@@ -7,6 +8,9 @@
 [![License: Proprietary](https://img.shields.io/badge/License-Proprietary-red.svg?style=for-the-badge)](LICENSE)
 
 > A modern, lightweight, role-based internal helpdesk workspace engineered to streamline support requests, eliminate duplicate communications, ensure task accountability, and provide management with real-time operational visibility.
+
+📲 **Live Demo / Install APK:** [Download & Install via BetaDrop](https://betadrop.app/install/?i=VbrYPg)
+
 
 ---
 

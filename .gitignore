@@ -83,11 +83,14 @@ app.*.map.json
 
 # Firebase
 .firebase/
+.firebaserc
 firebase-debug.log*
 firestore-debug.log*
 ui-debug.log*
 firebase_options.dart
 lib/firebase_options.dart
+**/google-services.json
+**/GoogleService-Info.plist
 
 # Sensitive Keys & Environment variables
 *.env
@@ -95,3 +98,4 @@ lib/firebase_options.dart
 *.keystore
 *.jks
 key.properties
+

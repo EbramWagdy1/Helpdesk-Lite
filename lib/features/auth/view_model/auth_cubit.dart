@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:helpdesk/core/errors/error_handler.dart';
 import 'package:helpdesk/core/services/service_locator.dart';
 import 'package:helpdesk/features/auth/data/auth_repository.dart';
 import 'package:helpdesk/features/auth/model/user_model.dart';
@@ -164,20 +165,6 @@ class AuthCubit extends Cubit<AuthState> {
   }
 
   String _formatAuthError(dynamic error) {
-    final str = error.toString();
-    if (str.contains('user-not-found')) {
-      return 'No user found with this email address.';
-    } else if (str.contains('wrong-password') || str.contains('invalid-credential')) {
-      return 'Invalid email or password.';
-    } else if (str.contains('email-already-in-use')) {
-      return 'An account already exists for this email address.';
-    } else if (str.contains('weak-password')) {
-      return 'The password provided is too weak.';
-    } else if (str.contains('invalid-email')) {
-      return 'The email address is badly formatted.';
-    } else if (str.contains('network-request-failed')) {
-      return 'Network error. Please check your internet connection.';
-    }
-    return str.replaceAll('Exception: ', '').replaceAll('firebase_auth/', '');
+    return ErrorHandler.getErrorMessage(error);
   }
 }

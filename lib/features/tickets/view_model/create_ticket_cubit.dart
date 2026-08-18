@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:helpdesk/core/errors/error_handler.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:helpdesk/core/services/service_locator.dart';
 import 'package:helpdesk/core/services/storage_service.dart';
@@ -65,7 +66,7 @@ class CreateTicketCubit extends Cubit<CreateTicketState> {
         emit(CreateTicketAttachmentsChangedState(attachments.length));
       }
     } catch (e) {
-      emit(CreateTicketErrorState('Failed to pick image: $e'));
+      emit(CreateTicketErrorState(ErrorHandler.getErrorMessage(e)));
     }
   }
 
@@ -119,7 +120,7 @@ class CreateTicketCubit extends Cubit<CreateTicketState> {
 
       emit(CreateTicketSuccessState(ticket));
     } catch (e) {
-      emit(CreateTicketErrorState('Failed to create ticket: $e'));
+      emit(CreateTicketErrorState(ErrorHandler.getErrorMessage(e)));
     }
   }
 }

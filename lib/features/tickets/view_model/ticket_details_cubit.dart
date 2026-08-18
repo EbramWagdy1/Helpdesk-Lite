@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:helpdesk/core/errors/error_handler.dart';
 import 'package:helpdesk/core/services/service_locator.dart';
 import 'package:helpdesk/features/auth/data/auth_repository.dart';
 import 'package:helpdesk/features/auth/model/user_model.dart';
@@ -45,7 +46,7 @@ class TicketDetailsCubit extends Cubit<TicketDetailsState> {
       },
       onError: (err) {
         if (isDeleting) return;
-        emit(TicketDetailsErrorState('Error loading ticket: $err'));
+        emit(TicketDetailsErrorState(ErrorHandler.getErrorMessage(err)));
       },
     );
 
@@ -59,7 +60,7 @@ class TicketDetailsCubit extends Cubit<TicketDetailsState> {
       },
       onError: (err) {
         if (isDeleting) return;
-        emit(TicketDetailsErrorState('Error loading comments: $err'));
+        emit(TicketDetailsErrorState(ErrorHandler.getErrorMessage(err)));
       },
     );
   }
@@ -96,7 +97,7 @@ class TicketDetailsCubit extends Cubit<TicketDetailsState> {
         performedByRole: currentUser.role.displayName,
       );
     } catch (e) {
-      emit(TicketDetailsErrorState('Failed to update status: $e'));
+      emit(TicketDetailsErrorState(ErrorHandler.getErrorMessage(e)));
     }
   }
 
@@ -115,7 +116,7 @@ class TicketDetailsCubit extends Cubit<TicketDetailsState> {
         performedByRole: currentUser.role.displayName,
       );
     } catch (e) {
-      emit(TicketDetailsErrorState('Failed to claim ticket: $e'));
+      emit(TicketDetailsErrorState(ErrorHandler.getErrorMessage(e)));
     }
   }
 
@@ -137,7 +138,7 @@ class TicketDetailsCubit extends Cubit<TicketDetailsState> {
         performedByRole: currentUser.role.displayName,
       );
     } catch (e) {
-      emit(TicketDetailsErrorState('Failed to assign ticket: $e'));
+      emit(TicketDetailsErrorState(ErrorHandler.getErrorMessage(e)));
     }
   }
 
@@ -160,7 +161,7 @@ class TicketDetailsCubit extends Cubit<TicketDetailsState> {
       _emitLoaded(isSubmittingComment: false);
     } catch (e) {
       _emitLoaded(isSubmittingComment: false);
-      emit(TicketDetailsErrorState('Failed to send comment: $e'));
+      emit(TicketDetailsErrorState(ErrorHandler.getErrorMessage(e)));
     }
   }
 
@@ -180,7 +181,7 @@ class TicketDetailsCubit extends Cubit<TicketDetailsState> {
       emit(TicketDetailsDeletedState());
     } catch (e) {
       isDeleting = false;
-      emit(TicketDetailsErrorState('Failed to delete ticket: $e'));
+      emit(TicketDetailsErrorState(ErrorHandler.getErrorMessage(e)));
     }
   }
 

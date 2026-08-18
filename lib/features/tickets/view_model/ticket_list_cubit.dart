@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:helpdesk/core/errors/error_handler.dart';
 import 'package:helpdesk/core/services/service_locator.dart';
 import 'package:helpdesk/features/auth/model/user_model.dart';
 import 'package:helpdesk/features/tickets/data/ticket_repository.dart';
@@ -46,7 +47,7 @@ class TicketListCubit extends Cubit<TicketListState> {
         _applyFilters();
       },
       onError: (error) {
-        emit(TicketListErrorState('Failed to load tickets: $error'));
+        emit(TicketListErrorState(ErrorHandler.getErrorMessage(error)));
       },
     );
   }

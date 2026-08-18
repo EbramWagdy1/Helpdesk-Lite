@@ -21,32 +21,25 @@
 
 ## 📱 App Previews & Screenshots
 
-<div align="center">
-  <table>
-    <tr>
-      <td align="center" width="25%">
-        <img src="assets/images/1.png" alt="Manager Executive Analytics & KPIs" width="100%" />
-        <br />
-        <sub><b>📊 Manager Executive Analytics & KPIs</b></sub>
-      </td>
-      <td align="center" width="25%">
-        <img src="assets/images/2.png" alt="Ticket Details & Timeline" width="100%" />
-        <br />
-        <sub><b>💬 Ticket Details & Timeline</b></sub>
-      </td>
-      <td align="center" width="25%">
-        <img src="assets/images/3.png" alt="Support Agent Workspace" width="100%" />
-        <br />
-        <sub><b>🎧 Support Agent Workspace</b></sub>
-      </td>
-      <td align="center" width="25%">
-        <img src="assets/images/4.png" alt="Network Check & 404 Status" width="100%" />
-        <br />
-        <sub><b>🌐 Network Connectivity Check</b></sub>
-      </td>
-    </tr>
-  </table>
-</div>
+### 📊 Manager Executive Analytics & KPIs
+<p align="center">
+  <img src="assets/images/1.png" alt="Manager Executive Analytics & KPIs" width="850" />
+</p>
+
+### 💬 Ticket Details & Timeline
+<p align="center">
+  <img src="assets/images/2.png" alt="Ticket Details & Timeline" width="850" />
+</p>
+
+### 🎧 Support Agent Workspace
+<p align="center">
+  <img src="assets/images/3.png" alt="Support Agent Workspace" width="850" />
+</p>
+
+### 🌐 Network Connectivity Check
+<p align="center">
+  <img src="assets/images/4.png" alt="Network Connectivity Check" width="340" />
+</p>
 
 ---
 

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:helpdesk/core/widgets/connectivity_checker_wrapper.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:helpdesk/core/utils/app_colors.dart';
 import 'package:helpdesk/core/utils/app_text_style.dart';
@@ -60,7 +61,8 @@ class ManagerDashboardView extends StatelessWidget {
       }
     }
 
-    return Scaffold(
+    return ConnectivityCheckerWrapper(
+      child: Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
         backgroundColor: AppColors.surface,
@@ -292,6 +294,7 @@ class ManagerDashboardView extends StatelessWidget {
             const SizedBox(height: 30),
           ],
         ),
+      ),
       ),
     );
   }

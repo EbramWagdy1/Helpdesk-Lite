@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:helpdesk/core/utils/app_colors.dart';
 import 'package:helpdesk/core/utils/app_text_style.dart';
+import 'package:helpdesk/core/widgets/connectivity_checker_wrapper.dart';
 import 'package:helpdesk/core/widgets/verified_badge_widget.dart';
 import 'package:helpdesk/features/auth/model/user_model.dart';
 import 'package:helpdesk/features/auth/view_model/auth_cubit.dart';
@@ -73,9 +74,10 @@ class _AgentDashboardViewState extends State<AgentDashboardView> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => TicketListCubit()..initializeTicketStream(currentUser: widget.currentUser),
-      child: Scaffold(
+    return ConnectivityCheckerWrapper(
+      child: BlocProvider(
+        create: (context) => TicketListCubit()..initializeTicketStream(currentUser: widget.currentUser),
+        child: Scaffold(
         backgroundColor: AppColors.background,
         body: SafeArea(
           child: BlocBuilder<TicketListCubit, TicketListState>(
@@ -440,6 +442,7 @@ class _AgentDashboardViewState extends State<AgentDashboardView> {
             },
           ),
         ),
+      ),
       ),
     );
   }

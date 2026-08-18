@@ -51,6 +51,7 @@ dependencies:
   url_launcher: ^6.3.2
   image_picker: ^1.2.3
   glaze_nav_bar: ^1.2.1
+  connectivity_plus: ^6.1.3
 
   # Analytics & Charts (Optional)
   syncfusion_flutter_charts: ^34.2.2

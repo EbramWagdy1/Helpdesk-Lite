@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:helpdesk/core/services/service_locator.dart';
+import 'package:helpdesk/core/widgets/connectivity_checker_wrapper.dart';
 import 'package:helpdesk/features/auth/model/user_model.dart';
 import 'package:helpdesk/features/auth/view_model/auth_cubit.dart';
 import 'package:helpdesk/features/profile/view/profile_view.dart';
@@ -60,7 +61,8 @@ class _EmployeePortalViewState extends State<EmployeePortalView> {
     final user = authCubit.currentUser ?? widget.currentUser;
     final ticketRepo = sl<TicketRepository>();
 
-    return Scaffold(
+    return ConnectivityCheckerWrapper(
+      child: Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -425,6 +427,7 @@ class _EmployeePortalViewState extends State<EmployeePortalView> {
             ),
           );
         },
+      ),
       ),
     );
   }

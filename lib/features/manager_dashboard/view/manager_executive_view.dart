@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:helpdesk/core/utils/app_colors.dart';
 import 'package:helpdesk/core/utils/app_text_style.dart';
+import 'package:helpdesk/core/widgets/connectivity_checker_wrapper.dart';
 import 'package:helpdesk/core/widgets/custom_snackbar.dart';
 import 'package:helpdesk/core/widgets/verified_badge_widget.dart';
 import 'package:helpdesk/features/auth/data/auth_repository.dart';
@@ -43,9 +44,10 @@ class _ManagerExecutiveViewState extends State<ManagerExecutiveView> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => TicketListCubit()..initializeTicketStream(currentUser: widget.currentUser),
-      child: Scaffold(
+    return ConnectivityCheckerWrapper(
+      child: BlocProvider(
+        create: (context) => TicketListCubit()..initializeTicketStream(currentUser: widget.currentUser),
+        child: Scaffold(
         backgroundColor: const Color(0xFFF8FAFC),
         bottomNavigationBar: Container(
           decoration: const BoxDecoration(
@@ -220,6 +222,7 @@ class _ManagerExecutiveViewState extends State<ManagerExecutiveView> {
             },
           ),
         ),
+      ),
       ),
     );
   }

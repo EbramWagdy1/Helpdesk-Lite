@@ -5,7 +5,7 @@
 <h1 align="center">🎫 HelpDesk Lite — Internal Support Ticketing Workspace</h1>
 
 <p align="center">
-  <a href="https://betadrop.app/install/?i=VbrYPg"><img src="https://img.shields.io/badge/Download-Try%20APK-3DDC84?style=for-the-badge&logo=android&logoColor=white" alt="Try APK" /></a>
+  <a href="https://betadrop.app/install/HTuPxW"><img src="https://img.shields.io/badge/Download-Try%20APK-3DDC84?style=for-the-badge&logo=android&logoColor=white" alt="Try APK" /></a>
   <a href="https://flutter.dev/"><img src="https://img.shields.io/badge/Flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white" alt="Flutter" /></a>
   <a href="https://dart.dev/"><img src="https://img.shields.io/badge/Dart-0175C2?style=for-the-badge&logo=dart&logoColor=white" alt="Dart" /></a>
   <a href="https://firebase.google.com/"><img src="https://img.shields.io/badge/Firebase-FFCA28?style=for-the-badge&logo=firebase&logoColor=black" alt="Firebase" /></a>
@@ -15,7 +15,7 @@
 
 > A modern, lightweight, role-based internal helpdesk workspace engineered to streamline support requests, eliminate duplicate communications, ensure task accountability, and provide management with real-time operational visibility.
 
-📲 **Live Demo / Install APK:** [Download & Install via BetaDrop](https://betadrop.app/install/?i=VbrYPg)
+📲 **Live Demo / Install APK:** [Download & Install via BetaDrop](https://betadrop.app/install/HTuPxW)
 
 ---
 

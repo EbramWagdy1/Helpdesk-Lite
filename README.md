@@ -1,22 +1,59 @@
-# 🎫 HelpDesk Lite — Internal Support Ticketing Workspace
+<p align="center">
+  <img src="assets/images/logo.png" alt="HelpDesk Lite Logo" width="120" />
+</p>
 
-[![Try APK](https://img.shields.io/badge/Download-Try%20APK-3DDC84?style=for-the-badge&logo=android&logoColor=white)](https://betadrop.app/install/?i=VbrYPg)
-[![Flutter](https://img.shields.io/badge/Flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white)](https://flutter.dev/)
-[![Dart](https://img.shields.io/badge/Dart-0175C2?style=for-the-badge&logo=dart&logoColor=white)](https://dart.dev/)
-[![Firebase](https://img.shields.io/badge/Firebase-FFCA28?style=for-the-badge&logo=firebase&logoColor=black)](https://firebase.google.com/)
-[![State Management](https://img.shields.io/badge/State_Management-Bloc%20%2F%20Cubit-blueviolet?style=for-the-badge)](https://bloclibrary.dev/)
-[![License: Proprietary](https://img.shields.io/badge/License-Proprietary-red.svg?style=for-the-badge)](LICENSE)
+<h1 align="center">🎫 HelpDesk Lite — Internal Support Ticketing Workspace</h1>
+
+<p align="center">
+  <a href="https://betadrop.app/install/?i=VbrYPg"><img src="https://img.shields.io/badge/Download-Try%20APK-3DDC84?style=for-the-badge&logo=android&logoColor=white" alt="Try APK" /></a>
+  <a href="https://flutter.dev/"><img src="https://img.shields.io/badge/Flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white" alt="Flutter" /></a>
+  <a href="https://dart.dev/"><img src="https://img.shields.io/badge/Dart-0175C2?style=for-the-badge&logo=dart&logoColor=white" alt="Dart" /></a>
+  <a href="https://firebase.google.com/"><img src="https://img.shields.io/badge/Firebase-FFCA28?style=for-the-badge&logo=firebase&logoColor=black" alt="Firebase" /></a>
+  <a href="https://bloclibrary.dev/"><img src="https://img.shields.io/badge/State_Management-Bloc%20%2F%20Cubit-blueviolet?style=for-the-badge" alt="State Management" /></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-Proprietary-red.svg?style=for-the-badge" alt="License" /></a>
+</p>
 
 > A modern, lightweight, role-based internal helpdesk workspace engineered to streamline support requests, eliminate duplicate communications, ensure task accountability, and provide management with real-time operational visibility.
 
 📲 **Live Demo / Install APK:** [Download & Install via BetaDrop](https://betadrop.app/install/?i=VbrYPg)
 
+---
+
+## 📱 App Previews & Screenshots
+
+<div align="center">
+  <table>
+    <tr>
+      <td align="center" width="25%">
+        <img src="assets/images/1.png" alt="Manager Executive Analytics & KPIs" width="100%" />
+        <br />
+        <sub><b>📊 Manager Executive Analytics & KPIs</b></sub>
+      </td>
+      <td align="center" width="25%">
+        <img src="assets/images/2.png" alt="Ticket Details & Timeline" width="100%" />
+        <br />
+        <sub><b>💬 Ticket Details & Timeline</b></sub>
+      </td>
+      <td align="center" width="25%">
+        <img src="assets/images/3.png" alt="Support Agent Workspace" width="100%" />
+        <br />
+        <sub><b>🎧 Support Agent Workspace</b></sub>
+      </td>
+      <td align="center" width="25%">
+        <img src="assets/images/4.png" alt="Network Check & 404 Status" width="100%" />
+        <br />
+        <sub><b>🌐 Network Connectivity Check</b></sub>
+      </td>
+    </tr>
+  </table>
+</div>
 
 ---
 
 ## 📌 Table of Contents
 
 - [Overview](#-overview)
+- [App Previews & Screenshots](#-app-previews--screenshots)
 - [Key Features by Role](#-key-features-by-role)
   - [👤 Employee Portal](#-employee-portal)
   - [🎧 Support Agent Workspace](#-support-agent-workspace)
@@ -77,6 +114,7 @@ In modern workplaces, support requests often get scattered across emails, chat c
 * **Design System**: Material 3 Design with custom typography, gradients, and micro-animations
 * **State Management**: [flutter_bloc](https://pub.dev/packages/flutter_bloc) (BLoC / Cubit Pattern)
 * **Dependency Injection**: [get_it](https://pub.dev/packages/get_it) (Service Locator)
+* **Connectivity & Network Check**: [connectivity_plus](https://pub.dev/packages/connectivity_plus) (Live connection monitoring & 404 handler)
 * **Routing**: [go_router](https://pub.dev/packages/go_router) (Declarative deep-linking)
 * **Backend & Cloud**:
   * **Authentication**: [firebase_auth](https://pub.dev/packages/firebase_auth) (Email/Password & RBAC)
@@ -95,12 +133,12 @@ lib/
 ├── app/                  # Application root & app-level configurations
 ├── core/                 # Shared domain logic, services, routing, and theme
 │   ├── database/         # Local / remote database helpers
-│   ├── errors/           # Failure & exception models
+│   ├── errors/           # Failures, exceptions, and global error handling
 │   ├── routing/          # GoRouter definitions & route guards
-│   ├── services/         # Firebase service, storage service, service locator (GetIt)
+│   ├── services/         # Connectivity service, Firebase service, Storage, Service Locator
 │   ├── theme/            # Color palettes, typography, and themes
 │   ├── utils/            # Constants, date formatters, and validators
-│   └── widgets/          # Reusable UI components & buttons
+│   └── widgets/          # Reusable UI components, 404 No Internet widget, buttons
 └── features/             # Business modules grouped by domain
     ├── agent_dashboard/  # Agent queue management & ticket triage
     ├── auth/             # Authentication (Login, Sign-up, User models)
@@ -118,7 +156,7 @@ lib/
 ```bash
 helpdesk/
 ├── assets/
-│   ├── images/              # App images and branding logos
+│   ├── images/              # App branding (logo.png, 1.png, 2.png, 3.png, 4.png)
 │   ├── lottie/              # Lottie animation files
 │   └── svgs/                # Vector SVG icons
 ├── lib/
@@ -209,6 +247,8 @@ firebase deploy --only firestore:rules,storage:rules
 - [x] Departmental triage (`IT`, `HR`, `Facilities`, `Finance`, `Operations`)
 - [x] Interactive Comments & Status Timeline
 - [x] Manager Executive Analytics with visual chart summaries
+- [x] Connectivity Monitoring with 404 No Internet Screen
+- [x] Centralized App-Wide Error Handling System
 - [ ] Push Notifications for ticket status updates (FCM)
 - [ ] Offline caching & sync
 - [ ] Automated email-to-ticket ingestion (V2)
@@ -231,4 +271,3 @@ Unauthorized use, reproduction, modification, distribution, or commercial use of
 The software is provided "AS IS", without warranty of any kind, express or implied.
 
 For licensing or permission requests, please contact **Ebram Wagdy Samy Zaki through GitHub**.
-

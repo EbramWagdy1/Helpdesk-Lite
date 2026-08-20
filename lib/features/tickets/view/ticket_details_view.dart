@@ -43,25 +43,26 @@ class _TicketDetailsViewState extends State<TicketDetailsView> {
   }
 
   void _confirmDeleteTicket(BuildContext context, TicketDetailsCubit cubit) {
+    final theme = Theme.of(context);
     showDialog(
       context: context,
       builder: (dialogCtx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Row(
+        title: Row(
           children: [
-            Icon(Icons.delete_outline_rounded, color: Color(0xFFDC2626)),
-            SizedBox(width: 8),
-            Text('Delete Ticket', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 17)),
+            const Icon(Icons.delete_outline_rounded, color: Color(0xFFDC2626)),
+            const SizedBox(width: 8),
+            Text('Delete Ticket', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 17, color: theme.colorScheme.onSurface)),
           ],
         ),
-        content: const Text(
+        content: Text(
           'Are you sure you want to permanently delete this ticket and all of its conversation history? This action cannot be undone.',
-          style: TextStyle(fontSize: 14, color: Color(0xFF475569)),
+          style: TextStyle(fontSize: 14, color: theme.colorScheme.onSurface.withValues(alpha: 0.7)),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogCtx),
-            child: const Text('Cancel', style: TextStyle(color: Color(0xFF64748B))),
+            child: Text('Cancel', style: TextStyle(color: theme.colorScheme.onSurface.withValues(alpha: 0.6))),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
@@ -87,6 +88,7 @@ class _TicketDetailsViewState extends State<TicketDetailsView> {
     List<UserModel> agents,
     TicketModel ticket,
   ) {
+    final theme = Theme.of(context);
     final matchingAgents = agents
         .where((agent) => ticket.category.matchesDepartment(agent.department))
         .toList();
@@ -97,7 +99,7 @@ class _TicketDetailsViewState extends State<TicketDetailsView> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.white,
+      backgroundColor: theme.cardColor,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -116,16 +118,16 @@ class _TicketDetailsViewState extends State<TicketDetailsView> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
+                      Text(
                         'Assign Agent',
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w700,
-                          color: Color(0xFF0F172A),
+                          color: theme.colorScheme.onSurface,
                         ),
                       ),
                       IconButton(
-                        icon: const Icon(Icons.close_rounded, color: Color(0xFF64748B)),
+                        icon: Icon(Icons.close_rounded, color: theme.colorScheme.onSurface.withValues(alpha: 0.6)),
                         onPressed: () => Navigator.pop(ctx),
                       ),
                     ],
@@ -133,22 +135,22 @@ class _TicketDetailsViewState extends State<TicketDetailsView> {
                   const SizedBox(height: 4),
                   Text(
                     'Assign this ${ticket.category.label} ticket to a support specialist:',
-                    style: const TextStyle(fontSize: 13, color: Color(0xFF64748B)),
+                    style: TextStyle(fontSize: 13, color: theme.colorScheme.onSurface.withValues(alpha: 0.6)),
                   ),
                   const SizedBox(height: 16),
 
                   if (agents.isEmpty)
-                    const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 24),
-                      child: Center(child: Text('No support agents found.')),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 24),
+                      child: Center(child: Text('No support agents found.', style: TextStyle(color: theme.colorScheme.onSurface.withValues(alpha: 0.6)))),
                     )
                   else ...[
                     if (matchingAgents.isNotEmpty) ...[
                       Padding(
                         padding: const EdgeInsets.only(bottom: 8),
-                        child: Text(
-                          '${ticket.category.label} Agents (${matchingAgents.length})',
-                          style: const TextStyle(
+                        child: const Text(
+                          'Department Matching Specialists',
+                          style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w700,
                             color: Color(0xFF16A34A),
@@ -160,25 +162,25 @@ class _TicketDetailsViewState extends State<TicketDetailsView> {
                         return Container(
                           margin: const EdgeInsets.only(bottom: 8),
                           decoration: BoxDecoration(
-                            color: isCurrentAssignee ? const Color(0xFFEFF6FF) : Colors.white,
+                            color: isCurrentAssignee ? theme.colorScheme.primary.withValues(alpha: 0.12) : theme.cardColor,
                             borderRadius: BorderRadius.circular(12),
                             border: Border.all(
-                              color: isCurrentAssignee ? const Color(0xFF2563EB) : const Color(0xFFE2E8F0),
+                              color: isCurrentAssignee ? theme.colorScheme.primary : theme.colorScheme.outline.withValues(alpha: 0.5),
                             ),
                           ),
                           child: ListTile(
                             leading: CircleAvatar(
                               radius: 16,
-                              backgroundColor: const Color(0xFF0F172A),
+                              backgroundColor: theme.colorScheme.primaryContainer,
                               child: Text(
                                 agent.name.isNotEmpty ? agent.name[0].toUpperCase() : 'A',
-                                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12),
+                                style: TextStyle(color: theme.colorScheme.onPrimaryContainer, fontWeight: FontWeight.bold, fontSize: 12),
                               ),
                             ),
                             title: Row(
                               children: [
                                 Flexible(
-                                  child: Text(agent.name, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
+                                  child: Text(agent.name, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14, color: theme.colorScheme.onSurface)),
                                 ),
                                 if (agent.isVerified) ...[
                                   const SizedBox(width: 4),
@@ -186,9 +188,9 @@ class _TicketDetailsViewState extends State<TicketDetailsView> {
                                 ],
                               ],
                             ),
-                            subtitle: Text('${agent.department} • ${agent.email}', style: const TextStyle(fontSize: 12, color: Color(0xFF64748B))),
+                            subtitle: Text('${agent.department} • ${agent.email}', style: TextStyle(fontSize: 12, color: theme.colorScheme.onSurface.withValues(alpha: 0.6))),
                             trailing: isCurrentAssignee
-                                ? const Icon(Icons.check_circle_rounded, color: Color(0xFF2563EB), size: 20)
+                                ? Icon(Icons.check_circle_rounded, color: theme.colorScheme.primary, size: 20)
                                 : null,
                             onTap: () {
                               Navigator.pop(ctx);
@@ -201,14 +203,14 @@ class _TicketDetailsViewState extends State<TicketDetailsView> {
                     ],
 
                     if (otherAgents.isNotEmpty) ...[
-                      const Padding(
-                        padding: EdgeInsets.only(bottom: 8),
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 8),
                         child: Text(
                           'Other Department Agents',
                           style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w700,
-                            color: Color(0xFF64748B),
+                            color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                           ),
                         ),
                       ),
@@ -216,23 +218,23 @@ class _TicketDetailsViewState extends State<TicketDetailsView> {
                         return Container(
                           margin: const EdgeInsets.only(bottom: 8),
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: theme.cardColor,
                             borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: const Color(0xFFE2E8F0)),
+                            border: Border.all(color: theme.colorScheme.outline.withValues(alpha: 0.5)),
                           ),
                           child: ListTile(
                             leading: CircleAvatar(
                               radius: 16,
-                              backgroundColor: const Color(0xFF64748B),
+                              backgroundColor: theme.colorScheme.surfaceContainerHighest,
                               child: Text(
                                 agent.name.isNotEmpty ? agent.name[0].toUpperCase() : 'A',
-                                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12),
+                                style: TextStyle(color: theme.colorScheme.onSurface, fontWeight: FontWeight.bold, fontSize: 12),
                               ),
                             ),
                             title: Row(
                               children: [
                                 Flexible(
-                                  child: Text(agent.name, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
+                                  child: Text(agent.name, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14, color: theme.colorScheme.onSurface)),
                                 ),
                                 if (agent.isVerified) ...[
                                   const SizedBox(width: 4),
@@ -240,7 +242,7 @@ class _TicketDetailsViewState extends State<TicketDetailsView> {
                                 ],
                               ],
                             ),
-                            subtitle: Text('${agent.department} • ${agent.email}', style: const TextStyle(fontSize: 12, color: Color(0xFF64748B))),
+                            subtitle: Text('${agent.department} • ${agent.email}', style: TextStyle(fontSize: 12, color: theme.colorScheme.onSurface.withValues(alpha: 0.6))),
                             onTap: () {
                               Navigator.pop(ctx);
                               cubit.assignToAgent(agent: agent, currentUser: widget.currentUser);
@@ -287,25 +289,26 @@ class _TicketDetailsViewState extends State<TicketDetailsView> {
   Widget build(BuildContext context) {
     final isStaff = widget.currentUser.role != UserRole.employee;
     final isManager = widget.currentUser.role == UserRole.manager;
+    final theme = Theme.of(context);
 
     return BlocProvider(
       create: (context) => TicketDetailsCubit()..init(widget.ticketId),
       child: Scaffold(
-        backgroundColor: const Color(0xFFF8FAFC),
+        backgroundColor: theme.scaffoldBackgroundColor,
         appBar: AppBar(
-          backgroundColor: Colors.white,
+          backgroundColor: theme.appBarTheme.backgroundColor,
           elevation: 0,
           scrolledUnderElevation: 0,
           leading: IconButton(
-            icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Color(0xFF0F172A), size: 18),
+            icon: Icon(Icons.arrow_back_ios_new_rounded, color: theme.colorScheme.onSurface, size: 18),
             onPressed: () => Navigator.pop(context),
           ),
-          title: const Text(
+          title: Text(
             'Ticket Details',
             style: TextStyle(
               fontSize: 17,
               fontWeight: FontWeight.w700,
-              color: Color(0xFF0F172A),
+              color: theme.colorScheme.onSurface,
             ),
           ),
           centerTitle: true,
@@ -321,7 +324,7 @@ class _TicketDetailsViewState extends State<TicketDetailsView> {
           },
           builder: (context, state) {
             if (state is TicketDetailsLoadingState || state is TicketDetailsInitialState) {
-              return const Center(child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF2563EB)));
+              return Center(child: CircularProgressIndicator(strokeWidth: 2, color: theme.colorScheme.primary));
             }
 
             if (state is TicketDetailsErrorState) {
@@ -331,7 +334,7 @@ class _TicketDetailsViewState extends State<TicketDetailsView> {
                   children: [
                     const Icon(Icons.error_outline_rounded, size: 48, color: Color(0xFFDC2626)),
                     const SizedBox(height: 12),
-                    Text(state.errorMessage, style: const TextStyle(color: Color(0xFF64748B))),
+                    Text(state.errorMessage, style: TextStyle(color: theme.colorScheme.onSurface.withValues(alpha: 0.6))),
                     const SizedBox(height: 16),
                     ElevatedButton(
                       onPressed: () => Navigator.pop(context),
@@ -368,9 +371,9 @@ class _TicketDetailsViewState extends State<TicketDetailsView> {
                           width: double.infinity,
                           padding: const EdgeInsets.all(18),
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: theme.cardColor,
                             borderRadius: BorderRadius.circular(16),
-                            border: Border.all(color: const Color(0xFFE2E8F0)),
+                            border: Border.all(color: theme.colorScheme.outline.withValues(alpha: 0.5)),
                           ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -381,15 +384,15 @@ class _TicketDetailsViewState extends State<TicketDetailsView> {
                                   Container(
                                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                                     decoration: BoxDecoration(
-                                      color: const Color(0xFFF1F5F9),
+                                      color: theme.colorScheme.surfaceContainerHighest,
                                       borderRadius: BorderRadius.circular(6),
                                     ),
                                     child: Text(
                                       ticket.ticketNumber,
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                         fontSize: 12,
                                         fontWeight: FontWeight.w700,
-                                        color: Color(0xFF475569),
+                                        color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
                                       ),
                                     ),
                                   ),
@@ -446,10 +449,10 @@ class _TicketDetailsViewState extends State<TicketDetailsView> {
                               // Title
                               Text(
                                 ticket.title,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.w700,
-                                  color: Color(0xFF0F172A),
+                                  color: theme.colorScheme.onSurface,
                                   height: 1.3,
                                 ),
                               ),
@@ -458,48 +461,48 @@ class _TicketDetailsViewState extends State<TicketDetailsView> {
                               // Department & Created Date
                               Row(
                                 children: [
-                                  Icon(ticket.category.icon, size: 14, color: const Color(0xFF64748B)),
+                                  Icon(ticket.category.icon, size: 14, color: theme.colorScheme.onSurface.withValues(alpha: 0.6)),
                                   const SizedBox(width: 5),
                                   Text(
                                     ticket.category.label,
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 12,
                                       fontWeight: FontWeight.w500,
-                                      color: Color(0xFF64748B),
+                                      color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                                     ),
                                   ),
                                   const SizedBox(width: 8),
-                                  const Text('•', style: TextStyle(color: Color(0xFFCBD5E1))),
+                                  Text('•', style: TextStyle(color: theme.colorScheme.outline)),
                                   const SizedBox(width: 8),
                                   Text(
                                     'Opened ${ticket.createdAt.day}/${ticket.createdAt.month}/${ticket.createdAt.year}',
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 12,
-                                      color: Color(0xFF94A3B8),
+                                      color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
                                     ),
                                   ),
                                 ],
                               ),
                               const SizedBox(height: 16),
-                              const Divider(height: 1, color: Color(0xFFF1F5F9)),
+                              Divider(height: 1, color: theme.dividerColor),
                               const SizedBox(height: 14),
 
                               // Description
-                              const Text(
+                              Text(
                                 'Description',
                                 style: TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.w700,
-                                  color: Color(0xFF94A3B8),
+                                  color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
                                   letterSpacing: 0.5,
                                 ),
                               ),
                               const SizedBox(height: 6),
                               Text(
                                 ticket.description.isNotEmpty ? ticket.description : 'No description provided.',
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 14,
-                                  color: Color(0xFF334155),
+                                  color: theme.colorScheme.onSurface.withValues(alpha: 0.85),
                                   height: 1.5,
                                 ),
                               ),
@@ -507,12 +510,12 @@ class _TicketDetailsViewState extends State<TicketDetailsView> {
                               // Attachments Strip (if any)
                               if (ticket.attachmentUrls.isNotEmpty) ...[
                                 const SizedBox(height: 16),
-                                const Text(
+                                Text(
                                   'Attachments',
                                   style: TextStyle(
                                     fontSize: 12,
                                     fontWeight: FontWeight.w700,
-                                    color: Color(0xFF94A3B8),
+                                    color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
                                     letterSpacing: 0.5,
                                   ),
                                 ),
@@ -528,7 +531,7 @@ class _TicketDetailsViewState extends State<TicketDetailsView> {
                                         height: 72,
                                         decoration: BoxDecoration(
                                           borderRadius: BorderRadius.circular(10),
-                                          border: Border.all(color: const Color(0xFFE2E8F0)),
+                                          border: Border.all(color: theme.colorScheme.outline.withValues(alpha: 0.5)),
                                         ),
                                         child: ClipRRect(
                                           borderRadius: BorderRadius.circular(9),
@@ -568,9 +571,9 @@ class _TicketDetailsViewState extends State<TicketDetailsView> {
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: theme.cardColor,
                             borderRadius: BorderRadius.circular(16),
-                            border: Border.all(color: const Color(0xFFE2E8F0)),
+                            border: Border.all(color: theme.colorScheme.outline.withValues(alpha: 0.5)),
                           ),
                           child: Column(
                             children: [
@@ -579,18 +582,18 @@ class _TicketDetailsViewState extends State<TicketDetailsView> {
                                 children: [
                                   CircleAvatar(
                                     radius: 16,
-                                    backgroundColor: const Color(0xFFF1F5F9),
-                                    child: const Icon(Icons.person_outline_rounded, size: 18, color: Color(0xFF475569)),
+                                    backgroundColor: theme.colorScheme.surfaceContainerHighest,
+                                    child: Icon(Icons.person_outline_rounded, size: 18, color: theme.colorScheme.onSurface),
                                   ),
                                   const SizedBox(width: 12),
                                   Expanded(
                                     child: Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
-                                        const Text('Requested by', style: TextStyle(fontSize: 11, color: Color(0xFF94A3B8))),
+                                        Text('Requested by', style: TextStyle(fontSize: 11, color: theme.colorScheme.onSurface.withValues(alpha: 0.5))),
                                         Text(
                                           ticket.createdBy.name,
-                                          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Color(0xFF0F172A)),
+                                          style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: theme.colorScheme.onSurface),
                                         ),
                                       ],
                                     ),
@@ -598,22 +601,22 @@ class _TicketDetailsViewState extends State<TicketDetailsView> {
                                   if (ticket.createdBy.department != null)
                                     Text(
                                       ticket.createdBy.department!,
-                                      style: const TextStyle(fontSize: 12, color: Color(0xFF64748B), fontWeight: FontWeight.w500),
+                                      style: TextStyle(fontSize: 12, color: theme.colorScheme.onSurface.withValues(alpha: 0.6), fontWeight: FontWeight.w500),
                                     ),
                                 ],
                               ),
-                              const Divider(height: 18, color: Color(0xFFF1F5F9)),
+                              Divider(height: 18, color: theme.dividerColor),
 
                               // Assignee
                               Row(
                                 children: [
                                   CircleAvatar(
                                     radius: 16,
-                                    backgroundColor: ticket.assignedTo != null ? const Color(0xFFEFF6FF) : const Color(0xFFFEF3C7),
+                                    backgroundColor: ticket.assignedTo != null ? theme.colorScheme.primary.withValues(alpha: 0.15) : const Color(0xFFFEF3C7),
                                     child: Icon(
                                       ticket.assignedTo != null ? Icons.support_agent_rounded : Icons.person_off_outlined,
                                       size: 18,
-                                      color: ticket.assignedTo != null ? const Color(0xFF2563EB) : const Color(0xFFD97706),
+                                      color: ticket.assignedTo != null ? theme.colorScheme.primary : const Color(0xFFD97706),
                                     ),
                                   ),
                                   const SizedBox(width: 12),
@@ -621,7 +624,7 @@ class _TicketDetailsViewState extends State<TicketDetailsView> {
                                     child: Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
-                                        const Text('Assigned Specialist', style: TextStyle(fontSize: 11, color: Color(0xFF94A3B8))),
+                                        Text('Assigned Specialist', style: TextStyle(fontSize: 11, color: theme.colorScheme.onSurface.withValues(alpha: 0.5))),
                                         Row(
                                           children: [
                                             Flexible(
@@ -630,7 +633,7 @@ class _TicketDetailsViewState extends State<TicketDetailsView> {
                                                 style: TextStyle(
                                                   fontSize: 14,
                                                   fontWeight: FontWeight.w600,
-                                                  color: ticket.assignedTo != null ? const Color(0xFF0F172A) : const Color(0xFFD97706),
+                                                  color: ticket.assignedTo != null ? theme.colorScheme.onSurface : const Color(0xFFD97706),
                                                 ),
                                                 maxLines: 1,
                                                 overflow: TextOverflow.ellipsis,
@@ -648,7 +651,7 @@ class _TicketDetailsViewState extends State<TicketDetailsView> {
                                   if (ticket.assignedTo != null && ticket.assignedTo!.department != null)
                                     Text(
                                       ticket.assignedTo!.department!,
-                                      style: const TextStyle(fontSize: 12, color: Color(0xFF64748B), fontWeight: FontWeight.w500),
+                                      style: TextStyle(fontSize: 12, color: theme.colorScheme.onSurface.withValues(alpha: 0.6), fontWeight: FontWeight.w500),
                                     ),
                                 ],
                               ),
@@ -678,28 +681,28 @@ class _TicketDetailsViewState extends State<TicketDetailsView> {
                         ? MediaQuery.of(context).padding.bottom + 6
                         : 12,
                   ),
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                    border: Border(top: BorderSide(color: Color(0xFFE2E8F0))),
+                  decoration: BoxDecoration(
+                    color: theme.cardColor,
+                    border: Border(top: BorderSide(color: theme.colorScheme.outline.withValues(alpha: 0.4))),
                   ),
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFF8FAFC),
+                      color: theme.colorScheme.surfaceContainerHighest,
                       borderRadius: BorderRadius.circular(24),
-                      border: Border.all(color: const Color(0xFFCBD5E1)),
+                      border: Border.all(color: theme.colorScheme.outline.withValues(alpha: 0.4)),
                     ),
                     child: Row(
                       children: [
                         Expanded(
                           child: TextField(
                             controller: _commentController,
-                            style: const TextStyle(fontSize: 14, color: Color(0xFF0F172A)),
-                            decoration: const InputDecoration(
+                            style: TextStyle(fontSize: 14, color: theme.colorScheme.onSurface),
+                            decoration: InputDecoration(
                               hintText: 'Write a response or update...',
-                              hintStyle: TextStyle(fontSize: 13, color: Color(0xFF94A3B8)),
+                              hintStyle: TextStyle(fontSize: 13, color: theme.colorScheme.onSurface.withValues(alpha: 0.5)),
                               border: InputBorder.none,
-                              contentPadding: EdgeInsets.symmetric(horizontal: 6, vertical: 10),
+                              contentPadding: const EdgeInsets.symmetric(horizontal: 6, vertical: 10),
                             ),
                             maxLines: 3,
                             minLines: 1,
@@ -709,12 +712,12 @@ class _TicketDetailsViewState extends State<TicketDetailsView> {
                         IconButton(
                           onPressed: loaded.isSubmittingComment ? null : () => _sendComment(cubit),
                           icon: loaded.isSubmittingComment
-                              ? const SizedBox(
+                              ? SizedBox(
                                   width: 18,
                                   height: 18,
-                                  child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF2563EB)),
+                                  child: CircularProgressIndicator(strokeWidth: 2, color: theme.colorScheme.primary),
                                 )
-                              : const Icon(Icons.send_rounded, color: Color(0xFF2563EB), size: 20),
+                              : Icon(Icons.send_rounded, color: theme.colorScheme.primary, size: 20),
                         ),
                       ],
                     ),
@@ -737,6 +740,7 @@ class _TicketDetailsViewState extends State<TicketDetailsView> {
     required bool isStaff,
     required bool isManager,
   }) {
+    final theme = Theme.of(context);
     final status = ticket.status;
 
     // Define Pipeline stages
@@ -752,12 +756,12 @@ class _TicketDetailsViewState extends State<TicketDetailsView> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: theme.cardColor,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        border: Border.all(color: theme.colorScheme.outline.withValues(alpha: 0.5)),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF0F172A).withValues(alpha: 0.03),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 10,
             offset: const Offset(0, 3),
           ),
@@ -775,18 +779,18 @@ class _TicketDetailsViewState extends State<TicketDetailsView> {
                   Container(
                     padding: const EdgeInsets.all(6),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFEEF2FF),
+                      color: theme.colorScheme.primary.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: const Icon(Icons.alt_route_rounded, size: 16, color: Color(0xFF4F46E5)),
+                    child: Icon(Icons.alt_route_rounded, size: 16, color: theme.colorScheme.primary),
                   ),
                   const SizedBox(width: 8),
-                  const Text(
+                  Text(
                     'WORKFLOW PROGRESS',
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w800,
-                      color: Color(0xFF64748B),
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                       letterSpacing: 0.8,
                     ),
                   ),
@@ -835,7 +839,7 @@ class _TicketDetailsViewState extends State<TicketDetailsView> {
                 return Expanded(
                   child: Container(
                     height: 3,
-                    color: isPassed ? const Color(0xFF2563EB) : const Color(0xFFE2E8F0),
+                    color: isPassed ? theme.colorScheme.primary : theme.colorScheme.outline.withValues(alpha: 0.4),
                   ),
                 );
               }
@@ -844,15 +848,15 @@ class _TicketDetailsViewState extends State<TicketDetailsView> {
               final isCompleted = stageIdx < currentStageIndex;
               final isCurrent = stageIdx == currentStageIndex;
 
-              Color stepBg = const Color(0xFFF1F5F9);
-              Color stepIconColor = const Color(0xFF94A3B8);
+              Color stepBg = theme.colorScheme.surfaceContainerHighest;
+              Color stepIconColor = theme.colorScheme.onSurface.withValues(alpha: 0.5);
               Widget iconWidget = Text(
                 '${stageIdx + 1}',
                 style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: stepIconColor),
               );
 
               if (isCompleted) {
-                stepBg = const Color(0xFF2563EB);
+                stepBg = theme.colorScheme.primary;
                 stepIconColor = Colors.white;
                 iconWidget = const Icon(Icons.check_rounded, size: 12, color: Colors.white);
               } else if (isCurrent) {
@@ -882,7 +886,7 @@ class _TicketDetailsViewState extends State<TicketDetailsView> {
                     style: TextStyle(
                       fontSize: 10,
                       fontWeight: isCurrent ? FontWeight.w700 : FontWeight.w500,
-                      color: isCurrent ? const Color(0xFF0F172A) : const Color(0xFF94A3B8),
+                      color: isCurrent ? theme.colorScheme.onSurface : theme.colorScheme.onSurface.withValues(alpha: 0.5),
                     ),
                   ),
                 ],
@@ -908,11 +912,12 @@ class _TicketDetailsViewState extends State<TicketDetailsView> {
               if (isManager) ...[
                 Expanded(
                   child: _buildSecondaryActionButton(
+                    context: context,
                     label: 'Reassign',
                     icon: Icons.swap_horiz_rounded,
-                    backgroundColor: const Color(0xFFF8FAFC),
-                    foregroundColor: const Color(0xFF334155),
-                    borderColor: const Color(0xFFCBD5E1),
+                    backgroundColor: theme.colorScheme.surfaceContainerHighest,
+                    foregroundColor: theme.colorScheme.onSurface,
+                    borderColor: theme.colorScheme.outline.withValues(alpha: 0.5),
                     onTap: () => _showReassignDialog(context, cubit, availableAgents, ticket),
                   ),
                 ),
@@ -923,11 +928,12 @@ class _TicketDetailsViewState extends State<TicketDetailsView> {
               if (widget.currentUser.uid == ticket.createdBy.uid && status == TicketStatus.open) ...[
                 Expanded(
                   child: _buildSecondaryActionButton(
+                    context: context,
                     label: 'Cancel Request',
                     icon: Icons.close_rounded,
-                    backgroundColor: const Color(0xFFF8FAFC),
-                    foregroundColor: const Color(0xFF64748B),
-                    borderColor: const Color(0xFFE2E8F0),
+                    backgroundColor: theme.colorScheme.surfaceContainerHighest,
+                    foregroundColor: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                    borderColor: theme.colorScheme.outline.withValues(alpha: 0.5),
                     onTap: () => cubit.updateStatus(
                       newStatus: TicketStatus.closed,
                       currentUser: widget.currentUser,
@@ -940,11 +946,12 @@ class _TicketDetailsViewState extends State<TicketDetailsView> {
               // Delete Ticket
               Expanded(
                 child: _buildSecondaryActionButton(
+                  context: context,
                   label: 'Delete',
                   icon: Icons.delete_outline_rounded,
-                  backgroundColor: const Color(0xFFFEF2F2),
+                  backgroundColor: const Color(0xFFFEF2F2).withValues(alpha: 0.2),
                   foregroundColor: const Color(0xFFDC2626),
-                  borderColor: const Color(0xFFFECACA),
+                  borderColor: const Color(0xFFFECACA).withValues(alpha: 0.5),
                   onTap: () => _confirmDeleteTicket(context, cubit),
                 ),
               ),
@@ -962,6 +969,8 @@ class _TicketDetailsViewState extends State<TicketDetailsView> {
     required bool isStaff,
     required bool isCreator,
   }) {
+    final theme = Theme.of(context);
+
     // 1. Open and Unassigned (Agent/Manager can claim)
     if (ticket.status == TicketStatus.open && ticket.assignedTo == null && isStaff) {
       return SizedBox(
@@ -969,7 +978,7 @@ class _TicketDetailsViewState extends State<TicketDetailsView> {
         height: 44,
         child: ElevatedButton.icon(
           style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFF2563EB),
+            backgroundColor: theme.colorScheme.primary,
             foregroundColor: Colors.white,
             elevation: 0,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -1042,9 +1051,9 @@ class _TicketDetailsViewState extends State<TicketDetailsView> {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: const Color(0xFFF0FDF4),
+                color: const Color(0xFF16A34A).withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: const Color(0xFFBBF7D0)),
+                border: Border.all(color: const Color(0xFF16A34A).withValues(alpha: 0.3)),
               ),
               child: const Row(
                 children: [
@@ -1053,7 +1062,7 @@ class _TicketDetailsViewState extends State<TicketDetailsView> {
                   Expanded(
                     child: Text(
                       'The support team marked this ticket as resolved. Please test and confirm to close it.',
-                      style: TextStyle(fontSize: 12, color: Color(0xFF166534), fontWeight: FontWeight.w500),
+                      style: TextStyle(fontSize: 12, color: Color(0xFF16A34A), fontWeight: FontWeight.w600),
                     ),
                   ),
                 ],
@@ -1115,9 +1124,9 @@ class _TicketDetailsViewState extends State<TicketDetailsView> {
           width: double.infinity,
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: const Color(0xFFF0FDF4),
+            color: const Color(0xFF16A34A).withValues(alpha: 0.12),
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: const Color(0xFFBBF7D0)),
+            border: Border.all(color: const Color(0xFF16A34A).withValues(alpha: 0.3)),
           ),
           child: const Row(
             children: [
@@ -1129,7 +1138,7 @@ class _TicketDetailsViewState extends State<TicketDetailsView> {
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
-                    color: Color(0xFF166534),
+                    color: Color(0xFF16A34A),
                   ),
                 ),
               ),
@@ -1147,9 +1156,9 @@ class _TicketDetailsViewState extends State<TicketDetailsView> {
           height: 44,
           child: OutlinedButton.icon(
             style: OutlinedButton.styleFrom(
-              foregroundColor: const Color(0xFF2563EB),
+              foregroundColor: theme.colorScheme.primary,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-              side: const BorderSide(color: Color(0xFF93C5FD)),
+              side: BorderSide(color: theme.colorScheme.primary.withValues(alpha: 0.5)),
             ),
             icon: const Icon(Icons.replay_rounded, size: 18),
             label: const Text(
@@ -1167,21 +1176,21 @@ class _TicketDetailsViewState extends State<TicketDetailsView> {
           width: double.infinity,
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: const Color(0xFFF8FAFC),
+            color: theme.colorScheme.surfaceContainerHighest,
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: const Color(0xFFE2E8F0)),
+            border: Border.all(color: theme.colorScheme.outline.withValues(alpha: 0.5)),
           ),
-          child: const Row(
+          child: Row(
             children: [
-              Icon(Icons.lock_outline_rounded, size: 18, color: Color(0xFF64748B)),
-              SizedBox(width: 10),
+              Icon(Icons.lock_outline_rounded, size: 18, color: theme.colorScheme.onSurface.withValues(alpha: 0.6)),
+              const SizedBox(width: 10),
               Expanded(
                 child: Text(
                   'This ticket is closed and archived by the employee.',
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
-                    color: Color(0xFF64748B),
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                   ),
                 ),
               ),
@@ -1195,6 +1204,7 @@ class _TicketDetailsViewState extends State<TicketDetailsView> {
   }
 
   Widget _buildSecondaryActionButton({
+    required BuildContext context,
     required String label,
     required IconData icon,
     required Color backgroundColor,

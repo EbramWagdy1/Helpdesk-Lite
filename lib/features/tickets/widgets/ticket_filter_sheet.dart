@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:helpdesk/core/utils/app_colors.dart';
-import 'package:helpdesk/core/utils/app_text_style.dart';
 import 'package:helpdesk/core/widgets/custom_button.dart';
 import 'package:helpdesk/features/auth/model/user_model.dart';
 import 'package:helpdesk/features/tickets/model/ticket_model.dart';
@@ -36,12 +35,13 @@ class _TicketFilterSheetState extends State<TicketFilterSheet> {
   @override
   Widget build(BuildContext context) {
     final isStaff = widget.currentUser.role != UserRole.employee;
+    final theme = Theme.of(context);
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
-      decoration: const BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      decoration: BoxDecoration(
+        color: theme.cardColor,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
       ),
       child: SafeArea(
         child: SingleChildScrollView(
@@ -55,7 +55,7 @@ class _TicketFilterSheetState extends State<TicketFilterSheet> {
                 children: [
                   Text(
                     'Filter Tickets',
-                    style: AppTextStyles.titleLarge.copyWith(fontWeight: FontWeight.w700),
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: theme.colorScheme.onSurface),
                   ),
                   TextButton(
                     onPressed: () {
@@ -65,27 +65,27 @@ class _TicketFilterSheetState extends State<TicketFilterSheet> {
                         _assignedToMe = false;
                       });
                     },
-                    child: Text(
+                    child: const Text(
                       'Reset All',
-                      style: AppTextStyles.labelMedium.copyWith(color: AppColors.error),
+                      style: TextStyle(fontWeight: FontWeight.w600, color: AppColors.error),
                     ),
                   ),
                 ],
               ),
-              const Divider(color: AppColors.divider),
+              Divider(color: theme.dividerColor),
               const SizedBox(height: 12),
 
               // Staff Filter: Assigned to me switch
               if (isStaff) ...[
                 SwitchListTile(
                   contentPadding: EdgeInsets.zero,
-                  title: Text('Only Assigned to Me', style: AppTextStyles.bodyMedium),
+                  title: Text('Only Assigned to Me', style: TextStyle(fontSize: 14, color: theme.colorScheme.onSurface)),
                   subtitle: Text(
                     'Show requests currently owned by you',
-                    style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary),
+                    style: TextStyle(fontSize: 12, color: theme.colorScheme.onSurface.withValues(alpha: 0.6)),
                   ),
                   value: _assignedToMe,
-                  activeTrackColor: AppColors.primary,
+                  activeTrackColor: theme.colorScheme.primary,
                   onChanged: (val) {
                     setState(() => _assignedToMe = val);
                   },
@@ -96,7 +96,7 @@ class _TicketFilterSheetState extends State<TicketFilterSheet> {
               // Priority Filter
               Text(
                 'Priority',
-                style: AppTextStyles.labelLarge.copyWith(fontWeight: FontWeight.w700),
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: theme.colorScheme.onSurface),
               ),
               const SizedBox(height: 8),
               Wrap(
@@ -107,10 +107,10 @@ class _TicketFilterSheetState extends State<TicketFilterSheet> {
                   return ChoiceChip(
                     label: Text(priority.label),
                     selected: isSelected,
-                    selectedColor: priority.color.withValues(alpha: 0.15),
-                    backgroundColor: AppColors.background,
+                    selectedColor: priority.color.withValues(alpha: 0.2),
+                    backgroundColor: theme.colorScheme.surfaceContainerHighest,
                     labelStyle: TextStyle(
-                      color: isSelected ? priority.color : AppColors.textPrimary,
+                      color: isSelected ? priority.color : theme.colorScheme.onSurface.withValues(alpha: 0.7),
                       fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
                     ),
                     onSelected: (selected) {
@@ -126,7 +126,7 @@ class _TicketFilterSheetState extends State<TicketFilterSheet> {
               // Category Filter
               Text(
                 'Department / Category',
-                style: AppTextStyles.labelLarge.copyWith(fontWeight: FontWeight.w700),
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: theme.colorScheme.onSurface),
               ),
               const SizedBox(height: 8),
               Wrap(
@@ -135,13 +135,13 @@ class _TicketFilterSheetState extends State<TicketFilterSheet> {
                 children: TicketCategory.values.map((cat) {
                   final isSelected = _selectedCategory == cat;
                   return ChoiceChip(
-                    avatar: Icon(cat.icon, size: 16, color: isSelected ? AppColors.primary : AppColors.textSecondary),
+                    avatar: Icon(cat.icon, size: 16, color: isSelected ? theme.colorScheme.primary : theme.colorScheme.onSurface.withValues(alpha: 0.6)),
                     label: Text(cat.label),
                     selected: isSelected,
-                    selectedColor: AppColors.primary.withValues(alpha: 0.12),
-                    backgroundColor: AppColors.background,
+                    selectedColor: theme.colorScheme.primary.withValues(alpha: 0.2),
+                    backgroundColor: theme.colorScheme.surfaceContainerHighest,
                     labelStyle: TextStyle(
-                      color: isSelected ? AppColors.primary : AppColors.textPrimary,
+                      color: isSelected ? theme.colorScheme.primary : theme.colorScheme.onSurface.withValues(alpha: 0.7),
                       fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
                     ),
                     onSelected: (selected) {

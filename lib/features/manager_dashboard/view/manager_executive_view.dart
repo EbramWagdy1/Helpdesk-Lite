@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:helpdesk/core/utils/app_colors.dart';
-import 'package:helpdesk/core/utils/app_text_style.dart';
 import 'package:helpdesk/core/widgets/connectivity_checker_wrapper.dart';
 import 'package:helpdesk/core/widgets/custom_snackbar.dart';
 import 'package:helpdesk/core/widgets/verified_badge_widget.dart';
@@ -44,97 +43,75 @@ class _ManagerExecutiveViewState extends State<ManagerExecutiveView> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return ConnectivityCheckerWrapper(
       child: BlocProvider(
         create: (context) => TicketListCubit()..initializeTicketStream(currentUser: widget.currentUser),
         child: Scaffold(
-        backgroundColor: const Color(0xFFF8FAFC),
-        bottomNavigationBar: Container(
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            border: Border(top: BorderSide(color: Color(0xFFE2E8F0))),
+          backgroundColor: theme.scaffoldBackgroundColor,
+          bottomNavigationBar: Container(
+            decoration: BoxDecoration(
+              color: theme.cardColor,
+              border: Border(top: BorderSide(color: theme.colorScheme.outline.withValues(alpha: 0.4))),
+            ),
+            child: NavigationBar(
+              selectedIndex: _selectedViewIndex,
+              onDestinationSelected: (index) {
+                setState(() {
+                  _selectedViewIndex = index;
+                });
+              },
+              backgroundColor: theme.cardColor,
+              indicatorColor: theme.colorScheme.primary.withValues(alpha: 0.15),
+              destinations: [
+                NavigationDestination(
+                  icon: Icon(Icons.insights_outlined, color: theme.colorScheme.onSurface.withValues(alpha: 0.6)),
+                  selectedIcon: Icon(Icons.insights_rounded, color: theme.colorScheme.primary),
+                  label: 'Analytics',
+                ),
+                NavigationDestination(
+                  icon: Icon(Icons.dashboard_outlined, color: theme.colorScheme.onSurface.withValues(alpha: 0.6)),
+                  selectedIcon: Icon(Icons.dashboard_rounded, color: theme.colorScheme.primary),
+                  label: 'Tickets',
+                ),
+                NavigationDestination(
+                  icon: Icon(Icons.badge_outlined, color: theme.colorScheme.onSurface.withValues(alpha: 0.6)),
+                  selectedIcon: Icon(Icons.badge_rounded, color: theme.colorScheme.primary),
+                  label: 'Support Team',
+                ),
+              ],
+            ),
           ),
-          child: NavigationBar(
-            selectedIndex: _selectedViewIndex,
-            onDestinationSelected: (index) {
-              setState(() {
-                _selectedViewIndex = index;
-              });
-            },
-            backgroundColor: Colors.white,
-            indicatorColor: const Color(0xFFEFF6FF),
-            destinations: const [
-              NavigationDestination(
-                icon: Icon(Icons.insights_outlined),
-                selectedIcon: Icon(Icons.insights_rounded, color: Color(0xFF2563EB)),
-                label: 'Analytics',
-              ),
-              NavigationDestination(
-                icon: Icon(Icons.dashboard_outlined),
-                selectedIcon: Icon(Icons.dashboard_rounded, color: Color(0xFF2563EB)),
-                label: 'Tickets',
-              ),
-              NavigationDestination(
-                icon: Icon(Icons.badge_outlined),
-                selectedIcon: Icon(Icons.badge_rounded, color: Color(0xFF2563EB)),
-                label: 'Support Team',
-              ),
-            ],
-          ),
-        ),
-        body: SafeArea(
-          child: BlocBuilder<TicketListCubit, TicketListState>(
-            builder: (context, state) {
-              final ticketCubit = TicketListCubit.get(context);
+          body: SafeArea(
+            child: BlocBuilder<TicketListCubit, TicketListState>(
+              builder: (context, state) {
+                final ticketCubit = TicketListCubit.get(context);
 
-              List<TicketModel> allTickets = [];
-              List<TicketModel> filteredTickets = [];
+                List<TicketModel> allTickets = [];
+                List<TicketModel> filteredTickets = [];
 
-              if (state is TicketListLoadedState) {
-                allTickets = state.allTickets;
-                filteredTickets = state.filteredTickets;
-              }
+                if (state is TicketListLoadedState) {
+                  allTickets = state.allTickets;
+                  filteredTickets = state.filteredTickets;
+                }
 
-              return GestureDetector(
-                behavior: HitTestBehavior.opaque,
-                onTap: () => FocusScope.of(context).unfocus(),
-                child: Column(
-                  children: [
-                    // Executive Top Header
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                      decoration: const BoxDecoration(
-                        color: Colors.white,
-                        border: Border(bottom: BorderSide(color: Color(0xFFE2E8F0))),
-                      ),
-                      child: Row(
-                        children: [
-                          // Interactive Profile Avatar
-                          GestureDetector(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => ProfileView(user: widget.currentUser),
-                                ),
-                              );
-                            },
-                            child: CircleAvatar(
-                              radius: 20,
-                              backgroundColor: const Color(0xFF0F172A),
-                              child: Text(
-                                widget.currentUser.name.isNotEmpty ? widget.currentUser.name[0].toUpperCase() : 'M',
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.w700,
-                                  color: Colors.white,
-                                  fontSize: 15,
-                                ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: GestureDetector(
+                return GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: () => FocusScope.of(context).unfocus(),
+                  child: Column(
+                    children: [
+                      // Executive Top Header
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        decoration: BoxDecoration(
+                          color: theme.cardColor,
+                          border: Border(bottom: BorderSide(color: theme.colorScheme.outline.withValues(alpha: 0.4))),
+                        ),
+                        child: Row(
+                          children: [
+                            // Interactive Profile Avatar
+                            GestureDetector(
                               onTap: () {
                                 Navigator.push(
                                   context,
@@ -143,86 +120,110 @@ class _ManagerExecutiveViewState extends State<ManagerExecutiveView> {
                                   ),
                                 );
                               },
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Row(
-                                    children: [
-                                      Flexible(
-                                        child: Text(
-                                          widget.currentUser.name,
-                                          style: const TextStyle(
-                                            fontSize: 15,
-                                            fontWeight: FontWeight.w700,
-                                            color: Color(0xFF0F172A),
-                                          ),
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ),
-                                      const SizedBox(width: 4),
-                                      const VerifiedBadgeWidget(size: 14),
-                                    ],
+                              child: CircleAvatar(
+                                radius: 20,
+                                backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.15),
+                                child: Text(
+                                  widget.currentUser.name.isNotEmpty ? widget.currentUser.name[0].toUpperCase() : 'M',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w700,
+                                    color: theme.colorScheme.primary,
+                                    fontSize: 15,
                                   ),
-                                  const SizedBox(height: 2),
-                                  const Text(
-                                    'Operations Manager • Executive',
-                                    style: TextStyle(
-                                      fontSize: 11,
-                                      color: Color(0xFF64748B),
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ],
+                                ),
                               ),
                             ),
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.add_rounded, color: Color(0xFF2563EB), size: 22),
-                            tooltip: 'Create Ticket',
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => CreateTicketView(currentUser: widget.currentUser),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => ProfileView(user: widget.currentUser),
+                                    ),
+                                  );
+                                },
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Flexible(
+                                          child: Text(
+                                            widget.currentUser.name,
+                                            style: TextStyle(
+                                              fontSize: 15,
+                                              fontWeight: FontWeight.w700,
+                                              color: theme.colorScheme.onSurface,
+                                            ),
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 4),
+                                        const VerifiedBadgeWidget(size: 14),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      'Operations Manager • Executive',
+                                      style: TextStyle(
+                                        fontSize: 11,
+                                        color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ],
                                 ),
-                              );
-                            },
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.person_outline_rounded, color: Color(0xFF334155), size: 20),
-                            tooltip: 'Profile',
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => ProfileView(user: widget.currentUser),
-                                ),
-                              );
-                            },
-                          ),
-                        ],
+                              ),
+                            ),
+                            IconButton(
+                              icon: Icon(Icons.add_rounded, color: theme.colorScheme.primary, size: 22),
+                              tooltip: 'Create Ticket',
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => CreateTicketView(currentUser: widget.currentUser),
+                                  ),
+                                );
+                              },
+                            ),
+                            IconButton(
+                              icon: Icon(Icons.person_outline_rounded, color: theme.colorScheme.onSurface, size: 20),
+                              tooltip: 'Profile',
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => ProfileView(user: widget.currentUser),
+                                  ),
+                                );
+                              },
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
 
-                    // Main View Content
-                    Expanded(
-                      child: _selectedViewIndex == 0
-                          ? _buildAnalyticsTab(context, allTickets, state is TicketListLoadingState)
-                          : _selectedViewIndex == 1
-                              ? _buildTicketsSupervisionTab(context, ticketCubit, state, allTickets, filteredTickets)
-                              : _buildAgentsManagementTab(context, allTickets),
-                    ),
-                  ],
-                ),
-              );
-            },
+                      // Main View Content
+                      Expanded(
+                        child: _selectedViewIndex == 0
+                            ? _buildAnalyticsTab(context, allTickets, state is TicketListLoadingState)
+                            : _selectedViewIndex == 1
+                                ? _buildTicketsSupervisionTab(context, ticketCubit, state, allTickets, filteredTickets)
+                                : _buildAgentsManagementTab(context, allTickets),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
           ),
         ),
-      ),
       ),
     );
   }
@@ -231,6 +232,8 @@ class _ManagerExecutiveViewState extends State<ManagerExecutiveView> {
   // TAB 1: EXECUTIVE ANALYTICS & KPIS
   // -------------------------------------------------------------
   Widget _buildAnalyticsTab(BuildContext context, List<TicketModel> allTickets, bool isLoading) {
+    final theme = Theme.of(context);
+
     if (isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -250,7 +253,7 @@ class _ManagerExecutiveViewState extends State<ManagerExecutiveView> {
     }
     final categoryData = categoryCounts.entries
         .where((e) => e.value > 0)
-        .map((e) => _ChartItem(e.key.label, e.value, AppColors.primary))
+        .map((e) => _ChartItem(e.key.label, e.value, theme.colorScheme.primary))
         .toList();
 
     // Priority Distribution Data
@@ -263,15 +266,6 @@ class _ManagerExecutiveViewState extends State<ManagerExecutiveView> {
         .map((e) => _ChartItem(e.key.label, e.value, e.key.color))
         .toList();
 
-    // Agent Workload Map
-    final Map<String, int> agentWorkload = {};
-    for (var ticket in allTickets) {
-      if (ticket.assignedTo != null && ticket.status != TicketStatus.closed) {
-        final name = ticket.assignedTo!.name;
-        agentWorkload[name] = (agentWorkload[name] ?? 0) + 1;
-      }
-    }
-
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -282,15 +276,17 @@ class _ManagerExecutiveViewState extends State<ManagerExecutiveView> {
             children: [
               Expanded(
                 child: _buildMetricTile(
+                  context: context,
                   title: 'Total Tickets',
                   value: '$total',
                   icon: Icons.receipt_long_rounded,
-                  color: AppColors.primary,
+                  color: theme.colorScheme.primary,
                 ),
               ),
               const SizedBox(width: 8),
               Expanded(
                 child: _buildMetricTile(
+                  context: context,
                   title: 'Resolution Rate',
                   value: '$resolutionRate%',
                   icon: Icons.trending_up_rounded,
@@ -304,15 +300,17 @@ class _ManagerExecutiveViewState extends State<ManagerExecutiveView> {
             children: [
               Expanded(
                 child: _buildMetricTile(
+                  context: context,
                   title: 'Open / Pending',
                   value: '$open',
                   icon: Icons.mark_email_unread_outlined,
-                  color: AppColors.primary,
+                  color: theme.colorScheme.primary,
                 ),
               ),
               const SizedBox(width: 8),
               Expanded(
                 child: _buildMetricTile(
+                  context: context,
                   title: 'In Progress',
                   value: '$inProgress',
                   icon: Icons.hourglass_top_rounded,
@@ -322,6 +320,7 @@ class _ManagerExecutiveViewState extends State<ManagerExecutiveView> {
               const SizedBox(width: 8),
               Expanded(
                 child: _buildMetricTile(
+                  context: context,
                   title: 'Unassigned',
                   value: '$unassigned',
                   icon: Icons.person_off_outlined,
@@ -335,9 +334,10 @@ class _ManagerExecutiveViewState extends State<ManagerExecutiveView> {
           // Department Volume Breakdown Chart
           Card(
             elevation: 0,
+            color: theme.cardColor,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(16),
-              side: const BorderSide(color: AppColors.border),
+              side: BorderSide(color: theme.colorScheme.outline.withValues(alpha: 0.5)),
             ),
             child: Padding(
               padding: const EdgeInsets.all(16),
@@ -346,35 +346,36 @@ class _ManagerExecutiveViewState extends State<ManagerExecutiveView> {
                 children: [
                   Row(
                     children: [
-                      const Icon(Icons.bar_chart_rounded, size: 20, color: AppColors.primary),
+                      Icon(Icons.bar_chart_rounded, size: 20, color: theme.colorScheme.primary),
                       const SizedBox(width: 8),
                       Text(
                         'Tickets by Department',
-                        style: AppTextStyles.titleMedium.copyWith(fontWeight: FontWeight.bold),
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: theme.colorScheme.onSurface),
                       ),
                     ],
                   ),
                   const SizedBox(height: 16),
                   categoryData.isEmpty
-                      ? const SizedBox(
+                      ? SizedBox(
                           height: 150,
-                          child: Center(child: Text('No ticket data yet')),
+                          child: Center(child: Text('No ticket data yet', style: TextStyle(color: theme.colorScheme.onSurface.withValues(alpha: 0.6)))),
                         )
                       : SizedBox(
                           height: 200,
                           child: SfCartesianChart(
-                            primaryXAxis: const CategoryAxis(
-                              labelStyle: TextStyle(fontSize: 10),
+                            primaryXAxis: CategoryAxis(
+                              labelStyle: TextStyle(fontSize: 10, color: theme.colorScheme.onSurface),
                             ),
-                            primaryYAxis: const NumericAxis(
+                            primaryYAxis: NumericAxis(
                               interval: 2,
+                              labelStyle: TextStyle(color: theme.colorScheme.onSurface),
                             ),
                             series: <CartesianSeries>[
                               ColumnSeries<_ChartItem, String>(
                                 dataSource: categoryData,
                                 xValueMapper: (_ChartItem data, _) => data.label,
                                 yValueMapper: (_ChartItem data, _) => data.value,
-                                color: AppColors.primary,
+                                color: theme.colorScheme.primary,
                                 borderRadius: const BorderRadius.vertical(top: Radius.circular(6)),
                                 dataLabelSettings: const DataLabelSettings(isVisible: true),
                               ),
@@ -390,9 +391,10 @@ class _ManagerExecutiveViewState extends State<ManagerExecutiveView> {
           // Priority Distribution Doughnut Chart
           Card(
             elevation: 0,
+            color: theme.cardColor,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(16),
-              side: const BorderSide(color: AppColors.border),
+              side: BorderSide(color: theme.colorScheme.outline.withValues(alpha: 0.5)),
             ),
             child: Padding(
               padding: const EdgeInsets.all(16),
@@ -405,23 +407,24 @@ class _ManagerExecutiveViewState extends State<ManagerExecutiveView> {
                       const SizedBox(width: 8),
                       Text(
                         'Priority Distribution',
-                        style: AppTextStyles.titleMedium.copyWith(fontWeight: FontWeight.bold),
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: theme.colorScheme.onSurface),
                       ),
                     ],
                   ),
                   const SizedBox(height: 16),
                   priorityData.isEmpty
-                      ? const SizedBox(
+                      ? SizedBox(
                           height: 150,
-                          child: Center(child: Text('No ticket data yet')),
+                          child: Center(child: Text('No ticket data yet', style: TextStyle(color: theme.colorScheme.onSurface.withValues(alpha: 0.6)))),
                         )
                       : SizedBox(
                           height: 220,
                           child: SfCircularChart(
-                            legend: const Legend(
+                            legend: Legend(
                               isVisible: true,
                               position: LegendPosition.right,
                               overflowMode: LegendItemOverflowMode.wrap,
+                              textStyle: TextStyle(color: theme.colorScheme.onSurface),
                             ),
                             series: <CircularSeries>[
                               DoughnutSeries<_ChartItem, String>(
@@ -455,6 +458,8 @@ class _ManagerExecutiveViewState extends State<ManagerExecutiveView> {
     List<TicketModel> allTickets,
     List<TicketModel> filteredTickets,
   ) {
+    final theme = Theme.of(context);
+
     return Column(
       children: [
         // Search & Filter Action Bar
@@ -466,20 +471,21 @@ class _ManagerExecutiveViewState extends State<ManagerExecutiveView> {
                 child: TextField(
                   controller: _searchController,
                   onChanged: (val) => cubit.search(val),
+                  style: TextStyle(fontSize: 14, color: theme.colorScheme.onSurface),
                   decoration: InputDecoration(
                     hintText: 'Search tickets across company...',
-                    hintStyle: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
-                    prefixIcon: const Icon(Icons.search, size: 20, color: AppColors.textSecondary),
+                    hintStyle: TextStyle(fontSize: 13, color: theme.colorScheme.onSurface.withValues(alpha: 0.5)),
+                    prefixIcon: Icon(Icons.search, size: 20, color: theme.colorScheme.onSurface.withValues(alpha: 0.5)),
                     contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 16),
                     filled: true,
-                    fillColor: Colors.white,
+                    fillColor: theme.cardColor,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+                      borderSide: BorderSide(color: theme.colorScheme.outline.withValues(alpha: 0.5)),
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+                      borderSide: BorderSide(color: theme.colorScheme.outline.withValues(alpha: 0.5)),
                     ),
                   ),
                 ),
@@ -487,17 +493,20 @@ class _ManagerExecutiveViewState extends State<ManagerExecutiveView> {
               const SizedBox(width: 8),
               Container(
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: theme.cardColor,
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: const Color(0xFFE2E8F0)),
+                  border: Border.all(color: theme.colorScheme.outline.withValues(alpha: 0.5)),
                 ),
                 child: IconButton(
-                  icon: const Icon(Icons.filter_list_rounded, color: Color(0xFF0F172A)),
+                  icon: Icon(Icons.filter_list_rounded, color: theme.colorScheme.onSurface),
                   onPressed: () {
                     showModalBottomSheet(
                       context: context,
                       isScrollControlled: true,
-                      backgroundColor: Colors.transparent,
+                      backgroundColor: theme.cardColor,
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+                      ),
                       builder: (_) => TicketFilterSheet(
                         cubit: cubit,
                         currentUser: widget.currentUser,
@@ -519,11 +528,11 @@ class _ManagerExecutiveViewState extends State<ManagerExecutiveView> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Icon(Icons.inbox_outlined, size: 48, color: Color(0xFF94A3B8)),
+                          Icon(Icons.inbox_outlined, size: 48, color: theme.colorScheme.onSurface.withValues(alpha: 0.4)),
                           const SizedBox(height: 12),
-                          const Text(
+                          Text(
                             'No tickets match your filters',
-                            style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: Color(0xFF64748B)),
+                            style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: theme.colorScheme.onSurface.withValues(alpha: 0.6)),
                           ),
                           const SizedBox(height: 8),
                           TextButton(
@@ -566,11 +575,13 @@ class _ManagerExecutiveViewState extends State<ManagerExecutiveView> {
   // TAB 3: AGENTS SUPPORT & VERIFICATION MANAGEMENT
   // -------------------------------------------------------------
   Widget _buildAgentsManagementTab(BuildContext context, List<TicketModel> allTickets) {
+    final theme = Theme.of(context);
+
     return StreamBuilder<List<UserModel>>(
       stream: AuthRepository().streamSupportAgents(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF2563EB)));
+          return Center(child: CircularProgressIndicator(strokeWidth: 2, color: theme.colorScheme.primary));
         }
 
         final agents = snapshot.data ?? [];
@@ -599,9 +610,9 @@ class _ManagerExecutiveViewState extends State<ManagerExecutiveView> {
               margin: const EdgeInsets.fromLTRB(16, 12, 16, 8),
               padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: theme.cardColor,
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: const Color(0xFFE2E8F0)),
+                border: Border.all(color: theme.colorScheme.outline.withValues(alpha: 0.5)),
               ),
               child: Row(
                 children: [
@@ -609,29 +620,29 @@ class _ManagerExecutiveViewState extends State<ManagerExecutiveView> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text('Total Agents', style: TextStyle(fontSize: 11, color: Color(0xFF94A3B8))),
+                        Text('Total Agents', style: TextStyle(fontSize: 11, color: theme.colorScheme.onSurface.withValues(alpha: 0.5))),
                         const SizedBox(height: 2),
                         Text(
                           '${agents.length}',
-                          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: Color(0xFF0F172A)),
+                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: theme.colorScheme.onSurface),
                         ),
                       ],
                     ),
                   ),
-                  Container(width: 1, height: 30, color: const Color(0xFFF1F5F9)),
+                  Container(width: 1, height: 30, color: theme.dividerColor),
                   Expanded(
                     child: Padding(
                       padding: const EdgeInsets.only(left: 12),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text('Verified', style: TextStyle(fontSize: 11, color: Color(0xFF94A3B8))),
+                          Text('Verified', style: TextStyle(fontSize: 11, color: theme.colorScheme.onSurface.withValues(alpha: 0.5))),
                           const SizedBox(height: 2),
                           Row(
                             children: [
                               Text(
                                 '$verifiedCount',
-                                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: Color(0xFF2563EB)),
+                                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: theme.colorScheme.primary),
                               ),
                               const SizedBox(width: 4),
                               const VerifiedBadgeWidget(size: 14),
@@ -641,14 +652,14 @@ class _ManagerExecutiveViewState extends State<ManagerExecutiveView> {
                       ),
                     ),
                   ),
-                  Container(width: 1, height: 30, color: const Color(0xFFF1F5F9)),
+                  Container(width: 1, height: 30, color: theme.dividerColor),
                   Expanded(
                     child: Padding(
                       padding: const EdgeInsets.only(left: 12),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text('Pending', style: TextStyle(fontSize: 11, color: Color(0xFF94A3B8))),
+                          Text('Pending', style: TextStyle(fontSize: 11, color: theme.colorScheme.onSurface.withValues(alpha: 0.5))),
                           const SizedBox(height: 2),
                           Text(
                             '$pendingCount',
@@ -668,20 +679,21 @@ class _ManagerExecutiveViewState extends State<ManagerExecutiveView> {
               child: TextField(
                 controller: _agentSearchController,
                 onChanged: (_) => setState(() {}),
+                style: TextStyle(fontSize: 14, color: theme.colorScheme.onSurface),
                 decoration: InputDecoration(
                   hintText: 'Search support specialists...',
-                  hintStyle: const TextStyle(fontSize: 13, color: Color(0xFF94A3B8)),
-                  prefixIcon: const Icon(Icons.search, size: 20, color: Color(0xFF94A3B8)),
+                  hintStyle: TextStyle(fontSize: 13, color: theme.colorScheme.onSurface.withValues(alpha: 0.5)),
+                  prefixIcon: Icon(Icons.search, size: 20, color: theme.colorScheme.onSurface.withValues(alpha: 0.5)),
                   contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 16),
                   filled: true,
-                  fillColor: Colors.white,
+                  fillColor: theme.cardColor,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+                    borderSide: BorderSide(color: theme.colorScheme.outline.withValues(alpha: 0.5)),
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+                    borderSide: BorderSide(color: theme.colorScheme.outline.withValues(alpha: 0.5)),
                   ),
                 ),
               ),
@@ -692,11 +704,11 @@ class _ManagerExecutiveViewState extends State<ManagerExecutiveView> {
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: Row(
                 children: [
-                  _buildAgentFilterChip('all', 'All (${agents.length})'),
+                  _buildAgentFilterChip(context, 'all', 'All (${agents.length})'),
                   const SizedBox(width: 8),
-                  _buildAgentFilterChip('verified', 'Verified ($verifiedCount)'),
+                  _buildAgentFilterChip(context, 'verified', 'Verified ($verifiedCount)'),
                   const SizedBox(width: 8),
-                  _buildAgentFilterChip('pending', 'Pending ($pendingCount)'),
+                  _buildAgentFilterChip(context, 'pending', 'Pending ($pendingCount)'),
                 ],
               ),
             ),
@@ -708,11 +720,11 @@ class _ManagerExecutiveViewState extends State<ManagerExecutiveView> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Icon(Icons.people_outline_rounded, size: 48, color: Color(0xFF94A3B8)),
+                          Icon(Icons.people_outline_rounded, size: 48, color: theme.colorScheme.onSurface.withValues(alpha: 0.4)),
                           const SizedBox(height: 12),
-                          const Text(
+                          Text(
                             'No support agents found',
-                            style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: Color(0xFF64748B)),
+                            style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: theme.colorScheme.onSurface.withValues(alpha: 0.6)),
                           ),
                         ],
                       ),
@@ -730,10 +742,10 @@ class _ManagerExecutiveViewState extends State<ManagerExecutiveView> {
                           margin: const EdgeInsets.only(bottom: 10),
                           padding: const EdgeInsets.all(14),
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: theme.cardColor,
                             borderRadius: BorderRadius.circular(16),
                             border: Border.all(
-                              color: agent.isVerified ? const Color(0xFFBFDBFE) : const Color(0xFFE2E8F0),
+                              color: agent.isVerified ? theme.colorScheme.primary.withValues(alpha: 0.4) : theme.colorScheme.outline.withValues(alpha: 0.5),
                               width: agent.isVerified ? 1.5 : 1,
                             ),
                           ),
@@ -745,13 +757,13 @@ class _ManagerExecutiveViewState extends State<ManagerExecutiveView> {
                                   CircleAvatar(
                                     radius: 20,
                                     backgroundColor: agent.isVerified
-                                        ? const Color(0xFFEFF6FF)
-                                        : const Color(0xFFF1F5F9),
+                                        ? theme.colorScheme.primary.withValues(alpha: 0.15)
+                                        : theme.colorScheme.surfaceContainerHighest,
                                     child: Text(
                                       agent.name.isNotEmpty ? agent.name[0].toUpperCase() : 'A',
                                       style: TextStyle(
                                         fontWeight: FontWeight.bold,
-                                        color: agent.isVerified ? const Color(0xFF2563EB) : const Color(0xFF475569),
+                                        color: agent.isVerified ? theme.colorScheme.primary : theme.colorScheme.onSurface,
                                         fontSize: 14,
                                       ),
                                     ),
@@ -766,10 +778,10 @@ class _ManagerExecutiveViewState extends State<ManagerExecutiveView> {
                                             Flexible(
                                               child: Text(
                                                 agent.name,
-                                                style: const TextStyle(
+                                                style: TextStyle(
                                                   fontSize: 15,
                                                   fontWeight: FontWeight.w700,
-                                                  color: Color(0xFF0F172A),
+                                                  color: theme.colorScheme.onSurface,
                                                 ),
                                                 maxLines: 1,
                                                 overflow: TextOverflow.ellipsis,
@@ -784,7 +796,7 @@ class _ManagerExecutiveViewState extends State<ManagerExecutiveView> {
                                         const SizedBox(height: 2),
                                         Text(
                                           '${agent.department} • ${agent.email}',
-                                          style: const TextStyle(fontSize: 12, color: Color(0xFF64748B)),
+                                          style: TextStyle(fontSize: 12, color: theme.colorScheme.onSurface.withValues(alpha: 0.6)),
                                           maxLines: 1,
                                           overflow: TextOverflow.ellipsis,
                                         ),
@@ -794,7 +806,7 @@ class _ManagerExecutiveViewState extends State<ManagerExecutiveView> {
                                   // Verification Toggle
                                   Switch.adaptive(
                                     value: agent.isVerified,
-                                    activeTrackColor: const Color(0xFF2563EB),
+                                    activeTrackColor: theme.colorScheme.primary,
                                     activeThumbColor: Colors.white,
                                     onChanged: (newValue) async {
                                       try {
@@ -806,8 +818,8 @@ class _ManagerExecutiveViewState extends State<ManagerExecutiveView> {
                                           CustomSnackBar.showSuccess(
                                             context,
                                             message: newValue
-                                                ? '${agent.name} is now a Verified Agent ✓'
-                                                : '${agent.name} verification revoked.',
+                                              ? '${agent.name} is now a Verified Agent ✓'
+                                              : '${agent.name} verification revoked.',
                                           );
                                         }
                                       } catch (e) {
@@ -823,7 +835,7 @@ class _ManagerExecutiveViewState extends State<ManagerExecutiveView> {
                                 ],
                               ),
                               const SizedBox(height: 10),
-                              const Divider(height: 1, color: Color(0xFFF1F5F9)),
+                              Divider(height: 1, color: theme.dividerColor),
                               const SizedBox(height: 10),
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -831,16 +843,16 @@ class _ManagerExecutiveViewState extends State<ManagerExecutiveView> {
                                   Container(
                                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                                     decoration: BoxDecoration(
-                                      color: const Color(0xFFF8FAFC),
+                                      color: theme.colorScheme.surfaceContainerHighest,
                                       borderRadius: BorderRadius.circular(6),
-                                      border: Border.all(color: const Color(0xFFE2E8F0)),
+                                      border: Border.all(color: theme.colorScheme.outline.withValues(alpha: 0.4)),
                                     ),
                                     child: Text(
                                       '$activeTicketsCount Active Tickets',
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                         fontSize: 11,
                                         fontWeight: FontWeight.w600,
-                                        color: Color(0xFF475569),
+                                        color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
                                       ),
                                     ),
                                   ),
@@ -869,7 +881,8 @@ class _ManagerExecutiveViewState extends State<ManagerExecutiveView> {
     );
   }
 
-  Widget _buildAgentFilterChip(String key, String label) {
+  Widget _buildAgentFilterChip(BuildContext context, String key, String label) {
+    final theme = Theme.of(context);
     final isSelected = _agentFilter == key;
     return InkWell(
       borderRadius: BorderRadius.circular(20),
@@ -881,10 +894,10 @@ class _ManagerExecutiveViewState extends State<ManagerExecutiveView> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFF0F172A) : Colors.white,
+          color: isSelected ? theme.colorScheme.primary : theme.cardColor,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: isSelected ? const Color(0xFF0F172A) : const Color(0xFFE2E8F0),
+            color: isSelected ? theme.colorScheme.primary : theme.colorScheme.outline.withValues(alpha: 0.5),
           ),
         ),
         child: Text(
@@ -892,7 +905,7 @@ class _ManagerExecutiveViewState extends State<ManagerExecutiveView> {
           style: TextStyle(
             fontSize: 12,
             fontWeight: FontWeight.w600,
-            color: isSelected ? Colors.white : const Color(0xFF64748B),
+            color: isSelected ? Colors.white : theme.colorScheme.onSurface.withValues(alpha: 0.7),
           ),
         ),
       ),
@@ -900,17 +913,19 @@ class _ManagerExecutiveViewState extends State<ManagerExecutiveView> {
   }
 
   Widget _buildMetricTile({
+    required BuildContext context,
     required String title,
     required String value,
     required IconData icon,
     required Color color,
   }) {
+    final theme = Theme.of(context);
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: theme.cardColor,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        border: Border.all(color: theme.colorScheme.outline.withValues(alpha: 0.5)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -921,7 +936,7 @@ class _ManagerExecutiveViewState extends State<ManagerExecutiveView> {
               Icon(icon, size: 18, color: color),
               Text(
                 value,
-                style: AppTextStyles.titleLarge.copyWith(
+                style: TextStyle(
                   fontWeight: FontWeight.w800,
                   color: color,
                   fontSize: 18,
@@ -932,9 +947,10 @@ class _ManagerExecutiveViewState extends State<ManagerExecutiveView> {
           const SizedBox(height: 6),
           Text(
             title,
-            style: AppTextStyles.labelSmall.copyWith(
-              color: AppColors.textSecondary,
+            style: TextStyle(
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
               fontWeight: FontWeight.w600,
+              fontSize: 10,
             ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,

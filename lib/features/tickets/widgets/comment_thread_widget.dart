@@ -18,6 +18,8 @@ class CommentThreadWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -27,13 +29,13 @@ class CommentThreadWidget extends StatelessWidget {
           children: [
             Text(
               'Activity & Messages (${comments.length})',
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.w700,
-                color: Color(0xFF0F172A),
+                color: theme.colorScheme.onSurface,
               ),
             ),
-            const Icon(Icons.chat_bubble_outline_rounded, size: 16, color: Color(0xFF64748B)),
+            Icon(Icons.chat_bubble_outline_rounded, size: 16, color: theme.colorScheme.onSurface.withValues(alpha: 0.6)),
           ],
         ),
         const SizedBox(height: 12),
@@ -44,17 +46,17 @@ class CommentThreadWidget extends StatelessWidget {
             padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
             alignment: Alignment.center,
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: theme.cardColor,
               borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: const Color(0xFFE2E8F0)),
+              border: Border.all(color: theme.colorScheme.outline.withValues(alpha: 0.5)),
             ),
-            child: const Column(
+            child: Column(
               children: [
-                Icon(Icons.mark_chat_unread_outlined, size: 24, color: Color(0xFF94A3B8)),
-                SizedBox(height: 6),
+                Icon(Icons.mark_chat_unread_outlined, size: 24, color: theme.colorScheme.onSurface.withValues(alpha: 0.45)),
+                const SizedBox(height: 6),
                 Text(
                   'No messages yet. Send a note below.',
-                  style: TextStyle(fontSize: 13, color: Color(0xFF64748B)),
+                  style: TextStyle(fontSize: 13, color: theme.colorScheme.onSurface.withValues(alpha: 0.6)),
                 ),
               ],
             ),
@@ -76,14 +78,14 @@ class CommentThreadWidget extends StatelessWidget {
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFF1F5F9),
+                      color: theme.colorScheme.surfaceContainerHighest,
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
                       '${comment.message} • ${_formatTime(comment.createdAt)}',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 11,
-                        color: Color(0xFF64748B),
+                        color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -101,12 +103,12 @@ class CommentThreadWidget extends StatelessWidget {
                     if (!isMe) ...[
                       CircleAvatar(
                         radius: 14,
-                        backgroundColor: const Color(0xFF0F172A),
+                        backgroundColor: theme.colorScheme.primaryContainer,
                         child: Text(
                           comment.senderName.isNotEmpty
                               ? comment.senderName[0].toUpperCase()
                               : 'U',
-                          style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 11),
+                          style: TextStyle(fontWeight: FontWeight.bold, color: theme.colorScheme.onPrimaryContainer, fontSize: 11),
                         ),
                       ),
                       const SizedBox(width: 8),
@@ -115,12 +117,12 @@ class CommentThreadWidget extends StatelessWidget {
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                         decoration: BoxDecoration(
-                          color: isMe ? const Color(0xFF2563EB) : Colors.white,
+                          color: isMe ? theme.colorScheme.primary : theme.cardColor,
                           borderRadius: BorderRadius.circular(14),
-                          border: isMe ? null : Border.all(color: const Color(0xFFE2E8F0)),
+                          border: isMe ? null : Border.all(color: theme.colorScheme.outline.withValues(alpha: 0.5)),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.02),
+                              color: Colors.black.withValues(alpha: 0.05),
                               blurRadius: 4,
                               offset: const Offset(0, 2),
                             ),
@@ -138,7 +140,7 @@ class CommentThreadWidget extends StatelessWidget {
                                   style: TextStyle(
                                     fontSize: 12,
                                     fontWeight: FontWeight.w700,
-                                    color: isMe ? Colors.white : const Color(0xFF0F172A),
+                                    color: isMe ? Colors.white : theme.colorScheme.onSurface,
                                   ),
                                 ),
                                 const SizedBox(width: 6),
@@ -147,7 +149,7 @@ class CommentThreadWidget extends StatelessWidget {
                                   decoration: BoxDecoration(
                                     color: isMe
                                         ? Colors.white.withValues(alpha: 0.2)
-                                        : const Color(0xFFF1F5F9),
+                                        : theme.colorScheme.surfaceContainerHighest,
                                     borderRadius: BorderRadius.circular(4),
                                   ),
                                   child: Text(
@@ -155,7 +157,7 @@ class CommentThreadWidget extends StatelessWidget {
                                     style: TextStyle(
                                       fontSize: 9,
                                       fontWeight: FontWeight.w600,
-                                      color: isMe ? Colors.white : const Color(0xFF64748B),
+                                      color: isMe ? Colors.white : theme.colorScheme.onSurface.withValues(alpha: 0.7),
                                     ),
                                   ),
                                 ),
@@ -168,7 +170,7 @@ class CommentThreadWidget extends StatelessWidget {
                               comment.message,
                               style: TextStyle(
                                 fontSize: 13,
-                                color: isMe ? Colors.white : const Color(0xFF334155),
+                                color: isMe ? Colors.white : theme.colorScheme.onSurface.withValues(alpha: 0.9),
                                 height: 1.35,
                               ),
                             ),
@@ -179,7 +181,7 @@ class CommentThreadWidget extends StatelessWidget {
                               _formatTime(comment.createdAt),
                               style: TextStyle(
                                 fontSize: 10,
-                                color: isMe ? Colors.white70 : const Color(0xFF94A3B8),
+                                color: isMe ? Colors.white70 : theme.colorScheme.onSurface.withValues(alpha: 0.5),
                               ),
                             ),
                           ],
@@ -190,7 +192,7 @@ class CommentThreadWidget extends StatelessWidget {
                       const SizedBox(width: 8),
                       CircleAvatar(
                         radius: 14,
-                        backgroundColor: const Color(0xFF2563EB),
+                        backgroundColor: theme.colorScheme.primary,
                         child: Text(
                           currentUser.name.isNotEmpty
                               ? currentUser.name[0].toUpperCase()

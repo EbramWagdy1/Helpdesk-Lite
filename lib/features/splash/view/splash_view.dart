@@ -117,8 +117,11 @@ class _SplashViewState extends State<SplashView> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF0F6FE),
+      backgroundColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF0F6FE),
       body: Stack(
         children: [
           // 1. High-Res Corporate Workspace Background Illustration
@@ -127,33 +130,39 @@ class _SplashViewState extends State<SplashView> with TickerProviderStateMixin {
               AppAssets.splashBg,
               fit: BoxFit.cover,
               errorBuilder: (context, error, stackTrace) => Container(
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                   gradient: LinearGradient(
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
-                    colors: [
-                      Color(0xFFF8FAFC),
-                      Color(0xFFE2E8F0),
-                    ],
+                    colors: isDark
+                        ? const [Color(0xFF0F172A), Color(0xFF1E293B)]
+                        : const [Color(0xFFF8FAFC), Color(0xFFE2E8F0)],
                   ),
                 ),
               ),
             ),
           ),
 
-          // 2. Soft Gradient Lighting Overlay for Top Contrast
+          // 2. Gradient Lighting Overlay for Top Contrast & Dark Theme integration
           Positioned.fill(
             child: Container(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
-                  colors: [
-                    Colors.white.withValues(alpha: 0.75),
-                    Colors.white.withValues(alpha: 0.10),
-                    Colors.transparent,
-                    const Color(0xFF0F172A).withValues(alpha: 0.15),
-                  ],
+                  colors: isDark
+                      ? [
+                          const Color(0xFF0F172A).withValues(alpha: 0.90),
+                          const Color(0xFF0F172A).withValues(alpha: 0.70),
+                          const Color(0xFF0F172A).withValues(alpha: 0.85),
+                          const Color(0xFF0F172A).withValues(alpha: 0.98),
+                        ]
+                      : [
+                          Colors.white.withValues(alpha: 0.75),
+                          Colors.white.withValues(alpha: 0.10),
+                          Colors.transparent,
+                          const Color(0xFF0F172A).withValues(alpha: 0.15),
+                        ],
                   stops: const [0.0, 0.35, 0.65, 1.0],
                 ),
               ),
@@ -179,10 +188,10 @@ class _SplashViewState extends State<SplashView> with TickerProviderStateMixin {
                         child: Image.asset(
                           AppAssets.logo,
                           fit: BoxFit.contain,
-                          errorBuilder: (context, error, stackTrace) => const Icon(
+                          errorBuilder: (context, error, stackTrace) => Icon(
                             Icons.support_agent_rounded,
                             size: 72,
-                            color: Color(0xFF2563EB),
+                            color: theme.colorScheme.primary,
                           ),
                         ),
                       ),
@@ -199,8 +208,8 @@ class _SplashViewState extends State<SplashView> with TickerProviderStateMixin {
                         children: [
                           RichText(
                             textAlign: TextAlign.center,
-                            text: const TextSpan(
-                              style: TextStyle(
+                            text: TextSpan(
+                              style: const TextStyle(
                                 fontSize: 34,
                                 fontWeight: FontWeight.w900,
                                 letterSpacing: -0.8,
@@ -208,12 +217,14 @@ class _SplashViewState extends State<SplashView> with TickerProviderStateMixin {
                               children: [
                                 TextSpan(
                                   text: 'HelpDesk',
-                                  style: TextStyle(color: Color(0xFF0F172A)),
+                                  style: TextStyle(
+                                    color: isDark ? const Color(0xFFF8FAFC) : const Color(0xFF0F172A),
+                                  ),
                                 ),
                                 TextSpan(
                                   text: ' Lite',
                                   style: TextStyle(
-                                    color: Color(0xFF2563EB),
+                                    color: theme.colorScheme.primary,
                                     fontWeight: FontWeight.w800,
                                   ),
                                 ),
@@ -221,12 +232,12 @@ class _SplashViewState extends State<SplashView> with TickerProviderStateMixin {
                             ),
                           ),
                           const SizedBox(height: 8),
-                          const Text(
+                          Text(
                             'Smart Workplace & Support Hub',
                             style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w600,
-                              color: Color(0xFF475569),
+                              color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF475569),
                               letterSpacing: 0.1,
                             ),
                             textAlign: TextAlign.center,
@@ -249,10 +260,14 @@ class _SplashViewState extends State<SplashView> with TickerProviderStateMixin {
                           width: 140,
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(4),
-                            child: const LinearProgressIndicator(
+                            child: LinearProgressIndicator(
                               minHeight: 3,
-                              backgroundColor: Color(0x33FFFFFF),
-                              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                              backgroundColor: isDark
+                                  ? const Color(0xFF334155)
+                                  : const Color(0x33FFFFFF),
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                isDark ? theme.colorScheme.primary : Colors.white,
+                              ),
                             ),
                           ),
                         ),
@@ -265,7 +280,9 @@ class _SplashViewState extends State<SplashView> with TickerProviderStateMixin {
                             Icon(
                               Icons.verified_user_rounded,
                               size: 14,
-                              color: Colors.white.withValues(alpha: 0.9),
+                              color: isDark
+                                  ? theme.colorScheme.onSurface.withValues(alpha: 0.75)
+                                  : Colors.white.withValues(alpha: 0.9),
                             ),
                             const SizedBox(width: 6),
                             Text(
@@ -273,7 +290,9 @@ class _SplashViewState extends State<SplashView> with TickerProviderStateMixin {
                               style: TextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.w600,
-                                color: Colors.white.withValues(alpha: 0.9),
+                                color: isDark
+                                    ? theme.colorScheme.onSurface.withValues(alpha: 0.75)
+                                    : Colors.white.withValues(alpha: 0.9),
                                 letterSpacing: 0.3,
                               ),
                             ),

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:helpdesk/core/utils/app_colors.dart';
-import 'package:helpdesk/core/utils/app_text_style.dart';
 import 'package:helpdesk/core/widgets/connectivity_checker_wrapper.dart';
 import 'package:helpdesk/core/widgets/verified_badge_widget.dart';
 import 'package:helpdesk/features/auth/model/user_model.dart';
@@ -44,16 +43,23 @@ class _AgentDashboardViewState extends State<AgentDashboardView> {
 
   void _showLogoutDialog(BuildContext context) {
     final authCubit = AuthCubit.get(context);
+    final theme = Theme.of(context);
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Text('Sign Out', style: AppTextStyles.titleMedium),
-        content: const Text('Are you sure you want to sign out from the Agent Hub?'),
+        title: Text(
+          'Sign Out',
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: theme.colorScheme.onSurface),
+        ),
+        content: Text(
+          'Are you sure you want to sign out from the Agent Hub?',
+          style: TextStyle(color: theme.colorScheme.onSurface.withValues(alpha: 0.7)),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Cancel'),
+            child: Text('Cancel', style: TextStyle(color: theme.colorScheme.onSurface.withValues(alpha: 0.6))),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
@@ -74,81 +80,59 @@ class _AgentDashboardViewState extends State<AgentDashboardView> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return ConnectivityCheckerWrapper(
       child: BlocProvider(
         create: (context) => TicketListCubit()..initializeTicketStream(currentUser: widget.currentUser),
         child: Scaffold(
-        backgroundColor: AppColors.background,
-        body: SafeArea(
-          child: BlocBuilder<TicketListCubit, TicketListState>(
-            builder: (context, state) {
-              final ticketCubit = TicketListCubit.get(context);
+          backgroundColor: theme.scaffoldBackgroundColor,
+          body: SafeArea(
+            child: BlocBuilder<TicketListCubit, TicketListState>(
+              builder: (context, state) {
+                final ticketCubit = TicketListCubit.get(context);
 
-              List<TicketModel> allDepartmentTickets = [];
-              List<TicketModel> filteredTickets = [];
+                List<TicketModel> allDepartmentTickets = [];
+                List<TicketModel> filteredTickets = [];
 
-              if (state is TicketListLoadedState) {
-                allDepartmentTickets = state.allTickets;
-                filteredTickets = state.filteredTickets;
-              }
+                if (state is TicketListLoadedState) {
+                  allDepartmentTickets = state.allTickets;
+                  filteredTickets = state.filteredTickets;
+                }
 
-              // Filter based on active tab
-              List<TicketModel> displayedTickets;
-              switch (_selectedTab) {
-                case AgentQueueTab.departmentQueue:
-                  displayedTickets = filteredTickets;
-                  break;
-                case AgentQueueTab.assignedToMe:
-                  displayedTickets = filteredTickets.where((t) => t.assignedTo?.uid == widget.currentUser.uid).toList();
-                  break;
-                case AgentQueueTab.urgentQueue:
-                  displayedTickets = filteredTickets.where((t) => t.priority == TicketPriority.high || t.priority == TicketPriority.urgent).toList();
-                  break;
-              }
+                // Filter based on active tab
+                List<TicketModel> displayedTickets;
+                switch (_selectedTab) {
+                  case AgentQueueTab.departmentQueue:
+                    displayedTickets = filteredTickets;
+                    break;
+                  case AgentQueueTab.assignedToMe:
+                    displayedTickets = filteredTickets.where((t) => t.assignedTo?.uid == widget.currentUser.uid).toList();
+                    break;
+                  case AgentQueueTab.urgentQueue:
+                    displayedTickets = filteredTickets.where((t) => t.priority == TicketPriority.high || t.priority == TicketPriority.urgent).toList();
+                    break;
+                }
 
-              final deptQueueCount = allDepartmentTickets.length;
-              final assignedCount = allDepartmentTickets.where((t) => t.assignedTo?.uid == widget.currentUser.uid).length;
-              final urgentCount = allDepartmentTickets.where((t) => (t.priority == TicketPriority.high || t.priority == TicketPriority.urgent) && t.status != TicketStatus.closed).length;
-              final resolvedCount = allDepartmentTickets.where((t) => t.status == TicketStatus.resolved || t.status == TicketStatus.closed).length;
+                final deptQueueCount = allDepartmentTickets.length;
+                final assignedCount = allDepartmentTickets.where((t) => t.assignedTo?.uid == widget.currentUser.uid).length;
+                final urgentCount = allDepartmentTickets.where((t) => (t.priority == TicketPriority.high || t.priority == TicketPriority.urgent) && t.status != TicketStatus.closed).length;
+                final resolvedCount = allDepartmentTickets.where((t) => t.status == TicketStatus.resolved || t.status == TicketStatus.closed).length;
 
-              return CustomScrollView(
-                slivers: [
-                  // Top Agent Header
-                  SliverToBoxAdapter(
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-                      decoration: const BoxDecoration(
-                        color: AppColors.surface,
-                        border: Border(bottom: BorderSide(color: AppColors.border)),
-                      ),
-                      child: Row(
-                        children: [
-                          // Interactive Profile Avatar
-                          GestureDetector(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => ProfileView(user: widget.currentUser),
-                                ),
-                              );
-                            },
-                            child: CircleAvatar(
-                              radius: 22,
-                              backgroundColor: AppColors.secondary.withValues(alpha: 0.15),
-                              child: Text(
-                                widget.currentUser.name.isNotEmpty ? widget.currentUser.name[0].toUpperCase() : 'A',
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: AppColors.secondary,
-                                  fontSize: 18,
-                                ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: GestureDetector(
+                return CustomScrollView(
+                  slivers: [
+                    // Top Agent Header
+                    SliverToBoxAdapter(
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                        decoration: BoxDecoration(
+                          color: theme.cardColor,
+                          border: Border(bottom: BorderSide(color: theme.colorScheme.outline.withValues(alpha: 0.4))),
+                        ),
+                        child: Row(
+                          children: [
+                            // Interactive Profile Avatar
+                            GestureDetector(
                               onTap: () {
                                 Navigator.push(
                                   context,
@@ -157,300 +141,342 @@ class _AgentDashboardViewState extends State<AgentDashboardView> {
                                   ),
                                 );
                               },
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    children: [
-                                      Flexible(
-                                        child: Text(
-                                          widget.currentUser.name,
-                                          style: const TextStyle(
-                                            fontSize: 15,
-                                            fontWeight: FontWeight.w700,
-                                            color: Color(0xFF0F172A),
-                                          ),
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ),
-                                      if (widget.currentUser.isVerified) ...[
-                                        const SizedBox(width: 4),
-                                        const VerifiedBadgeWidget(size: 14),
-                                      ],
-                                    ],
+                              child: CircleAvatar(
+                                radius: 22,
+                                backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.15),
+                                child: Text(
+                                  widget.currentUser.name.isNotEmpty ? widget.currentUser.name[0].toUpperCase() : 'A',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: theme.colorScheme.primary,
+                                    fontSize: 18,
                                   ),
-                                  const SizedBox(height: 2),
-                                  Row(
-                                    children: [
-                                      Flexible(
-                                        child: Text(
-                                          '${widget.currentUser.department} Agent',
-                                          style: const TextStyle(
-                                            fontSize: 11,
-                                            fontWeight: FontWeight.w600,
-                                            color: Color(0xFF64748B),
-                                          ),
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ),
-                                      const SizedBox(width: 6),
-                                      const Text('•', style: TextStyle(color: Color(0xFFCBD5E1), fontSize: 11)),
-                                      const SizedBox(width: 6),
-                                      const Text(
-                                        'On-Duty',
-                                        style: TextStyle(
-                                          fontSize: 11,
-                                          fontWeight: FontWeight.w700,
-                                          color: Color(0xFF16A34A),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
+                                ),
                               ),
                             ),
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.person_outline_rounded, color: AppColors.textPrimary),
-                            tooltip: 'Account Profile',
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => ProfileView(user: widget.currentUser),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => ProfileView(user: widget.currentUser),
+                                    ),
+                                  );
+                                },
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Flexible(
+                                          child: Text(
+                                            widget.currentUser.name,
+                                            style: TextStyle(
+                                              fontSize: 15,
+                                              fontWeight: FontWeight.w700,
+                                              color: theme.colorScheme.onSurface,
+                                            ),
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                        if (widget.currentUser.isVerified) ...[
+                                          const SizedBox(width: 4),
+                                          const VerifiedBadgeWidget(size: 14),
+                                        ],
+                                      ],
+                                    ),
+                                    const SizedBox(height: 2),
+                                    Row(
+                                      children: [
+                                        Flexible(
+                                          child: Text(
+                                            '${widget.currentUser.department} Agent',
+                                            style: TextStyle(
+                                              fontSize: 11,
+                                              fontWeight: FontWeight.w600,
+                                              color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                                            ),
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 6),
+                                        Text('•', style: TextStyle(color: theme.colorScheme.outline, fontSize: 11)),
+                                        const SizedBox(width: 6),
+                                        const Text(
+                                          'On-Duty',
+                                          style: TextStyle(
+                                            fontSize: 11,
+                                            fontWeight: FontWeight.w700,
+                                            color: Color(0xFF16A34A),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
                                 ),
-                              );
-                            },
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.tune_rounded, color: AppColors.textPrimary),
-                            tooltip: 'Filter Queue',
-                            onPressed: () {
-                              showModalBottomSheet(
-                                context: context,
-                                isScrollControlled: true,
-                                shape: const RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-                                ),
-                                builder: (_) => TicketFilterSheet(
-                                  cubit: ticketCubit,
-                                  currentUser: widget.currentUser,
-                                ),
-                              );
-                            },
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.logout_rounded, color: AppColors.textSecondary),
-                            tooltip: 'Sign Out',
-                            onPressed: () => _showLogoutDialog(context),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-
-                  // Agent Metrics Grid
-                  SliverToBoxAdapter(
-                    child: Padding(
-                      padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: _buildMetricCard(
-                              title: 'Dept Queue',
-                              value: '$deptQueueCount',
-                              icon: Icons.all_inbox_rounded,
-                              color: AppColors.primary,
+                              ),
                             ),
-                          ),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: _buildMetricCard(
-                              title: 'Assigned to Me',
-                              value: '$assignedCount',
-                              icon: Icons.assignment_ind_rounded,
-                              color: AppColors.secondary,
+                            IconButton(
+                              icon: Icon(Icons.person_outline_rounded, color: theme.colorScheme.onSurface),
+                              tooltip: 'Account Profile',
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => ProfileView(user: widget.currentUser),
+                                  ),
+                                );
+                              },
                             ),
-                          ),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: _buildMetricCard(
-                              title: 'Urgent',
-                              value: '$urgentCount',
-                              icon: Icons.local_fire_department_rounded,
-                              color: AppColors.priorityHigh,
+                            IconButton(
+                              icon: Icon(Icons.tune_rounded, color: theme.colorScheme.onSurface),
+                              tooltip: 'Filter Queue',
+                              onPressed: () {
+                                showModalBottomSheet(
+                                  context: context,
+                                  isScrollControlled: true,
+                                  backgroundColor: theme.cardColor,
+                                  shape: const RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+                                  ),
+                                  builder: (_) => TicketFilterSheet(
+                                    cubit: ticketCubit,
+                                    currentUser: widget.currentUser,
+                                  ),
+                                );
+                              },
                             ),
-                          ),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: _buildMetricCard(
-                              title: 'Resolved',
-                              value: '$resolvedCount',
-                              icon: Icons.task_alt_rounded,
-                              color: AppColors.statusResolved,
+                            IconButton(
+                              icon: Icon(Icons.logout_rounded, color: theme.colorScheme.onSurface.withValues(alpha: 0.6)),
+                              tooltip: 'Sign Out',
+                              onPressed: () => _showLogoutDialog(context),
                             ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-
-                  // Search Bar
-                  SliverToBoxAdapter(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-                      child: Container(
-                        height: 44,
-                        decoration: BoxDecoration(
-                          color: AppColors.surface,
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: AppColors.border),
-                        ),
-                        child: TextField(
-                          controller: _searchController,
-                          onChanged: (val) => ticketCubit.search(val),
-                          decoration: InputDecoration(
-                            hintText: 'Search department tickets, ID, requester...',
-                            hintStyle: AppTextStyles.bodySmall.copyWith(color: AppColors.textMuted),
-                            prefixIcon: const Icon(Icons.search_rounded, size: 20, color: AppColors.textMuted),
-                            suffixIcon: _searchController.text.isNotEmpty
-                                ? IconButton(
-                                    icon: const Icon(Icons.clear_rounded, size: 16),
-                                    onPressed: () {
-                                      _searchController.clear();
-                                      ticketCubit.search('');
-                                    },
-                                  )
-                                : null,
-                            border: InputBorder.none,
-                            contentPadding: const EdgeInsets.symmetric(vertical: 10),
-                          ),
+                          ],
                         ),
                       ),
                     ),
-                  ),
 
-                  // Queue Navigation Tabs (Segmented)
-                  SliverToBoxAdapter(
-                    child: Padding(
-                      padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
-                      child: Container(
-                        padding: const EdgeInsets.all(4),
-                        decoration: BoxDecoration(
-                          color: AppColors.surfaceVariant,
-                          borderRadius: BorderRadius.circular(14),
-                        ),
+                    // Agent Metrics Grid
+                    SliverToBoxAdapter(
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
                         child: Row(
                           children: [
                             Expanded(
-                              child: _buildQueueTabItem(
-                                label: 'Dept Queue ($deptQueueCount)',
-                                tab: AgentQueueTab.departmentQueue,
+                              child: _buildMetricCard(
+                                context: context,
+                                title: 'Dept Queue',
+                                value: '$deptQueueCount',
+                                icon: Icons.all_inbox_rounded,
+                                color: theme.colorScheme.primary,
                               ),
                             ),
+                            const SizedBox(width: 8),
                             Expanded(
-                              child: _buildQueueTabItem(
-                                label: 'My Assigned ($assignedCount)',
-                                tab: AgentQueueTab.assignedToMe,
+                              child: _buildMetricCard(
+                                context: context,
+                                title: 'Assigned to Me',
+                                value: '$assignedCount',
+                                icon: Icons.assignment_ind_rounded,
+                                color: AppColors.secondary,
                               ),
                             ),
+                            const SizedBox(width: 8),
                             Expanded(
-                              child: _buildQueueTabItem(
-                                label: 'Urgent ($urgentCount)',
-                                tab: AgentQueueTab.urgentQueue,
+                              child: _buildMetricCard(
+                                context: context,
+                                title: 'Urgent',
+                                value: '$urgentCount',
+                                icon: Icons.local_fire_department_rounded,
+                                color: AppColors.priorityHigh,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: _buildMetricCard(
+                                context: context,
+                                title: 'Resolved',
+                                value: '$resolvedCount',
+                                icon: Icons.task_alt_rounded,
+                                color: AppColors.statusResolved,
                               ),
                             ),
                           ],
                         ),
                       ),
                     ),
-                  ),
 
-                  // Ticket List
-                  if (state is TicketListLoadingState)
-                    const SliverFillRemaining(
-                      child: Center(child: CircularProgressIndicator()),
-                    )
-                  else if (displayedTickets.isEmpty)
+                    // Search Bar
                     SliverToBoxAdapter(
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 20),
-                        child: Center(
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                        child: Container(
+                          height: 44,
+                          decoration: BoxDecoration(
+                            color: theme.cardColor,
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: theme.colorScheme.outline.withValues(alpha: 0.5)),
+                          ),
+                          child: TextField(
+                            controller: _searchController,
+                            onChanged: (val) => ticketCubit.search(val),
+                            style: TextStyle(fontSize: 14, color: theme.colorScheme.onSurface),
+                            decoration: InputDecoration(
+                              hintText: 'Search department tickets, ID, requester...',
+                              hintStyle: TextStyle(fontSize: 13, color: theme.colorScheme.onSurface.withValues(alpha: 0.45)),
+                              prefixIcon: Icon(Icons.search_rounded, size: 20, color: theme.colorScheme.onSurface.withValues(alpha: 0.45)),
+                              suffixIcon: _searchController.text.isNotEmpty
+                                  ? IconButton(
+                                      icon: Icon(Icons.clear_rounded, size: 16, color: theme.colorScheme.onSurface.withValues(alpha: 0.6)),
+                                      onPressed: () {
+                                        _searchController.clear();
+                                        ticketCubit.search('');
+                                      },
+                                    )
+                                  : null,
+                              border: InputBorder.none,
+                              contentPadding: const EdgeInsets.symmetric(vertical: 10),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    // Queue Navigation Tabs (Segmented)
+                    SliverToBoxAdapter(
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
+                        child: Container(
+                          padding: const EdgeInsets.all(4),
+                          decoration: BoxDecoration(
+                            color: theme.colorScheme.surfaceContainerHighest,
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                          child: Row(
                             children: [
-                              Container(
-                                padding: const EdgeInsets.all(20),
-                                decoration: const BoxDecoration(
-                                  color: AppColors.surfaceVariant,
-                                  shape: BoxShape.circle,
+                              Expanded(
+                                child: _buildQueueTabItem(
+                                  context: context,
+                                  label: 'Dept Queue ($deptQueueCount)',
+                                  tab: AgentQueueTab.departmentQueue,
                                 ),
-                                child: const Icon(Icons.done_all_rounded, size: 48, color: AppColors.success),
                               ),
-                              const SizedBox(height: 16),
-                              Text(
-                                _selectedTab == AgentQueueTab.assignedToMe
-                                    ? 'No tickets assigned to you right now'
-                                    : 'Queue is clean!',
-                                style: AppTextStyles.titleMedium.copyWith(fontWeight: FontWeight.w700),
+                              Expanded(
+                                child: _buildQueueTabItem(
+                                  context: context,
+                                  label: 'My Assigned ($assignedCount)',
+                                  tab: AgentQueueTab.assignedToMe,
+                                ),
                               ),
-                              const SizedBox(height: 6),
-                              Text(
-                                _selectedTab == AgentQueueTab.assignedToMe
-                                    ? 'Check the "Dept Queue" tab to claim incoming support tickets.'
-                                    : 'All tickets for your department have been handled or assigned.',
-                                style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary),
-                                textAlign: TextAlign.center,
+                              Expanded(
+                                child: _buildQueueTabItem(
+                                  context: context,
+                                  label: 'Urgent ($urgentCount)',
+                                  tab: AgentQueueTab.urgentQueue,
+                                ),
                               ),
                             ],
                           ),
                         ),
                       ),
-                    )
-                  else
-                    SliverPadding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                      sliver: SliverList(
-                        delegate: SliverChildBuilderDelegate(
-                          (context, index) {
-                            final ticket = displayedTickets[index];
-                            return TicketCardWidget(
-                              ticket: ticket,
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) => TicketDetailsView(
-                                      ticketId: ticket.id,
-                                      currentUser: widget.currentUser,
-                                    ),
-                                  ),
-                                );
-                              },
-                            );
-                          },
-                          childCount: displayedTickets.length,
-                        ),
-                      ),
                     ),
 
-                  const SliverToBoxAdapter(child: SizedBox(height: 30)),
-                ],
-              );
-            },
+                    // Ticket List
+                    if (state is TicketListLoadingState)
+                      const SliverFillRemaining(
+                        child: Center(child: CircularProgressIndicator()),
+                      )
+                    else if (displayedTickets.isEmpty)
+                      SliverToBoxAdapter(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 20),
+                          child: Center(
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(20),
+                                  decoration: BoxDecoration(
+                                    color: theme.colorScheme.surfaceContainerHighest,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: const Icon(Icons.done_all_rounded, size: 48, color: AppColors.success),
+                                ),
+                                const SizedBox(height: 16),
+                                Text(
+                                  _selectedTab == AgentQueueTab.assignedToMe
+                                      ? 'No tickets assigned to you right now'
+                                      : 'Queue is clean!',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w700,
+                                    color: theme.colorScheme.onSurface,
+                                  ),
+                                ),
+                                const SizedBox(height: 6),
+                                Text(
+                                  _selectedTab == AgentQueueTab.assignedToMe
+                                      ? 'Check the "Dept Queue" tab to claim incoming support tickets.'
+                                      : 'All tickets for your department have been handled or assigned.',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      )
+                    else
+                      SliverPadding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                        sliver: SliverList(
+                          delegate: SliverChildBuilderDelegate(
+                            (context, index) {
+                              final ticket = displayedTickets[index];
+                              return TicketCardWidget(
+                                ticket: ticket,
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => TicketDetailsView(
+                                        ticketId: ticket.id,
+                                        currentUser: widget.currentUser,
+                                      ),
+                                    ),
+                                  );
+                                },
+                              );
+                            },
+                            childCount: displayedTickets.length,
+                          ),
+                        ),
+                      ),
+
+                    const SliverToBoxAdapter(child: SizedBox(height: 30)),
+                  ],
+                );
+              },
+            ),
           ),
         ),
-      ),
       ),
     );
   }
 
   Widget _buildQueueTabItem({
+    required BuildContext context,
     required String label,
     required AgentQueueTab tab,
   }) {
+    final theme = Theme.of(context);
     final isSelected = _selectedTab == tab;
     return GestureDetector(
       onTap: () {
@@ -461,12 +487,12 @@ class _AgentDashboardViewState extends State<AgentDashboardView> {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 10),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.surface : Colors.transparent,
+          color: isSelected ? theme.cardColor : Colors.transparent,
           borderRadius: BorderRadius.circular(10),
           boxShadow: isSelected
               ? [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.05),
+                    color: Colors.black.withValues(alpha: 0.08),
                     blurRadius: 4,
                     offset: const Offset(0, 2),
                   ),
@@ -479,7 +505,7 @@ class _AgentDashboardViewState extends State<AgentDashboardView> {
             style: TextStyle(
               fontSize: 11,
               fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
-              color: isSelected ? AppColors.primary : AppColors.textSecondary,
+              color: isSelected ? theme.colorScheme.primary : theme.colorScheme.onSurface.withValues(alpha: 0.6),
             ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
@@ -490,17 +516,19 @@ class _AgentDashboardViewState extends State<AgentDashboardView> {
   }
 
   Widget _buildMetricCard({
+    required BuildContext context,
     required String title,
     required String value,
     required IconData icon,
     required Color color,
   }) {
+    final theme = Theme.of(context);
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: theme.cardColor,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: theme.colorScheme.outline.withValues(alpha: 0.5)),
       ),
       child: Column(
         children: [
@@ -517,9 +545,9 @@ class _AgentDashboardViewState extends State<AgentDashboardView> {
           const SizedBox(height: 2),
           Text(
             title,
-            style: AppTextStyles.labelSmall.copyWith(
+            style: TextStyle(
               fontSize: 10,
-              color: AppColors.textMuted,
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.55),
               fontWeight: FontWeight.w600,
             ),
             textAlign: TextAlign.center,

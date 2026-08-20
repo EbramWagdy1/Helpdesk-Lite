@@ -3,9 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:helpdesk/core/routing/app_routes.dart';
 import 'package:helpdesk/core/utils/app_assets.dart';
-import 'package:helpdesk/core/utils/app_colors.dart';
 import 'package:helpdesk/core/utils/app_strings.dart';
-import 'package:helpdesk/core/utils/app_text_style.dart';
 import 'package:helpdesk/core/utils/regexes.dart';
 import 'package:helpdesk/core/widgets/custom_button.dart';
 import 'package:helpdesk/core/widgets/custom_snackbar.dart';
@@ -43,8 +41,10 @@ class _LoginViewState extends State<LoginView> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: SafeArea(
         child: BlocConsumer<AuthCubit, AuthState>(
           listener: (context, state) {
@@ -74,7 +74,7 @@ class _LoginViewState extends State<LoginView> {
                           height: 84,
                           padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
-                            color: AppColors.primary.withValues(alpha: 0.1),
+                            color: theme.colorScheme.primary.withValues(alpha: 0.12),
                             shape: BoxShape.circle,
                           ),
                           child: Image.asset(AppAssets.logo, fit: BoxFit.contain),
@@ -83,13 +83,20 @@ class _LoginViewState extends State<LoginView> {
                       const SizedBox(height: 24),
                       Text(
                         AppStrings.welcomeBack,
-                        style: AppTextStyles.headlineMedium,
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.w800,
+                          color: theme.colorScheme.onSurface,
+                        ),
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 8),
                       Text(
                         'Sign in to your HelpDesk workspace',
-                        style: AppTextStyles.bodyMedium,
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                        ),
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 32),
@@ -100,7 +107,7 @@ class _LoginViewState extends State<LoginView> {
                         labelText: AppStrings.email,
                         hintText: AppStrings.emailHint,
                         keyboardType: TextInputType.emailAddress,
-                        prefixIcon: const Icon(Icons.email_outlined, color: AppColors.primary),
+                        prefixIcon: Icon(Icons.email_outlined, color: theme.colorScheme.primary),
                         validator: (value) {
                           if (value == null || value.trim().isEmpty) {
                             return AppStrings.requiredField;
@@ -119,13 +126,13 @@ class _LoginViewState extends State<LoginView> {
                         labelText: AppStrings.password,
                         hintText: AppStrings.passwordHint,
                         obscureText: cubit.isPasswordHidden,
-                        prefixIcon: const Icon(Icons.lock_outline_rounded, color: AppColors.primary),
+                        prefixIcon: Icon(Icons.lock_outline_rounded, color: theme.colorScheme.primary),
                         suffixIcon: IconButton(
                           icon: Icon(
                             cubit.isPasswordHidden
                                 ? Icons.visibility_outlined
                                 : Icons.visibility_off_outlined,
-                            color: AppColors.textSecondary,
+                            color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                           ),
                           onPressed: cubit.togglePasswordVisibility,
                         ),
@@ -153,14 +160,18 @@ class _LoginViewState extends State<LoginView> {
                                 child: Checkbox(
                                   value: cubit.rememberMe,
                                   onChanged: cubit.toggleRememberMe,
-                                  activeColor: AppColors.primary,
+                                  activeColor: theme.colorScheme.primary,
                                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
                                 ),
                               ),
                               const SizedBox(width: 8),
                               Text(
                                 AppStrings.rememberMe,
-                                style: AppTextStyles.labelMedium.copyWith(color: AppColors.textPrimary),
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
+                                  fontWeight: FontWeight.w500,
+                                ),
                               ),
                             ],
                           ),
@@ -173,9 +184,10 @@ class _LoginViewState extends State<LoginView> {
                             },
                             child: Text(
                               AppStrings.forgotPassword,
-                              style: AppTextStyles.labelMedium.copyWith(
-                                color: AppColors.primary,
+                              style: TextStyle(
+                                color: theme.colorScheme.primary,
                                 fontWeight: FontWeight.w600,
+                                fontSize: 13,
                               ),
                             ),
                           ),
@@ -197,15 +209,20 @@ class _LoginViewState extends State<LoginView> {
                         children: [
                           Text(
                             AppStrings.dontHaveAccount,
-                            style: AppTextStyles.bodyMedium,
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                            ),
                           ),
+                          const SizedBox(width: 4),
                           GestureDetector(
                             onTap: () => context.push(AppRoutes.signup),
                             child: Text(
                               AppStrings.signUp,
-                              style: AppTextStyles.bodyMedium.copyWith(
-                                color: AppColors.primary,
+                              style: TextStyle(
+                                color: theme.colorScheme.primary,
                                 fontWeight: FontWeight.w700,
+                                fontSize: 14,
                               ),
                             ),
                           ),

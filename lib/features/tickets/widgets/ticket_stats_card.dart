@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:helpdesk/core/utils/app_colors.dart';
-import 'package:helpdesk/core/utils/app_text_style.dart';
 import 'package:helpdesk/features/tickets/model/ticket_model.dart';
 
 class TicketStatsCard extends StatelessWidget {
@@ -21,43 +20,48 @@ class TicketStatsCard extends StatelessWidget {
     final openCount = tickets.where((t) => t.status == TicketStatus.open).length;
     final inProgressCount = tickets.where((t) => t.status == TicketStatus.inProgress).length;
     final resolvedCount = tickets.where((t) => t.status == TicketStatus.resolved || t.status == TicketStatus.closed).length;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Row(
         children: [
           _buildStatPill(
+            context: context,
             label: 'All',
             count: totalCount,
             color: AppColors.primary,
-            bgColor: AppColors.primary.withValues(alpha: 0.08),
+            bgColor: isDark ? AppColors.primary.withValues(alpha: 0.15) : AppColors.primary.withValues(alpha: 0.08),
             isSelected: selectedStatus == null,
             onTap: () => onStatusSelected(null),
           ),
           const SizedBox(width: 8),
           _buildStatPill(
+            context: context,
             label: 'Open',
             count: openCount,
             color: AppColors.statusOpen,
-            bgColor: AppColors.statusOpenBg,
+            bgColor: isDark ? AppColors.statusOpen.withValues(alpha: 0.15) : AppColors.statusOpenBg,
             isSelected: selectedStatus == TicketStatus.open,
             onTap: () => onStatusSelected(TicketStatus.open),
           ),
           const SizedBox(width: 8),
           _buildStatPill(
+            context: context,
             label: 'In Progress',
             count: inProgressCount,
             color: AppColors.statusInProgress,
-            bgColor: AppColors.statusInProgressBg,
+            bgColor: isDark ? AppColors.statusInProgress.withValues(alpha: 0.15) : AppColors.statusInProgressBg,
             isSelected: selectedStatus == TicketStatus.inProgress,
             onTap: () => onStatusSelected(TicketStatus.inProgress),
           ),
           const SizedBox(width: 8),
           _buildStatPill(
+            context: context,
             label: 'Resolved',
             count: resolvedCount,
             color: AppColors.statusResolved,
-            bgColor: AppColors.statusResolvedBg,
+            bgColor: isDark ? AppColors.statusResolved.withValues(alpha: 0.15) : AppColors.statusResolvedBg,
             isSelected: selectedStatus == TicketStatus.resolved,
             onTap: () => onStatusSelected(TicketStatus.resolved),
           ),
@@ -67,6 +71,7 @@ class TicketStatsCard extends StatelessWidget {
   }
 
   Widget _buildStatPill({
+    required BuildContext context,
     required String label,
     required int count,
     required Color color,
@@ -74,6 +79,8 @@ class TicketStatsCard extends StatelessWidget {
     required bool isSelected,
     required VoidCallback onTap,
   }) {
+    final theme = Theme.of(context);
+
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
@@ -101,8 +108,9 @@ class TicketStatsCard extends StatelessWidget {
           children: [
             Text(
               label,
-              style: AppTextStyles.labelMedium.copyWith(
-                color: isSelected ? Colors.white : AppColors.textPrimary,
+              style: TextStyle(
+                fontSize: 13,
+                color: isSelected ? Colors.white : theme.colorScheme.onSurface,
                 fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
               ),
             ),
@@ -117,7 +125,7 @@ class TicketStatsCard extends StatelessWidget {
               ),
               child: Text(
                 '$count',
-                style: AppTextStyles.labelSmall.copyWith(
+                style: TextStyle(
                   color: isSelected ? Colors.white : color,
                   fontWeight: FontWeight.w800,
                   fontSize: 11,

@@ -3,9 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:helpdesk/core/routing/app_routes.dart';
 import 'package:helpdesk/core/utils/app_assets.dart';
-import 'package:helpdesk/core/utils/app_colors.dart';
 import 'package:helpdesk/core/utils/app_strings.dart';
-import 'package:helpdesk/core/utils/app_text_style.dart';
 import 'package:helpdesk/core/utils/regexes.dart';
 import 'package:helpdesk/core/widgets/custom_button.dart';
 import 'package:helpdesk/core/widgets/custom_snackbar.dart';
@@ -52,13 +50,15 @@ class _SignUpViewState extends State<SignUpView> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.textPrimary, size: 20),
+          icon: Icon(Icons.arrow_back_ios_new_rounded, color: theme.colorScheme.onSurface, size: 20),
           onPressed: () => context.pop(),
         ),
       ),
@@ -90,7 +90,7 @@ class _SignUpViewState extends State<SignUpView> {
                           height: 64,
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
-                            color: AppColors.primary.withValues(alpha: 0.1),
+                            color: theme.colorScheme.primary.withValues(alpha: 0.12),
                             shape: BoxShape.circle,
                           ),
                           child: Image.asset(AppAssets.logo, fit: BoxFit.contain),
@@ -99,13 +99,20 @@ class _SignUpViewState extends State<SignUpView> {
                       const SizedBox(height: 12),
                       Text(
                         AppStrings.createAccount,
-                        style: AppTextStyles.headlineMedium,
+                        style: TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.w800,
+                          color: theme.colorScheme.onSurface,
+                        ),
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 4),
                       Text(
                         'Join your team helpdesk workspace',
-                        style: AppTextStyles.bodyMedium,
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                        ),
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 20),
@@ -113,7 +120,11 @@ class _SignUpViewState extends State<SignUpView> {
                       // User Role Selector
                       Text(
                         'Workspace Role',
-                        style: AppTextStyles.labelLarge.copyWith(fontWeight: FontWeight.w700),
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w700,
+                          color: theme.colorScheme.onSurface,
+                        ),
                       ),
                       const SizedBox(height: 8),
                       Row(
@@ -127,18 +138,18 @@ class _SignUpViewState extends State<SignUpView> {
                                 padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 4),
                                 decoration: BoxDecoration(
                                   color: isSelected
-                                      ? AppColors.primary
-                                      : AppColors.surface,
+                                      ? theme.colorScheme.primary
+                                      : theme.cardColor,
                                   borderRadius: BorderRadius.circular(10),
                                   border: Border.all(
                                     color: isSelected
-                                        ? AppColors.primary
-                                        : AppColors.border,
+                                        ? theme.colorScheme.primary
+                                        : theme.colorScheme.outline.withValues(alpha: 0.5),
                                   ),
                                   boxShadow: isSelected
                                       ? [
                                           BoxShadow(
-                                            color: AppColors.primary.withValues(alpha: 0.25),
+                                            color: theme.colorScheme.primary.withValues(alpha: 0.25),
                                             blurRadius: 8,
                                             offset: const Offset(0, 3),
                                           )
@@ -148,10 +159,11 @@ class _SignUpViewState extends State<SignUpView> {
                                 child: Text(
                                   role.displayName,
                                   textAlign: TextAlign.center,
-                                  style: AppTextStyles.labelSmall.copyWith(
+                                  style: TextStyle(
+                                    fontSize: 11,
                                     color: isSelected
                                         ? Colors.white
-                                        : AppColors.textPrimary,
+                                        : theme.colorScheme.onSurface,
                                     fontWeight: isSelected
                                         ? FontWeight.w700
                                         : FontWeight.w500,
@@ -167,25 +179,30 @@ class _SignUpViewState extends State<SignUpView> {
                       // Department Dropdown
                       Text(
                         'Department',
-                        style: AppTextStyles.labelLarge.copyWith(fontWeight: FontWeight.w700),
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w700,
+                          color: theme.colorScheme.onSurface,
+                        ),
                       ),
                       const SizedBox(height: 8),
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 16),
                         decoration: BoxDecoration(
-                          color: AppColors.surface,
+                          color: theme.cardColor,
                           borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: AppColors.border),
+                          border: Border.all(color: theme.colorScheme.outline.withValues(alpha: 0.5)),
                         ),
                         child: DropdownButtonHideUnderline(
                           child: DropdownButton<String>(
                             value: cubit.selectedDepartment,
+                            dropdownColor: theme.cardColor,
                             isExpanded: true,
-                            icon: const Icon(Icons.keyboard_arrow_down_rounded, color: AppColors.primary),
+                            icon: Icon(Icons.keyboard_arrow_down_rounded, color: theme.colorScheme.primary),
                             items: cubit.departments.map((dept) {
                               return DropdownMenuItem<String>(
                                 value: dept,
-                                child: Text(dept, style: AppTextStyles.bodyMedium),
+                                child: Text(dept, style: TextStyle(color: theme.colorScheme.onSurface)),
                               );
                             }).toList(),
                             onChanged: (val) {
@@ -201,7 +218,7 @@ class _SignUpViewState extends State<SignUpView> {
                         controller: _nameController,
                         labelText: AppStrings.fullName,
                         hintText: AppStrings.fullNameHint,
-                        prefixIcon: const Icon(Icons.person_outline_rounded, color: AppColors.primary),
+                        prefixIcon: Icon(Icons.person_outline_rounded, color: theme.colorScheme.primary),
                         validator: (value) {
                           if (value == null || value.trim().isEmpty) {
                             return AppStrings.requiredField;
@@ -217,7 +234,7 @@ class _SignUpViewState extends State<SignUpView> {
                         labelText: AppStrings.email,
                         hintText: AppStrings.emailHint,
                         keyboardType: TextInputType.emailAddress,
-                        prefixIcon: const Icon(Icons.email_outlined, color: AppColors.primary),
+                        prefixIcon: Icon(Icons.email_outlined, color: theme.colorScheme.primary),
                         validator: (value) {
                           if (value == null || value.trim().isEmpty) {
                             return AppStrings.requiredField;
@@ -236,7 +253,7 @@ class _SignUpViewState extends State<SignUpView> {
                         labelText: AppStrings.phone,
                         hintText: AppStrings.phoneHint,
                         keyboardType: TextInputType.phone,
-                        prefixIcon: const Icon(Icons.phone_outlined, color: AppColors.primary),
+                        prefixIcon: Icon(Icons.phone_outlined, color: theme.colorScheme.primary),
                         validator: (value) {
                           if (value == null || value.trim().isEmpty) {
                             return AppStrings.requiredField;
@@ -255,13 +272,13 @@ class _SignUpViewState extends State<SignUpView> {
                         labelText: AppStrings.password,
                         hintText: AppStrings.passwordHint,
                         obscureText: cubit.isPasswordHidden,
-                        prefixIcon: const Icon(Icons.lock_outline_rounded, color: AppColors.primary),
+                        prefixIcon: Icon(Icons.lock_outline_rounded, color: theme.colorScheme.primary),
                         suffixIcon: IconButton(
                           icon: Icon(
                             cubit.isPasswordHidden
                                 ? Icons.visibility_outlined
                                 : Icons.visibility_off_outlined,
-                            color: AppColors.textSecondary,
+                            color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                           ),
                           onPressed: cubit.togglePasswordVisibility,
                         ),
@@ -283,13 +300,13 @@ class _SignUpViewState extends State<SignUpView> {
                         labelText: AppStrings.confirmPassword,
                         hintText: AppStrings.confirmPasswordHint,
                         obscureText: cubit.isConfirmPasswordHidden,
-                        prefixIcon: const Icon(Icons.lock_reset_rounded, color: AppColors.primary),
+                        prefixIcon: Icon(Icons.lock_reset_rounded, color: theme.colorScheme.primary),
                         suffixIcon: IconButton(
                           icon: Icon(
                             cubit.isConfirmPasswordHidden
                                 ? Icons.visibility_outlined
                                 : Icons.visibility_off_outlined,
-                            color: AppColors.textSecondary,
+                            color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                           ),
                           onPressed: cubit.toggleConfirmPasswordVisibility,
                         ),
@@ -319,15 +336,20 @@ class _SignUpViewState extends State<SignUpView> {
                         children: [
                           Text(
                             AppStrings.alreadyHaveAccount,
-                            style: AppTextStyles.bodyMedium,
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                            ),
                           ),
+                          const SizedBox(width: 4),
                           GestureDetector(
                             onTap: () => context.pop(),
                             child: Text(
                               AppStrings.signIn,
-                              style: AppTextStyles.bodyMedium.copyWith(
-                                color: AppColors.primary,
+                              style: TextStyle(
+                                color: theme.colorScheme.primary,
                                 fontWeight: FontWeight.w700,
+                                fontSize: 14,
                               ),
                             ),
                           ),

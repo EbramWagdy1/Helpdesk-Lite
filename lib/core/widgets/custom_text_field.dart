@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:helpdesk/core/utils/app_colors.dart';
-import 'package:helpdesk/core/utils/app_text_style.dart';
 
 class CustomTextField extends StatelessWidget {
   const CustomTextField({
@@ -42,15 +41,18 @@ class CustomTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (labelText != null) ...[
           Text(
             labelText!,
-            style: AppTextStyles.labelMedium.copyWith(
-              color: AppColors.textPrimary,
+            style: TextStyle(
+              fontSize: 14,
               fontWeight: FontWeight.w600,
+              color: theme.colorScheme.onSurface,
             ),
           ),
           const SizedBox(height: 8),
@@ -68,11 +70,19 @@ class CustomTextField extends StatelessWidget {
           readOnly: readOnly,
           onTap: onTap,
           focusNode: focusNode,
-          style: AppTextStyles.bodyLarge,
-          cursorColor: AppColors.primary,
+          style: TextStyle(
+            fontSize: 15,
+            fontWeight: FontWeight.w400,
+            color: theme.colorScheme.onSurface,
+          ),
+          cursorColor: theme.colorScheme.primary,
           decoration: InputDecoration(
             hintText: hintText,
-            hintStyle: AppTextStyles.bodyMedium.copyWith(color: AppColors.textMuted),
+            hintStyle: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w400,
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.45),
+            ),
             prefixIcon: prefixIcon != null
                 ? Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -88,19 +98,19 @@ class CustomTextField extends StatelessWidget {
                 : null,
             suffixIconConstraints: const BoxConstraints(minWidth: 44, minHeight: 44),
             filled: true,
-            fillColor: AppColors.surface,
+            fillColor: theme.cardColor,
             contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(14),
-              borderSide: const BorderSide(color: AppColors.border),
+              borderSide: BorderSide(color: theme.colorScheme.outline.withValues(alpha: 0.5)),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(14),
-              borderSide: const BorderSide(color: AppColors.border),
+              borderSide: BorderSide(color: theme.colorScheme.outline.withValues(alpha: 0.5)),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(14),
-              borderSide: const BorderSide(color: AppColors.borderFocused, width: 1.8),
+              borderSide: BorderSide(color: theme.colorScheme.primary, width: 1.8),
             ),
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(14),

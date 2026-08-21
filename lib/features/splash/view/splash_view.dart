@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:helpdesk/core/database/cache/cache_helper.dart';
 import 'package:helpdesk/core/database/cache/cache_keys.dart';
+import 'package:helpdesk/core/extensions/localization_extension.dart';
 import 'package:helpdesk/core/routing/app_routes.dart';
 import 'package:helpdesk/core/utils/app_assets.dart';
 import 'package:helpdesk/features/auth/view_model/auth_cubit.dart';
@@ -233,7 +234,7 @@ class _SplashViewState extends State<SplashView> with TickerProviderStateMixin {
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            'Smart Workplace & Support Hub',
+                            context.l10n.smartWorkplaceHub,
                             style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w600,
@@ -286,7 +287,7 @@ class _SplashViewState extends State<SplashView> with TickerProviderStateMixin {
                             ),
                             const SizedBox(width: 6),
                             Text(
-                              'Enterprise-Grade • Secure Workspace',
+                              context.l10n.enterpriseGradeSecurity,
                               style: TextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.w600,

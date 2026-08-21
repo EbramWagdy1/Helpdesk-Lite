@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:helpdesk/core/extensions/localization_extension.dart';
 import 'package:helpdesk/core/widgets/custom_snackbar.dart';
 import 'package:helpdesk/features/auth/model/user_model.dart';
 import 'package:helpdesk/features/tickets/model/ticket_model.dart';
@@ -49,7 +50,7 @@ class _CreateTicketViewState extends State<CreateTicketView> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  'Add Attachment',
+                  context.l10n.addAttachment,
                   style: TextStyle(
                     fontSize: 17,
                     fontWeight: FontWeight.w700,
@@ -59,7 +60,7 @@ class _CreateTicketViewState extends State<CreateTicketView> {
                 const SizedBox(height: 16),
                 ListTile(
                   leading: Icon(Icons.camera_alt_outlined, color: theme.colorScheme.primary),
-                  title: Text('Take a Photo', style: TextStyle(fontWeight: FontWeight.w600, color: theme.colorScheme.onSurface)),
+                  title: Text(context.l10n.takePhoto, style: TextStyle(fontWeight: FontWeight.w600, color: theme.colorScheme.onSurface)),
                   onTap: () {
                     Navigator.pop(ctx);
                     cubit.pickImage(ImageSource.camera);
@@ -67,7 +68,7 @@ class _CreateTicketViewState extends State<CreateTicketView> {
                 ),
                 ListTile(
                   leading: Icon(Icons.photo_library_outlined, color: theme.colorScheme.primary),
-                  title: Text('Choose from Gallery', style: TextStyle(fontWeight: FontWeight.w600, color: theme.colorScheme.onSurface)),
+                  title: Text(context.l10n.chooseFromGallery, style: TextStyle(fontWeight: FontWeight.w600, color: theme.colorScheme.onSurface)),
                   onTap: () {
                     Navigator.pop(ctx);
                     cubit.pickImage(ImageSource.gallery);
@@ -104,7 +105,7 @@ class _CreateTicketViewState extends State<CreateTicketView> {
             onPressed: () => Navigator.pop(context),
           ),
           title: Text(
-            'New Ticket',
+            context.l10n.newTicket,
             style: TextStyle(
               fontSize: 17,
               fontWeight: FontWeight.w700,
@@ -167,7 +168,7 @@ class _CreateTicketViewState extends State<CreateTicketView> {
                             const SizedBox(width: 10),
                             Expanded(
                               child: Text(
-                                'Requester: ${widget.currentUser.name} (${widget.currentUser.department})',
+                                '${context.l10n.requester}: ${widget.currentUser.name} (${context.getLocalizedDepartment(widget.currentUser.department)})',
                                 style: TextStyle(
                                   fontSize: 13,
                                   color: theme.colorScheme.onSurface.withValues(alpha: 0.75),
@@ -183,7 +184,7 @@ class _CreateTicketViewState extends State<CreateTicketView> {
                       const SizedBox(height: 18),
 
                       // Category Section
-                      _buildFieldLabel(context, 'Category'),
+                      _buildFieldLabel(context, context.l10n.department),
                       const SizedBox(height: 8),
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
@@ -206,7 +207,7 @@ class _CreateTicketViewState extends State<CreateTicketView> {
                                     Icon(cat.icon, size: 18, color: theme.colorScheme.primary),
                                     const SizedBox(width: 10),
                                     Text(
-                                      cat.label,
+                                      cat.getLocalizedLabel(context),
                                       style: TextStyle(
                                         fontSize: 14,
                                         fontWeight: FontWeight.w600,
@@ -226,7 +227,7 @@ class _CreateTicketViewState extends State<CreateTicketView> {
                       const SizedBox(height: 18),
 
                       // Priority Level
-                      _buildFieldLabel(context, 'Priority Level'),
+                      _buildFieldLabel(context, context.l10n.priority),
                       const SizedBox(height: 8),
                       Container(
                         padding: const EdgeInsets.all(4),
@@ -269,7 +270,7 @@ class _CreateTicketViewState extends State<CreateTicketView> {
                                       ),
                                       const SizedBox(width: 5),
                                       Text(
-                                        priority.label,
+                                        priority.getLocalizedLabel(context),
                                         style: TextStyle(
                                           fontSize: 12,
                                           fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
@@ -287,13 +288,13 @@ class _CreateTicketViewState extends State<CreateTicketView> {
                       const SizedBox(height: 18),
 
                       // Summary / Title
-                      _buildFieldLabel(context, 'Title'),
+                      _buildFieldLabel(context, context.l10n.title),
                       const SizedBox(height: 8),
                       TextFormField(
                         controller: _titleController,
                         style: TextStyle(fontSize: 14, color: theme.colorScheme.onSurface, fontWeight: FontWeight.w500),
                         decoration: InputDecoration(
-                          hintText: 'Brief summary of the issue or request',
+                          hintText: context.l10n.titleHint,
                           hintStyle: TextStyle(fontSize: 14, color: theme.colorScheme.onSurface.withValues(alpha: 0.45)),
                           filled: true,
                           fillColor: theme.cardColor,
@@ -317,7 +318,7 @@ class _CreateTicketViewState extends State<CreateTicketView> {
                         ),
                         validator: (value) {
                           if (value == null || value.trim().isEmpty) {
-                            return 'Please enter a ticket title';
+                            return context.l10n.enterTicketTitle;
                           }
                           return null;
                         },
@@ -325,14 +326,14 @@ class _CreateTicketViewState extends State<CreateTicketView> {
                       const SizedBox(height: 18),
 
                       // Description
-                      _buildFieldLabel(context, 'Description'),
+                      _buildFieldLabel(context, context.l10n.description),
                       const SizedBox(height: 8),
                       TextFormField(
                         controller: _descController,
                         maxLines: 4,
                         style: TextStyle(fontSize: 14, color: theme.colorScheme.onSurface, height: 1.4),
                         decoration: InputDecoration(
-                          hintText: 'Describe details, steps to reproduce, or requirements...',
+                          hintText: context.l10n.descriptionHint,
                           hintStyle: TextStyle(fontSize: 14, color: theme.colorScheme.onSurface.withValues(alpha: 0.45)),
                           filled: true,
                           fillColor: theme.cardColor,
@@ -357,7 +358,7 @@ class _CreateTicketViewState extends State<CreateTicketView> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          _buildFieldLabel(context, 'Attachments (${cubit.attachments.length})'),
+                          _buildFieldLabel(context, '${context.l10n.attachments} (${cubit.attachments.length})'),
                           InkWell(
                             onTap: () => _showAttachmentPicker(context, cubit),
                             borderRadius: BorderRadius.circular(8),
@@ -368,7 +369,7 @@ class _CreateTicketViewState extends State<CreateTicketView> {
                                   Icon(Icons.attach_file_rounded, size: 16, color: theme.colorScheme.primary),
                                   const SizedBox(width: 4),
                                   Text(
-                                    'Add File/Photo',
+                                    context.l10n.addFileOrPhoto,
                                     style: TextStyle(
                                       fontSize: 13,
                                       fontWeight: FontWeight.w600,
@@ -459,9 +460,9 @@ class _CreateTicketViewState extends State<CreateTicketView> {
                                   height: 20,
                                   child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
                                 )
-                              : const Text(
-                                  'Submit Ticket',
-                                  style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15),
+                              : Text(
+                                  context.l10n.submitTicket,
+                                  style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15),
                                 ),
                         ),
                       ),

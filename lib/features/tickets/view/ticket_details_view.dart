@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:helpdesk/core/extensions/localization_extension.dart';
 import 'package:helpdesk/core/widgets/custom_snackbar.dart';
 import 'package:helpdesk/core/widgets/verified_badge_widget.dart';
 import 'package:helpdesk/features/auth/model/user_model.dart';
@@ -52,17 +53,17 @@ class _TicketDetailsViewState extends State<TicketDetailsView> {
           children: [
             const Icon(Icons.delete_outline_rounded, color: Color(0xFFDC2626)),
             const SizedBox(width: 8),
-            Text('Delete Ticket', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 17, color: theme.colorScheme.onSurface)),
+            Text(context.l10n.deleteTicket, style: TextStyle(fontWeight: FontWeight.w700, fontSize: 17, color: theme.colorScheme.onSurface)),
           ],
         ),
         content: Text(
-          'Are you sure you want to permanently delete this ticket and all of its conversation history? This action cannot be undone.',
+          context.l10n.deleteTicketConfirmMessage,
           style: TextStyle(fontSize: 14, color: theme.colorScheme.onSurface.withValues(alpha: 0.7)),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogCtx),
-            child: Text('Cancel', style: TextStyle(color: theme.colorScheme.onSurface.withValues(alpha: 0.6))),
+            child: Text(context.l10n.cancel, style: TextStyle(color: theme.colorScheme.onSurface.withValues(alpha: 0.6))),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
@@ -75,7 +76,7 @@ class _TicketDetailsViewState extends State<TicketDetailsView> {
               Navigator.pop(dialogCtx);
               cubit.deleteTicket();
             },
-            child: const Text('Delete Permanently', style: TextStyle(fontWeight: FontWeight.w600)),
+            child: Text(context.l10n.deletePermanently, style: const TextStyle(fontWeight: FontWeight.w600)),
           ),
         ],
       ),
@@ -119,9 +120,9 @@ class _TicketDetailsViewState extends State<TicketDetailsView> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        'Assign Agent',
+                        context.l10n.assignAgent,
                         style: TextStyle(
-                          fontSize: 18,
+                          fontSize: 17,
                           fontWeight: FontWeight.w700,
                           color: theme.colorScheme.onSurface,
                         ),
@@ -134,7 +135,7 @@ class _TicketDetailsViewState extends State<TicketDetailsView> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'Assign this ${ticket.category.label} ticket to a support specialist:',
+                    context.l10n.assignTicketInstruction,
                     style: TextStyle(fontSize: 13, color: theme.colorScheme.onSurface.withValues(alpha: 0.6)),
                   ),
                   const SizedBox(height: 16),
@@ -142,15 +143,15 @@ class _TicketDetailsViewState extends State<TicketDetailsView> {
                   if (agents.isEmpty)
                     Padding(
                       padding: const EdgeInsets.symmetric(vertical: 24),
-                      child: Center(child: Text('No support agents found.', style: TextStyle(color: theme.colorScheme.onSurface.withValues(alpha: 0.6)))),
+                      child: Center(child: Text(context.l10n.noAgentsFound, style: TextStyle(color: theme.colorScheme.onSurface.withValues(alpha: 0.6)))),
                     )
                   else ...[
                     if (matchingAgents.isNotEmpty) ...[
                       Padding(
                         padding: const EdgeInsets.only(bottom: 8),
-                        child: const Text(
-                          'Department Matching Specialists',
-                          style: TextStyle(
+                        child: Text(
+                          context.l10n.deptMatchingSpecialists,
+                          style: const TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w700,
                             color: Color(0xFF16A34A),
@@ -206,7 +207,7 @@ class _TicketDetailsViewState extends State<TicketDetailsView> {
                       Padding(
                         padding: const EdgeInsets.only(bottom: 8),
                         child: Text(
-                          'Other Department Agents',
+                          context.l10n.otherDepartmentAgents,
                           style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w700,
@@ -304,7 +305,7 @@ class _TicketDetailsViewState extends State<TicketDetailsView> {
             onPressed: () => Navigator.pop(context),
           ),
           title: Text(
-            'Ticket Details',
+            context.l10n.ticketDetails,
             style: TextStyle(
               fontSize: 17,
               fontWeight: FontWeight.w700,
@@ -416,7 +417,7 @@ class _TicketDetailsViewState extends State<TicketDetailsView> {
                                         ),
                                         const SizedBox(width: 5),
                                         Text(
-                                          ticket.status.label,
+                                          ticket.status.getLocalizedLabel(context),
                                           style: TextStyle(
                                             fontSize: 11,
                                             fontWeight: FontWeight.w700,
@@ -434,7 +435,7 @@ class _TicketDetailsViewState extends State<TicketDetailsView> {
                                       borderRadius: BorderRadius.circular(6),
                                     ),
                                     child: Text(
-                                      ticket.priority.label,
+                                      ticket.priority.getLocalizedLabel(context),
                                       style: TextStyle(
                                         fontSize: 11,
                                         fontWeight: FontWeight.w700,
@@ -464,7 +465,7 @@ class _TicketDetailsViewState extends State<TicketDetailsView> {
                                   Icon(ticket.category.icon, size: 14, color: theme.colorScheme.onSurface.withValues(alpha: 0.6)),
                                   const SizedBox(width: 5),
                                   Text(
-                                    ticket.category.label,
+                                    ticket.category.getLocalizedLabel(context),
                                     style: TextStyle(
                                       fontSize: 12,
                                       fontWeight: FontWeight.w500,
@@ -475,7 +476,7 @@ class _TicketDetailsViewState extends State<TicketDetailsView> {
                                   Text('•', style: TextStyle(color: theme.colorScheme.outline)),
                                   const SizedBox(width: 8),
                                   Text(
-                                    'Opened ${ticket.createdAt.day}/${ticket.createdAt.month}/${ticket.createdAt.year}',
+                                    '${context.l10n.openedOn} ${ticket.createdAt.day}/${ticket.createdAt.month}/${ticket.createdAt.year}',
                                     style: TextStyle(
                                       fontSize: 12,
                                       color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
@@ -489,7 +490,7 @@ class _TicketDetailsViewState extends State<TicketDetailsView> {
 
                               // Description
                               Text(
-                                'Description',
+                                context.l10n.description,
                                 style: TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.w700,
@@ -499,7 +500,7 @@ class _TicketDetailsViewState extends State<TicketDetailsView> {
                               ),
                               const SizedBox(height: 6),
                               Text(
-                                ticket.description.isNotEmpty ? ticket.description : 'No description provided.',
+                                ticket.description.isNotEmpty ? ticket.description : context.l10n.noDescriptionProvided,
                                 style: TextStyle(
                                   fontSize: 14,
                                   color: theme.colorScheme.onSurface.withValues(alpha: 0.85),
@@ -511,7 +512,7 @@ class _TicketDetailsViewState extends State<TicketDetailsView> {
                               if (ticket.attachmentUrls.isNotEmpty) ...[
                                 const SizedBox(height: 16),
                                 Text(
-                                  'Attachments',
+                                  context.l10n.attachments,
                                   style: TextStyle(
                                     fontSize: 12,
                                     fontWeight: FontWeight.w700,
@@ -590,7 +591,7 @@ class _TicketDetailsViewState extends State<TicketDetailsView> {
                                     child: Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
-                                        Text('Requested by', style: TextStyle(fontSize: 11, color: theme.colorScheme.onSurface.withValues(alpha: 0.5))),
+                                        Text(context.l10n.requestedBy, style: TextStyle(fontSize: 11, color: theme.colorScheme.onSurface.withValues(alpha: 0.5))),
                                         Text(
                                           ticket.createdBy.name,
                                           style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: theme.colorScheme.onSurface),
@@ -600,7 +601,7 @@ class _TicketDetailsViewState extends State<TicketDetailsView> {
                                   ),
                                   if (ticket.createdBy.department != null)
                                     Text(
-                                      ticket.createdBy.department!,
+                                      context.getLocalizedDepartment(ticket.createdBy.department),
                                       style: TextStyle(fontSize: 12, color: theme.colorScheme.onSurface.withValues(alpha: 0.6), fontWeight: FontWeight.w500),
                                     ),
                                 ],
@@ -624,12 +625,12 @@ class _TicketDetailsViewState extends State<TicketDetailsView> {
                                     child: Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
-                                        Text('Assigned Specialist', style: TextStyle(fontSize: 11, color: theme.colorScheme.onSurface.withValues(alpha: 0.5))),
+                                        Text(context.l10n.assignedSpecialistTitle, style: TextStyle(fontSize: 11, color: theme.colorScheme.onSurface.withValues(alpha: 0.5))),
                                         Row(
                                           children: [
                                             Flexible(
                                               child: Text(
-                                                ticket.assignedTo != null ? ticket.assignedTo!.name : 'Unassigned',
+                                                ticket.assignedTo != null ? ticket.assignedTo!.name : context.l10n.unassigned,
                                                 style: TextStyle(
                                                   fontSize: 14,
                                                   fontWeight: FontWeight.w600,
@@ -650,7 +651,7 @@ class _TicketDetailsViewState extends State<TicketDetailsView> {
                                   ),
                                   if (ticket.assignedTo != null && ticket.assignedTo!.department != null)
                                     Text(
-                                      ticket.assignedTo!.department!,
+                                      context.getLocalizedDepartment(ticket.assignedTo!.department),
                                       style: TextStyle(fontSize: 12, color: theme.colorScheme.onSurface.withValues(alpha: 0.6), fontWeight: FontWeight.w500),
                                     ),
                                 ],
@@ -699,7 +700,7 @@ class _TicketDetailsViewState extends State<TicketDetailsView> {
                             controller: _commentController,
                             style: TextStyle(fontSize: 14, color: theme.colorScheme.onSurface),
                             decoration: InputDecoration(
-                              hintText: 'Write a response or update...',
+                              hintText: context.l10n.writeResponseHint,
                               hintStyle: TextStyle(fontSize: 13, color: theme.colorScheme.onSurface.withValues(alpha: 0.5)),
                               border: InputBorder.none,
                               contentPadding: const EdgeInsets.symmetric(horizontal: 6, vertical: 10),
@@ -745,10 +746,10 @@ class _TicketDetailsViewState extends State<TicketDetailsView> {
 
     // Define Pipeline stages
     final stages = [
-      {'status': TicketStatus.open, 'label': 'Open'},
-      {'status': TicketStatus.inProgress, 'label': 'In Progress'},
-      {'status': TicketStatus.resolved, 'label': 'Resolved'},
-      {'status': TicketStatus.closed, 'label': 'Closed'},
+      {'status': TicketStatus.open, 'label': context.l10n.open},
+      {'status': TicketStatus.inProgress, 'label': context.l10n.inProgress},
+      {'status': TicketStatus.resolved, 'label': context.l10n.resolved},
+      {'status': TicketStatus.closed, 'label': context.l10n.closed},
     ];
 
     final currentStageIndex = stages.indexWhere((s) => s['status'] == status);
@@ -786,7 +787,7 @@ class _TicketDetailsViewState extends State<TicketDetailsView> {
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    'WORKFLOW PROGRESS',
+                    context.l10n.workflowProgress,
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w800,
@@ -816,7 +817,7 @@ class _TicketDetailsViewState extends State<TicketDetailsView> {
                     ),
                     const SizedBox(width: 6),
                     Text(
-                      status.label,
+                      status.getLocalizedLabel(context),
                       style: TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.w700,
@@ -913,7 +914,7 @@ class _TicketDetailsViewState extends State<TicketDetailsView> {
                 Expanded(
                   child: _buildSecondaryActionButton(
                     context: context,
-                    label: 'Reassign',
+                    label: context.l10n.reassign,
                     icon: Icons.swap_horiz_rounded,
                     backgroundColor: theme.colorScheme.surfaceContainerHighest,
                     foregroundColor: theme.colorScheme.onSurface,
@@ -929,7 +930,7 @@ class _TicketDetailsViewState extends State<TicketDetailsView> {
                 Expanded(
                   child: _buildSecondaryActionButton(
                     context: context,
-                    label: 'Cancel Request',
+                    label: context.l10n.cancelRequest,
                     icon: Icons.close_rounded,
                     backgroundColor: theme.colorScheme.surfaceContainerHighest,
                     foregroundColor: theme.colorScheme.onSurface.withValues(alpha: 0.6),
@@ -947,7 +948,7 @@ class _TicketDetailsViewState extends State<TicketDetailsView> {
               Expanded(
                 child: _buildSecondaryActionButton(
                   context: context,
-                  label: 'Delete',
+                  label: context.l10n.deleteTicket,
                   icon: Icons.delete_outline_rounded,
                   backgroundColor: const Color(0xFFFEF2F2).withValues(alpha: 0.2),
                   foregroundColor: const Color(0xFFDC2626),
@@ -984,9 +985,9 @@ class _TicketDetailsViewState extends State<TicketDetailsView> {
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           ),
           icon: const Icon(Icons.person_add_alt_1_rounded, size: 18),
-          label: const Text(
-            'Claim & Start Ticket',
-            style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
+          label: Text(
+            context.l10n.claimAndStartTicket,
+            style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
           ),
           onPressed: () => cubit.claimTicket(widget.currentUser),
         ),
@@ -1006,9 +1007,9 @@ class _TicketDetailsViewState extends State<TicketDetailsView> {
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           ),
           icon: const Icon(Icons.play_arrow_rounded, size: 20),
-          label: const Text(
-            'Start Working (In Progress)',
-            style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
+          label: Text(
+            context.l10n.startWorking,
+            style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
           ),
           onPressed: () => cubit.updateStatus(
             newStatus: TicketStatus.inProgress,
@@ -1031,9 +1032,9 @@ class _TicketDetailsViewState extends State<TicketDetailsView> {
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           ),
           icon: const Icon(Icons.check_circle_outline_rounded, size: 18),
-          label: const Text(
-            'Mark as Resolved',
-            style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
+          label: Text(
+            context.l10n.markAsResolved,
+            style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
           ),
           onPressed: () => cubit.updateStatus(
             newStatus: TicketStatus.resolved,
@@ -1055,14 +1056,14 @@ class _TicketDetailsViewState extends State<TicketDetailsView> {
                 borderRadius: BorderRadius.circular(10),
                 border: Border.all(color: const Color(0xFF16A34A).withValues(alpha: 0.3)),
               ),
-              child: const Row(
+              child: Row(
                 children: [
-                  Icon(Icons.info_outline_rounded, size: 18, color: Color(0xFF16A34A)),
-                  SizedBox(width: 8),
+                  const Icon(Icons.info_outline_rounded, size: 18, color: Color(0xFF16A34A)),
+                  const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      'The support team marked this ticket as resolved. Please test and confirm to close it.',
-                      style: TextStyle(fontSize: 12, color: Color(0xFF16A34A), fontWeight: FontWeight.w600),
+                      context.l10n.resolvedAwaitingConfirmation,
+                      style: const TextStyle(fontSize: 12, color: Color(0xFF16A34A), fontWeight: FontWeight.w600),
                     ),
                   ),
                 ],
@@ -1081,9 +1082,9 @@ class _TicketDetailsViewState extends State<TicketDetailsView> {
                       padding: const EdgeInsets.symmetric(vertical: 11),
                     ),
                     icon: const Icon(Icons.replay_rounded, size: 16),
-                    label: const Text(
-                      'Not Fixed',
-                      style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
+                    label: Text(
+                      context.l10n.notFixed,
+                      style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
                     ),
                     onPressed: () => cubit.updateStatus(
                       newStatus: TicketStatus.inProgress,
@@ -1104,9 +1105,9 @@ class _TicketDetailsViewState extends State<TicketDetailsView> {
                       padding: const EdgeInsets.symmetric(vertical: 11),
                     ),
                     icon: const Icon(Icons.check_circle_rounded, size: 18),
-                    label: const Text(
-                      'Approve & Close',
-                      style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
+                    label: Text(
+                      context.l10n.approveAndClose,
+                      style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
                     ),
                     onPressed: () => cubit.updateStatus(
                       newStatus: TicketStatus.closed,
@@ -1128,14 +1129,14 @@ class _TicketDetailsViewState extends State<TicketDetailsView> {
             borderRadius: BorderRadius.circular(10),
             border: Border.all(color: const Color(0xFF16A34A).withValues(alpha: 0.3)),
           ),
-          child: const Row(
+          child: Row(
             children: [
-              Icon(Icons.hourglass_top_rounded, size: 20, color: Color(0xFF16A34A)),
-              SizedBox(width: 10),
+              const Icon(Icons.hourglass_top_rounded, size: 20, color: Color(0xFF16A34A)),
+              const SizedBox(width: 10),
               Expanded(
                 child: Text(
-                  'Resolved • Awaiting employee testing and confirmation to close.',
-                  style: TextStyle(
+                  context.l10n.resolvedAwaitingEmployee,
+                  style: const TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
                     color: Color(0xFF16A34A),
@@ -1161,9 +1162,9 @@ class _TicketDetailsViewState extends State<TicketDetailsView> {
               side: BorderSide(color: theme.colorScheme.primary.withValues(alpha: 0.5)),
             ),
             icon: const Icon(Icons.replay_rounded, size: 18),
-            label: const Text(
-              'Reopen Ticket',
-              style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
+            label: Text(
+              context.l10n.reopenTicket,
+              style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
             ),
             onPressed: () => cubit.updateStatus(
               newStatus: TicketStatus.open,
@@ -1186,7 +1187,7 @@ class _TicketDetailsViewState extends State<TicketDetailsView> {
               const SizedBox(width: 10),
               Expanded(
                 child: Text(
-                  'This ticket is closed and archived by the employee.',
+                  context.l10n.ticketClosedArchived,
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w500,

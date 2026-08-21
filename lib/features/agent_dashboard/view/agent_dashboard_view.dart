@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:helpdesk/core/extensions/localization_extension.dart';
 import 'package:helpdesk/core/utils/app_colors.dart';
 import 'package:helpdesk/core/widgets/connectivity_checker_wrapper.dart';
 import 'package:helpdesk/core/widgets/verified_badge_widget.dart';
@@ -49,17 +50,17 @@ class _AgentDashboardViewState extends State<AgentDashboardView> {
       builder: (dialogContext) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Text(
-          'Sign Out',
+          context.l10n.logout,
           style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: theme.colorScheme.onSurface),
         ),
         content: Text(
-          'Are you sure you want to sign out from the Agent Hub?',
+          context.l10n.signOutPrompt,
           style: TextStyle(color: theme.colorScheme.onSurface.withValues(alpha: 0.7)),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: Text('Cancel', style: TextStyle(color: theme.colorScheme.onSurface.withValues(alpha: 0.6))),
+            child: Text(context.l10n.cancel, style: TextStyle(color: theme.colorScheme.onSurface.withValues(alpha: 0.6))),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
@@ -71,7 +72,7 @@ class _AgentDashboardViewState extends State<AgentDashboardView> {
               Navigator.pop(dialogContext);
               await authCubit.logout();
             },
-            child: const Text('Sign Out'),
+            child: Text(context.l10n.logout),
           ),
         ],
       ),
@@ -193,7 +194,7 @@ class _AgentDashboardViewState extends State<AgentDashboardView> {
                                       children: [
                                         Flexible(
                                           child: Text(
-                                            '${widget.currentUser.department} Agent',
+                                            '${context.getLocalizedDepartment(widget.currentUser.department)} • ${widget.currentUser.role.getLocalizedLabel(context)}',
                                             style: TextStyle(
                                               fontSize: 11,
                                               fontWeight: FontWeight.w600,
@@ -206,9 +207,9 @@ class _AgentDashboardViewState extends State<AgentDashboardView> {
                                         const SizedBox(width: 6),
                                         Text('•', style: TextStyle(color: theme.colorScheme.outline, fontSize: 11)),
                                         const SizedBox(width: 6),
-                                        const Text(
-                                          'On-Duty',
-                                          style: TextStyle(
+                                        Text(
+                                          context.l10n.onDuty,
+                                          style: const TextStyle(
                                             fontSize: 11,
                                             fontWeight: FontWeight.w700,
                                             color: Color(0xFF16A34A),
@@ -222,7 +223,7 @@ class _AgentDashboardViewState extends State<AgentDashboardView> {
                             ),
                             IconButton(
                               icon: Icon(Icons.person_outline_rounded, color: theme.colorScheme.onSurface),
-                              tooltip: 'Account Profile',
+                              tooltip: context.l10n.profile,
                               onPressed: () {
                                 Navigator.push(
                                   context,
@@ -234,7 +235,7 @@ class _AgentDashboardViewState extends State<AgentDashboardView> {
                             ),
                             IconButton(
                               icon: Icon(Icons.tune_rounded, color: theme.colorScheme.onSurface),
-                              tooltip: 'Filter Queue',
+                              tooltip: context.l10n.filterTickets,
                               onPressed: () {
                                 showModalBottomSheet(
                                   context: context,
@@ -252,7 +253,7 @@ class _AgentDashboardViewState extends State<AgentDashboardView> {
                             ),
                             IconButton(
                               icon: Icon(Icons.logout_rounded, color: theme.colorScheme.onSurface.withValues(alpha: 0.6)),
-                              tooltip: 'Sign Out',
+                              tooltip: context.l10n.signOut,
                               onPressed: () => _showLogoutDialog(context),
                             ),
                           ],
@@ -269,7 +270,7 @@ class _AgentDashboardViewState extends State<AgentDashboardView> {
                             Expanded(
                               child: _buildMetricCard(
                                 context: context,
-                                title: 'Dept Queue',
+                                title: context.l10n.deptQueue,
                                 value: '$deptQueueCount',
                                 icon: Icons.all_inbox_rounded,
                                 color: theme.colorScheme.primary,
@@ -279,7 +280,7 @@ class _AgentDashboardViewState extends State<AgentDashboardView> {
                             Expanded(
                               child: _buildMetricCard(
                                 context: context,
-                                title: 'Assigned to Me',
+                                title: context.l10n.assignedToMe,
                                 value: '$assignedCount',
                                 icon: Icons.assignment_ind_rounded,
                                 color: AppColors.secondary,
@@ -289,7 +290,7 @@ class _AgentDashboardViewState extends State<AgentDashboardView> {
                             Expanded(
                               child: _buildMetricCard(
                                 context: context,
-                                title: 'Urgent',
+                                title: context.l10n.urgent,
                                 value: '$urgentCount',
                                 icon: Icons.local_fire_department_rounded,
                                 color: AppColors.priorityHigh,
@@ -299,7 +300,7 @@ class _AgentDashboardViewState extends State<AgentDashboardView> {
                             Expanded(
                               child: _buildMetricCard(
                                 context: context,
-                                title: 'Resolved',
+                                title: context.l10n.resolved,
                                 value: '$resolvedCount',
                                 icon: Icons.task_alt_rounded,
                                 color: AppColors.statusResolved,
@@ -326,7 +327,7 @@ class _AgentDashboardViewState extends State<AgentDashboardView> {
                             onChanged: (val) => ticketCubit.search(val),
                             style: TextStyle(fontSize: 14, color: theme.colorScheme.onSurface),
                             decoration: InputDecoration(
-                              hintText: 'Search department tickets, ID, requester...',
+                              hintText: context.l10n.searchDepartmentTicketsHint,
                               hintStyle: TextStyle(fontSize: 13, color: theme.colorScheme.onSurface.withValues(alpha: 0.45)),
                               prefixIcon: Icon(Icons.search_rounded, size: 20, color: theme.colorScheme.onSurface.withValues(alpha: 0.45)),
                               suffixIcon: _searchController.text.isNotEmpty
@@ -361,21 +362,21 @@ class _AgentDashboardViewState extends State<AgentDashboardView> {
                               Expanded(
                                 child: _buildQueueTabItem(
                                   context: context,
-                                  label: 'Dept Queue ($deptQueueCount)',
+                                  label: '${context.l10n.deptQueue} ($deptQueueCount)',
                                   tab: AgentQueueTab.departmentQueue,
                                 ),
                               ),
                               Expanded(
                                 child: _buildQueueTabItem(
                                   context: context,
-                                  label: 'My Assigned ($assignedCount)',
+                                  label: '${context.l10n.assignedToMe} ($assignedCount)',
                                   tab: AgentQueueTab.assignedToMe,
                                 ),
                               ),
                               Expanded(
                                 child: _buildQueueTabItem(
                                   context: context,
-                                  label: 'Urgent ($urgentCount)',
+                                  label: '${context.l10n.urgent} ($urgentCount)',
                                   tab: AgentQueueTab.urgentQueue,
                                 ),
                               ),
@@ -409,8 +410,8 @@ class _AgentDashboardViewState extends State<AgentDashboardView> {
                                 const SizedBox(height: 16),
                                 Text(
                                   _selectedTab == AgentQueueTab.assignedToMe
-                                      ? 'No tickets assigned to you right now'
-                                      : 'Queue is clean!',
+                                      ? context.l10n.noTicketsAssignedRightNow
+                                      : context.l10n.queueIsClean,
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w700,
@@ -420,8 +421,8 @@ class _AgentDashboardViewState extends State<AgentDashboardView> {
                                 const SizedBox(height: 6),
                                 Text(
                                   _selectedTab == AgentQueueTab.assignedToMe
-                                      ? 'Check the "Dept Queue" tab to claim incoming support tickets.'
-                                      : 'All tickets for your department have been handled or assigned.',
+                                      ? context.l10n.checkDeptQueueHint
+                                      : context.l10n.allDeptTicketsHandledHint,
                                   style: TextStyle(
                                     fontSize: 13,
                                     color: theme.colorScheme.onSurface.withValues(alpha: 0.6),

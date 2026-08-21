@@ -11,4 +11,5 @@ class CacheKeys {
   static const String userIsVerified = 'user_is_verified';
   static const String userToken = 'user_token';
   static const String cachedTasks = 'cached_tasks';
+  static const String appLocale = 'app_locale';
 }

@@ -14,6 +14,9 @@ class VerifiedBadgeWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     if (!showLabel) {
       return Icon(
         Icons.verified_rounded,
@@ -25,9 +28,11 @@ class VerifiedBadgeWidget extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
       decoration: BoxDecoration(
-        color: const Color(0xFFEFF6FF),
+        color: isDark ? const Color(0xFF1E3A8A).withValues(alpha: 0.4) : const Color(0xFFEFF6FF),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFFBFDBFE)),
+        border: Border.all(
+          color: isDark ? const Color(0xFF3B82F6).withValues(alpha: 0.4) : const Color(0xFFBFDBFE),
+        ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -35,15 +40,15 @@ class VerifiedBadgeWidget extends StatelessWidget {
           Icon(
             Icons.verified_rounded,
             size: size,
-            color: const Color(0xFF2563EB),
+            color: isDark ? const Color(0xFF60A5FA) : const Color(0xFF2563EB),
           ),
           const SizedBox(width: 4),
           Text(
             label,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 10,
               fontWeight: FontWeight.w700,
-              color: Color(0xFF1D4ED8),
+              color: isDark ? const Color(0xFF93C5FD) : const Color(0xFF1D4ED8),
               letterSpacing: 0.2,
             ),
           ),

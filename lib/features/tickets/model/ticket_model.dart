@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:helpdesk/core/l10n/app_localizations.dart';
 import 'package:helpdesk/core/utils/app_colors.dart';
 
 enum TicketCategory {
@@ -39,6 +40,25 @@ enum TicketCategory {
         return true;
     }
   }
+
+  String getLocalizedLabel(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    if (l10n == null) return label;
+    switch (this) {
+      case TicketCategory.it:
+        return l10n.categoryIT;
+      case TicketCategory.hr:
+        return l10n.categoryHR;
+      case TicketCategory.facilities:
+        return l10n.categoryFacilities;
+      case TicketCategory.operations:
+        return l10n.categoryOperations;
+      case TicketCategory.finance:
+        return l10n.categoryFinance;
+      case TicketCategory.other:
+        return l10n.categoryOther;
+    }
+  }
 }
 
 enum TicketPriority {
@@ -57,6 +77,21 @@ enum TicketPriority {
       (p) => p.name == value?.toLowerCase(),
       orElse: () => TicketPriority.medium,
     );
+  }
+
+  String getLocalizedLabel(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    if (l10n == null) return label;
+    switch (this) {
+      case TicketPriority.low:
+        return l10n.priorityLow;
+      case TicketPriority.medium:
+        return l10n.priorityMedium;
+      case TicketPriority.high:
+        return l10n.priorityHigh;
+      case TicketPriority.urgent:
+        return l10n.priorityUrgent;
+    }
   }
 }
 
@@ -83,6 +118,21 @@ enum TicketStatus {
       case 'open':
       default:
         return TicketStatus.open;
+    }
+  }
+
+  String getLocalizedLabel(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    if (l10n == null) return label;
+    switch (this) {
+      case TicketStatus.open:
+        return l10n.open;
+      case TicketStatus.inProgress:
+        return l10n.inProgress;
+      case TicketStatus.resolved:
+        return l10n.resolved;
+      case TicketStatus.closed:
+        return l10n.closed;
     }
   }
 }

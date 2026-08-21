@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:helpdesk/core/extensions/localization_extension.dart';
 import 'package:helpdesk/core/utils/app_colors.dart';
 import 'package:helpdesk/features/tickets/model/ticket_model.dart';
 
@@ -28,7 +29,7 @@ class TicketStatsCard extends StatelessWidget {
         children: [
           _buildStatPill(
             context: context,
-            label: 'All',
+            label: context.l10n.all,
             count: totalCount,
             color: AppColors.primary,
             bgColor: isDark ? AppColors.primary.withValues(alpha: 0.15) : AppColors.primary.withValues(alpha: 0.08),
@@ -38,7 +39,7 @@ class TicketStatsCard extends StatelessWidget {
           const SizedBox(width: 8),
           _buildStatPill(
             context: context,
-            label: 'Open',
+            label: context.l10n.open,
             count: openCount,
             color: AppColors.statusOpen,
             bgColor: isDark ? AppColors.statusOpen.withValues(alpha: 0.15) : AppColors.statusOpenBg,
@@ -48,7 +49,7 @@ class TicketStatsCard extends StatelessWidget {
           const SizedBox(width: 8),
           _buildStatPill(
             context: context,
-            label: 'In Progress',
+            label: context.l10n.inProgress,
             count: inProgressCount,
             color: AppColors.statusInProgress,
             bgColor: isDark ? AppColors.statusInProgress.withValues(alpha: 0.15) : AppColors.statusInProgressBg,
@@ -58,7 +59,7 @@ class TicketStatsCard extends StatelessWidget {
           const SizedBox(width: 8),
           _buildStatPill(
             context: context,
-            label: 'Resolved',
+            label: context.l10n.resolved,
             count: resolvedCount,
             color: AppColors.statusResolved,
             bgColor: isDark ? AppColors.statusResolved.withValues(alpha: 0.15) : AppColors.statusResolvedBg,

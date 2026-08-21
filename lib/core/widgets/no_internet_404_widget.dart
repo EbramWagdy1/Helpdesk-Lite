@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:helpdesk/core/extensions/localization_extension.dart';
 import 'package:helpdesk/core/services/connectivity_service.dart';
 import 'package:helpdesk/core/services/service_locator.dart';
 import 'package:helpdesk/core/utils/app_colors.dart';
-import 'package:helpdesk/core/utils/app_text_style.dart';
 
 class NoInternet404Widget extends StatefulWidget {
   final VoidCallback? onRetry;
@@ -95,14 +95,14 @@ class _NoInternet404WidgetState extends State<NoInternet404Widget>
             behavior: SnackBarBehavior.floating,
             margin: const EdgeInsets.all(16),
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-            content: const Row(
+            content: Row(
               children: [
-                Icon(Icons.wifi_rounded, color: Colors.white, size: 22),
-                SizedBox(width: 12),
+                const Icon(Icons.wifi_rounded, color: Colors.white, size: 22),
+                const SizedBox(width: 12),
                 Expanded(
                   child: Text(
-                    'Connection restored! You are back online.',
-                    style: TextStyle(fontWeight: FontWeight.w600, color: Colors.white),
+                    context.l10n.connectionRestored,
+                    style: const TextStyle(fontWeight: FontWeight.w600, color: Colors.white),
                   ),
                 ),
               ],
@@ -117,14 +117,14 @@ class _NoInternet404WidgetState extends State<NoInternet404Widget>
             behavior: SnackBarBehavior.floating,
             margin: const EdgeInsets.all(16),
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-            content: const Row(
+            content: Row(
               children: [
-                Icon(Icons.wifi_off_rounded, color: Colors.white, size: 22),
-                SizedBox(width: 12),
+                const Icon(Icons.wifi_off_rounded, color: Colors.white, size: 22),
+                const SizedBox(width: 12),
                 Expanded(
                   child: Text(
-                    'Still offline. Please check your network connection.',
-                    style: TextStyle(fontWeight: FontWeight.w600, color: Colors.white),
+                    context.l10n.stillOffline,
+                    style: const TextStyle(fontWeight: FontWeight.w600, color: Colors.white),
                   ),
                 ),
               ],
@@ -138,6 +138,7 @@ class _NoInternet404WidgetState extends State<NoInternet404Widget>
   @override
   Widget build(BuildContext context) {
     _initAnimations();
+    final theme = Theme.of(context);
     final AnimationController pulseCtrl = _pulseController!;
     final AnimationController rotateCtrl = _rotateController!;
     final Animation<double> pulseAnim = _pulseAnimation!;
@@ -361,9 +362,9 @@ class _NoInternet404WidgetState extends State<NoInternet404Widget>
                         ),
                       ),
                       const SizedBox(width: 8),
-                      const Text(
-                        'HTTP 404 • NO CONNECTION',
-                        style: TextStyle(
+                      Text(
+                        context.l10n.noConnectionStatus,
+                        style: const TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.w800,
                           color: Color(0xFFDC2626),
@@ -377,12 +378,12 @@ class _NoInternet404WidgetState extends State<NoInternet404Widget>
 
                 // 3. HEADLINE
                 Text(
-                  'Please Check Your Internet',
+                  context.l10n.checkInternetTitle,
                   textAlign: TextAlign.center,
-                  style: AppTextStyles.titleMedium.copyWith(
-                    fontSize: 23,
+                  style: TextStyle(
+                    fontSize: 22,
                     fontWeight: FontWeight.w800,
-                    color: const Color(0xFF0F172A),
+                    color: theme.colorScheme.onSurface,
                     letterSpacing: -0.5,
                   ),
                 ),
@@ -392,12 +393,11 @@ class _NoInternet404WidgetState extends State<NoInternet404Widget>
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Text(
-                    widget.message ??
-                        'We couldn\'t connect to the server. Please verify your Wi-Fi router or cellular data connection.',
+                    widget.message ?? context.l10n.checkInternetSubtitle,
                     textAlign: TextAlign.center,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 14,
-                      color: Color(0xFF64748B),
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.65),
                       height: 1.5,
                       fontWeight: FontWeight.w400,
                     ),
@@ -411,15 +411,15 @@ class _NoInternet404WidgetState extends State<NoInternet404Widget>
                   constraints: const BoxConstraints(maxWidth: 360),
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: theme.cardColor,
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
-                      color: const Color(0xFFE2E8F0),
+                      color: theme.colorScheme.outline.withValues(alpha: 0.5),
                       width: 1,
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: const Color(0xFF0F172A).withValues(alpha: 0.03),
+                        color: Colors.black.withValues(alpha: 0.04),
                         blurRadius: 16,
                         offset: const Offset(0, 6),
                       ),
@@ -428,29 +428,32 @@ class _NoInternet404WidgetState extends State<NoInternet404Widget>
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        'Quick Troubleshooting Tips:',
+                      Text(
+                        context.l10n.troubleshootingTips,
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w700,
-                          color: Color(0xFF475569),
+                          color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
                           letterSpacing: 0.3,
                         ),
                       ),
                       const SizedBox(height: 10),
                       _buildCheckItem(
+                        context: context,
                         icon: Icons.wifi_rounded,
-                        text: 'Verify Wi-Fi network is active',
+                        text: context.l10n.tipWifi,
                       ),
                       const SizedBox(height: 8),
                       _buildCheckItem(
+                        context: context,
                         icon: Icons.cell_tower_rounded,
-                        text: 'Check mobile cellular data signal',
+                        text: context.l10n.tipCellular,
                       ),
                       const SizedBox(height: 8),
                       _buildCheckItem(
+                        context: context,
                         icon: Icons.airplanemode_inactive_rounded,
-                        text: 'Ensure Airplane mode is turned off',
+                        text: context.l10n.tipAirplane,
                       ),
                     ],
                   ),
@@ -491,10 +494,10 @@ class _NoInternet404WidgetState extends State<NoInternet404Widget>
                       child: Container(
                         alignment: Alignment.center,
                         child: _isChecking
-                            ? const Row(
+                            ? Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  SizedBox(
+                                  const SizedBox(
                                     width: 20,
                                     height: 20,
                                     child: CircularProgressIndicator(
@@ -502,10 +505,10 @@ class _NoInternet404WidgetState extends State<NoInternet404Widget>
                                       valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                                     ),
                                   ),
-                                  SizedBox(width: 12),
+                                  const SizedBox(width: 12),
                                   Text(
-                                    'Reconnecting...',
-                                    style: TextStyle(
+                                    context.l10n.reconnecting,
+                                    style: const TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w700,
                                       color: Colors.white,
@@ -513,14 +516,14 @@ class _NoInternet404WidgetState extends State<NoInternet404Widget>
                                   ),
                                 ],
                               )
-                            : const Row(
+                            : Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  Icon(Icons.refresh_rounded, size: 22, color: Colors.white),
-                                  SizedBox(width: 8),
+                                  const Icon(Icons.refresh_rounded, size: 22, color: Colors.white),
+                                  const SizedBox(width: 8),
                                   Text(
-                                    'Try Again',
-                                    style: TextStyle(
+                                    context.l10n.tryAgain,
+                                    style: const TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w700,
                                       letterSpacing: 0.2,
@@ -543,7 +546,7 @@ class _NoInternet404WidgetState extends State<NoInternet404Widget>
 
     if (widget.isFullScreen) {
       return Scaffold(
-        backgroundColor: const Color(0xFFF8FAFC),
+        backgroundColor: theme.scaffoldBackgroundColor,
         body: SafeArea(child: content),
       );
     }
@@ -551,24 +554,25 @@ class _NoInternet404WidgetState extends State<NoInternet404Widget>
     return content;
   }
 
-  Widget _buildCheckItem({required IconData icon, required String text}) {
+  Widget _buildCheckItem({required BuildContext context, required IconData icon, required String text}) {
+    final theme = Theme.of(context);
     return Row(
       children: [
         Container(
-          padding: const EdgeInsets.all(4),
+          padding: const EdgeInsets.all(5),
           decoration: BoxDecoration(
-            color: const Color(0xFFEFF6FF),
+            color: theme.colorScheme.primary.withValues(alpha: 0.12),
             borderRadius: BorderRadius.circular(6),
           ),
-          child: Icon(icon, size: 14, color: AppColors.primary),
+          child: Icon(icon, size: 14, color: theme.colorScheme.primary),
         ),
         const SizedBox(width: 10),
         Expanded(
           child: Text(
             text,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 12.5,
-              color: Color(0xFF334155),
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
               fontWeight: FontWeight.w500,
             ),
           ),

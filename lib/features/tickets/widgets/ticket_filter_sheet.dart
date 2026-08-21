@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:helpdesk/core/extensions/localization_extension.dart';
 import 'package:helpdesk/core/utils/app_colors.dart';
 import 'package:helpdesk/core/widgets/custom_button.dart';
 import 'package:helpdesk/features/auth/model/user_model.dart';
@@ -54,7 +55,7 @@ class _TicketFilterSheetState extends State<TicketFilterSheet> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Filter Tickets',
+                    context.l10n.filterTickets,
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: theme.colorScheme.onSurface),
                   ),
                   TextButton(
@@ -65,9 +66,9 @@ class _TicketFilterSheetState extends State<TicketFilterSheet> {
                         _assignedToMe = false;
                       });
                     },
-                    child: const Text(
-                      'Reset All',
-                      style: TextStyle(fontWeight: FontWeight.w600, color: AppColors.error),
+                    child: Text(
+                      context.l10n.resetAll,
+                      style: const TextStyle(fontWeight: FontWeight.w600, color: AppColors.error),
                     ),
                   ),
                 ],
@@ -79,9 +80,9 @@ class _TicketFilterSheetState extends State<TicketFilterSheet> {
               if (isStaff) ...[
                 SwitchListTile(
                   contentPadding: EdgeInsets.zero,
-                  title: Text('Only Assigned to Me', style: TextStyle(fontSize: 14, color: theme.colorScheme.onSurface)),
+                  title: Text(context.l10n.assignedToMe, style: TextStyle(fontSize: 14, color: theme.colorScheme.onSurface)),
                   subtitle: Text(
-                    'Show requests currently owned by you',
+                    context.l10n.showOnlyOwnedRequests,
                     style: TextStyle(fontSize: 12, color: theme.colorScheme.onSurface.withValues(alpha: 0.6)),
                   ),
                   value: _assignedToMe,
@@ -95,7 +96,7 @@ class _TicketFilterSheetState extends State<TicketFilterSheet> {
 
               // Priority Filter
               Text(
-                'Priority',
+                context.l10n.priority,
                 style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: theme.colorScheme.onSurface),
               ),
               const SizedBox(height: 8),
@@ -105,7 +106,7 @@ class _TicketFilterSheetState extends State<TicketFilterSheet> {
                 children: TicketPriority.values.map((priority) {
                   final isSelected = _selectedPriority == priority;
                   return ChoiceChip(
-                    label: Text(priority.label),
+                    label: Text(priority.getLocalizedLabel(context)),
                     selected: isSelected,
                     selectedColor: priority.color.withValues(alpha: 0.2),
                     backgroundColor: theme.colorScheme.surfaceContainerHighest,
@@ -125,7 +126,7 @@ class _TicketFilterSheetState extends State<TicketFilterSheet> {
 
               // Category Filter
               Text(
-                'Department / Category',
+                context.l10n.department,
                 style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: theme.colorScheme.onSurface),
               ),
               const SizedBox(height: 8),
@@ -136,7 +137,7 @@ class _TicketFilterSheetState extends State<TicketFilterSheet> {
                   final isSelected = _selectedCategory == cat;
                   return ChoiceChip(
                     avatar: Icon(cat.icon, size: 16, color: isSelected ? theme.colorScheme.primary : theme.colorScheme.onSurface.withValues(alpha: 0.6)),
-                    label: Text(cat.label),
+                    label: Text(cat.getLocalizedLabel(context)),
                     selected: isSelected,
                     selectedColor: theme.colorScheme.primary.withValues(alpha: 0.2),
                     backgroundColor: theme.colorScheme.surfaceContainerHighest,
@@ -156,7 +157,7 @@ class _TicketFilterSheetState extends State<TicketFilterSheet> {
 
               // Apply Filters Button
               CustomButton(
-                text: 'Apply Filters',
+                text: context.l10n.filterTickets,
                 onPressed: () {
                   widget.cubit.filterByCategory(_selectedCategory);
                   widget.cubit.filterByPriority(_selectedPriority);

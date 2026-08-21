@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:helpdesk/core/l10n/app_localizations.dart';
 import 'package:helpdesk/features/tickets/model/ticket_model.dart';
 import 'package:helpdesk/features/tickets/widgets/ticket_card_widget.dart';
 
@@ -25,6 +26,9 @@ void main() {
 
     await tester.pumpWidget(
       MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        locale: const Locale('en'),
         home: Scaffold(
           body: TicketCardWidget(
             ticket: ticket,
@@ -33,6 +37,8 @@ void main() {
         ),
       ),
     );
+
+    await tester.pumpAndSettle();
 
     expect(find.text('HD-1001'), findsOneWidget);
     expect(find.text('Server Connection Timeout'), findsOneWidget);

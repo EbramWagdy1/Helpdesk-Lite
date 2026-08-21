@@ -1,4 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
+import 'package:helpdesk/core/l10n/app_localizations.dart';
 
 enum UserRole {
   employee,
@@ -13,6 +15,19 @@ enum UserRole {
         return 'Support Agent';
       case UserRole.manager:
         return 'Manager';
+    }
+  }
+
+  String getLocalizedLabel(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    if (l10n == null) return displayName;
+    switch (this) {
+      case UserRole.employee:
+        return l10n.roleEmployee;
+      case UserRole.agent:
+        return l10n.roleAgent;
+      case UserRole.manager:
+        return l10n.roleManager;
     }
   }
 

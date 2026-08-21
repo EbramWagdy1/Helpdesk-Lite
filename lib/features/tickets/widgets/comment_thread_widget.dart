@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:helpdesk/core/extensions/localization_extension.dart';
 import 'package:helpdesk/features/auth/model/user_model.dart';
 import 'package:helpdesk/features/tickets/model/comment_model.dart';
 
@@ -16,6 +17,46 @@ class CommentThreadWidget extends StatelessWidget {
     return '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
   }
 
+  String _localizeMessage(BuildContext context, String rawMessage) {
+    final isAr = Localizations.localeOf(context).languageCode == 'ar';
+
+    if (rawMessage.startsWith('Ticket created:') || rawMessage.startsWith('تم إنشاء التذكرة:')) {
+      final prefixLen = rawMessage.startsWith('Ticket created:')
+          ? 'Ticket created:'.length
+          : 'تم إنشاء التذكرة:'.length;
+      final title = rawMessage.substring(prefixLen).trim();
+      return isAr ? 'تم إنشاء التذكرة: $title' : 'Ticket created: $title';
+    }
+
+    if (rawMessage.startsWith('Assigned ticket to ') || rawMessage.startsWith('تم إسناد التذكرة إلى ')) {
+      final prefixLen = rawMessage.startsWith('Assigned ticket to ')
+          ? 'Assigned ticket to '.length
+          : 'تم إسناد التذكرة إلى '.length;
+      final name = rawMessage.substring(prefixLen).trim();
+      return isAr ? 'تم إسناد التذكرة إلى $name' : 'Assigned ticket to $name';
+    }
+
+    if (rawMessage == 'Unassigned ticket' || rawMessage == 'تم إلغاء إسناد التذكرة') {
+      return isAr ? 'تم إلغاء إسناد التذكرة' : 'Unassigned ticket';
+    }
+
+    if (rawMessage.startsWith('Status changed to') || rawMessage.startsWith('تم تغيير الحالة إلى')) {
+      String statusLabel = rawMessage;
+      if (rawMessage.toLowerCase().contains('open') || rawMessage.contains('مفتوح')) {
+        statusLabel = context.l10n.open;
+      } else if (rawMessage.toLowerCase().contains('progress') || rawMessage.contains('تنفيذ')) {
+        statusLabel = context.l10n.inProgress;
+      } else if (rawMessage.toLowerCase().contains('resolved') || rawMessage.contains('تم الحل') || rawMessage.contains('محلول')) {
+        statusLabel = context.l10n.resolved;
+      } else if (rawMessage.toLowerCase().contains('closed') || rawMessage.contains('مغلق')) {
+        statusLabel = context.l10n.closed;
+      }
+      return isAr ? 'تم تغيير الحالة إلى "$statusLabel"' : 'Status changed to "$statusLabel"';
+    }
+
+    return rawMessage;
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -28,7 +69,7 @@ class CommentThreadWidget extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              'Activity & Messages (${comments.length})',
+              '${context.l10n.activityAndMessages} (${comments.length})',
               style: TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.w700,
@@ -55,7 +96,7 @@ class CommentThreadWidget extends StatelessWidget {
                 Icon(Icons.mark_chat_unread_outlined, size: 24, color: theme.colorScheme.onSurface.withValues(alpha: 0.45)),
                 const SizedBox(height: 6),
                 Text(
-                  'No messages yet. Send a note below.',
+                  context.l10n.noMessagesYet,
                   style: TextStyle(fontSize: 13, color: theme.colorScheme.onSurface.withValues(alpha: 0.6)),
                 ),
               ],
@@ -82,7 +123,7 @@ class CommentThreadWidget extends StatelessWidget {
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
-                      '${comment.message} • ${_formatTime(comment.createdAt)}',
+                      '${_localizeMessage(context, comment.message)} • ${_formatTime(comment.createdAt)}',
                       style: TextStyle(
                         fontSize: 11,
                         color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
@@ -136,7 +177,7 @@ class CommentThreadWidget extends StatelessWidget {
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 Text(
-                                  isMe ? 'You' : comment.senderName,
+                                  isMe ? context.l10n.you : comment.senderName,
                                   style: TextStyle(
                                     fontSize: 12,
                                     fontWeight: FontWeight.w700,
@@ -153,7 +194,7 @@ class CommentThreadWidget extends StatelessWidget {
                                     borderRadius: BorderRadius.circular(4),
                                   ),
                                   child: Text(
-                                    comment.senderRole,
+                                    UserRole.fromString(comment.senderRole).getLocalizedLabel(context),
                                     style: TextStyle(
                                       fontSize: 9,
                                       fontWeight: FontWeight.w600,
@@ -167,7 +208,7 @@ class CommentThreadWidget extends StatelessWidget {
 
                             // Message
                             Text(
-                              comment.message,
+                              _localizeMessage(context, comment.message),
                               style: TextStyle(
                                 fontSize: 13,
                                 color: isMe ? Colors.white : theme.colorScheme.onSurface.withValues(alpha: 0.9),

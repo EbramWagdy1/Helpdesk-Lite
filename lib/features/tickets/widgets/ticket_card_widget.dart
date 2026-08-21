@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:helpdesk/core/extensions/localization_extension.dart';
 import 'package:helpdesk/features/tickets/model/ticket_model.dart';
 
 class TicketCardWidget extends StatelessWidget {
@@ -11,18 +12,19 @@ class TicketCardWidget extends StatelessWidget {
     required this.onTap,
   });
 
-  String _formatDate(DateTime dt) {
+  String _formatDate(BuildContext context, DateTime dt) {
     final now = DateTime.now();
     final diff = now.difference(dt);
+    final isAr = Localizations.localeOf(context).languageCode == 'ar';
 
     if (diff.inMinutes < 1) {
-      return 'Just now';
+      return isAr ? 'الآن' : 'Just now';
     } else if (diff.inMinutes < 60) {
-      return '${diff.inMinutes}m ago';
+      return isAr ? 'منذ ${diff.inMinutes} د' : '${diff.inMinutes}m ago';
     } else if (diff.inHours < 24) {
-      return '${diff.inHours}h ago';
+      return isAr ? 'منذ ${diff.inHours} س' : '${diff.inHours}h ago';
     } else if (diff.inDays < 7) {
-      return '${diff.inDays}d ago';
+      return isAr ? 'منذ ${diff.inDays} يوم' : '${diff.inDays}d ago';
     } else {
       return '${dt.day}/${dt.month}/${dt.year}';
     }
@@ -82,7 +84,7 @@ class TicketCardWidget extends StatelessWidget {
                 const SizedBox(width: 4),
                 Expanded(
                   child: Text(
-                    ticket.category.label,
+                    ticket.category.getLocalizedLabel(context),
                     style: TextStyle(
                       fontSize: 12,
                       color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
@@ -101,7 +103,7 @@ class TicketCardWidget extends StatelessWidget {
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(
-                    ticket.priority.label,
+                    ticket.priority.getLocalizedLabel(context),
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w700,
@@ -165,7 +167,7 @@ class TicketCardWidget extends StatelessWidget {
                       ),
                       const SizedBox(width: 5),
                       Text(
-                        ticket.status.label,
+                        ticket.status.getLocalizedLabel(context),
                         style: TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.w700,
@@ -210,7 +212,7 @@ class TicketCardWidget extends StatelessWidget {
                   )
                 else
                   Text(
-                    'Unassigned',
+                    context.l10n.unassigned,
                     style: TextStyle(
                       fontSize: 12,
                       color: theme.colorScheme.onSurface.withValues(alpha: 0.45),
@@ -224,7 +226,7 @@ class TicketCardWidget extends StatelessWidget {
 
                 // Time ago
                 Text(
-                  _formatDate(ticket.createdAt),
+                  _formatDate(context, ticket.createdAt),
                   style: TextStyle(
                     fontSize: 12,
                     color: theme.colorScheme.onSurface.withValues(alpha: 0.5),

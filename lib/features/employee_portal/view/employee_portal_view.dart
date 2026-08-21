@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:helpdesk/core/extensions/localization_extension.dart';
 import 'package:helpdesk/core/services/service_locator.dart';
 import 'package:helpdesk/core/widgets/connectivity_checker_wrapper.dart';
 import 'package:helpdesk/features/auth/model/user_model.dart';
@@ -105,7 +106,7 @@ class _EmployeePortalViewState extends State<EmployeePortalView> {
                       overflow: TextOverflow.ellipsis,
                     ),
                     Text(
-                      '${user.department} • Employee',
+                      '${context.getLocalizedDepartment(user.department)} • ${context.l10n.roleEmployee}',
                       style: TextStyle(
                         fontSize: 11,
                         color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
@@ -137,7 +138,7 @@ class _EmployeePortalViewState extends State<EmployeePortalView> {
             ),
             IconButton(
               icon: Icon(Icons.person_outline_rounded, color: theme.colorScheme.onSurface),
-              tooltip: 'Profile',
+              tooltip: context.l10n.profile,
               onPressed: () => _openProfile(context),
             ),
             const SizedBox(width: 6),
@@ -149,9 +150,9 @@ class _EmployeePortalViewState extends State<EmployeePortalView> {
           elevation: 3,
           highlightElevation: 5,
           icon: const Icon(Icons.add_rounded, size: 20),
-          label: const Text(
-            'New Ticket',
-            style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
+          label: Text(
+            context.l10n.newTicket,
+            style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
           ),
           onPressed: () => _openCreateTicket(),
         ),
@@ -225,7 +226,7 @@ class _EmployeePortalViewState extends State<EmployeePortalView> {
                             },
                             style: TextStyle(fontSize: 14, color: theme.colorScheme.onSurface),
                             decoration: InputDecoration(
-                              hintText: 'Search tickets by title, description or ID...',
+                              hintText: context.l10n.searchDepartmentTicketsHint,
                               hintStyle: TextStyle(fontSize: 13, color: theme.colorScheme.onSurface.withValues(alpha: 0.45)),
                               prefixIcon: Icon(Icons.search_rounded, size: 18, color: theme.colorScheme.onSurface.withValues(alpha: 0.5)),
                               border: InputBorder.none,
@@ -251,7 +252,7 @@ class _EmployeePortalViewState extends State<EmployeePortalView> {
                               children: [
                                 _buildFilterChip(
                                   context: context,
-                                  label: 'All',
+                                  label: context.l10n.all,
                                   count: totalCount,
                                   isSelected: _selectedStatus == null,
                                   onTap: () => setState(() => _selectedStatus = null),
@@ -259,7 +260,7 @@ class _EmployeePortalViewState extends State<EmployeePortalView> {
                                 const SizedBox(width: 8),
                                 _buildFilterChip(
                                   context: context,
-                                  label: 'Open',
+                                  label: context.l10n.open,
                                   count: openCount,
                                   isSelected: _selectedStatus == TicketStatus.open,
                                   color: const Color(0xFF2563EB),
@@ -270,7 +271,7 @@ class _EmployeePortalViewState extends State<EmployeePortalView> {
                                 const SizedBox(width: 8),
                                 _buildFilterChip(
                                   context: context,
-                                  label: 'In Progress',
+                                  label: context.l10n.inProgress,
                                   count: inProgressCount,
                                   isSelected: _selectedStatus == TicketStatus.inProgress,
                                   color: const Color(0xFFD97706),
@@ -281,7 +282,7 @@ class _EmployeePortalViewState extends State<EmployeePortalView> {
                                 const SizedBox(width: 8),
                                 _buildFilterChip(
                                   context: context,
-                                  label: 'Resolved',
+                                  label: context.l10n.resolved,
                                   count: resolvedCount,
                                   isSelected: _selectedStatus == TicketStatus.resolved,
                                   color: const Color(0xFF16A34A),
@@ -292,7 +293,7 @@ class _EmployeePortalViewState extends State<EmployeePortalView> {
                                 const SizedBox(width: 8),
                                 _buildFilterChip(
                                   context: context,
-                                  label: 'Closed',
+                                  label: context.l10n.closed,
                                   count: closedCount,
                                   isSelected: _selectedStatus == TicketStatus.closed,
                                   color: const Color(0xFF64748B),
@@ -310,7 +311,7 @@ class _EmployeePortalViewState extends State<EmployeePortalView> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                'My Tickets (${filteredTickets.length})',
+                                '${context.l10n.myTickets} (${filteredTickets.length})',
                                 style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w700,
@@ -327,7 +328,7 @@ class _EmployeePortalViewState extends State<EmployeePortalView> {
                                     });
                                   },
                                   child: Text(
-                                    'Clear filter',
+                                    context.l10n.resetFilters,
                                     style: TextStyle(
                                       fontSize: 12,
                                       fontWeight: FontWeight.w600,
@@ -363,7 +364,7 @@ class _EmployeePortalViewState extends State<EmployeePortalView> {
                               ),
                               const SizedBox(height: 16),
                               Text(
-                                allMyTickets.isEmpty ? 'No support tickets yet' : 'No matching tickets',
+                                allMyTickets.isEmpty ? context.l10n.noSupportTicketsYet : context.l10n.noMatchingTickets,
                                 style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w700,
@@ -373,8 +374,8 @@ class _EmployeePortalViewState extends State<EmployeePortalView> {
                               const SizedBox(height: 6),
                               Text(
                                 allMyTickets.isEmpty
-                                    ? 'Tap "+ New Ticket" below to submit your first request.'
-                                    : 'Try adjusting your search or selected status.',
+                                    ? context.l10n.createFirstTicketHint
+                                    : context.l10n.adjustSearchHint,
                                 style: TextStyle(
                                   fontSize: 13,
                                   color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
@@ -392,7 +393,7 @@ class _EmployeePortalViewState extends State<EmployeePortalView> {
                                     padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
                                   ),
                                   icon: const Icon(Icons.add_rounded, size: 18),
-                                  label: const Text('Create Ticket', style: TextStyle(fontWeight: FontWeight.w600)),
+                                  label: Text(context.l10n.createTicket, style: const TextStyle(fontWeight: FontWeight.w600)),
                                   onPressed: () => _openCreateTicket(),
                                 ),
                               ],

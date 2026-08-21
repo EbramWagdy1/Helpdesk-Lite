@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:helpdesk/core/extensions/localization_extension.dart';
 import 'package:helpdesk/core/routing/app_routes.dart';
 import 'package:helpdesk/core/utils/app_assets.dart';
-import 'package:helpdesk/core/utils/app_strings.dart';
 import 'package:helpdesk/core/utils/regexes.dart';
 import 'package:helpdesk/core/widgets/custom_button.dart';
 import 'package:helpdesk/core/widgets/custom_snackbar.dart';
@@ -82,7 +82,7 @@ class _LoginViewState extends State<LoginView> {
                       ),
                       const SizedBox(height: 24),
                       Text(
-                        AppStrings.welcomeBack,
+                        context.l10n.welcomeBack,
                         style: TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.w800,
@@ -92,7 +92,7 @@ class _LoginViewState extends State<LoginView> {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'Sign in to your HelpDesk workspace',
+                        context.l10n.loginSubtitle,
                         style: TextStyle(
                           fontSize: 14,
                           color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
@@ -104,16 +104,16 @@ class _LoginViewState extends State<LoginView> {
                       // Email Field
                       CustomTextField(
                         controller: _emailController,
-                        labelText: AppStrings.email,
-                        hintText: AppStrings.emailHint,
+                        labelText: context.l10n.email,
+                        hintText: context.l10n.emailHint,
                         keyboardType: TextInputType.emailAddress,
                         prefixIcon: Icon(Icons.email_outlined, color: theme.colorScheme.primary),
                         validator: (value) {
                           if (value == null || value.trim().isEmpty) {
-                            return AppStrings.requiredField;
+                            return context.l10n.requiredField;
                           }
                           if (!AppRegex.isEmailValid(value.trim())) {
-                            return AppStrings.invalidEmail;
+                            return context.l10n.invalidEmail;
                           }
                           return null;
                         },
@@ -123,8 +123,8 @@ class _LoginViewState extends State<LoginView> {
                       // Password Field
                       CustomTextField(
                         controller: _passwordController,
-                        labelText: AppStrings.password,
-                        hintText: AppStrings.passwordHint,
+                        labelText: context.l10n.password,
+                        hintText: context.l10n.passwordHint,
                         obscureText: cubit.isPasswordHidden,
                         prefixIcon: Icon(Icons.lock_outline_rounded, color: theme.colorScheme.primary),
                         suffixIcon: IconButton(
@@ -138,10 +138,10 @@ class _LoginViewState extends State<LoginView> {
                         ),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return AppStrings.requiredField;
+                            return context.l10n.requiredField;
                           }
                           if (value.length < 6) {
-                            return AppStrings.invalidPassword;
+                            return context.l10n.invalidPassword;
                           }
                           return null;
                         },
@@ -166,7 +166,7 @@ class _LoginViewState extends State<LoginView> {
                               ),
                               const SizedBox(width: 8),
                               Text(
-                                AppStrings.rememberMe,
+                                context.l10n.rememberMe,
                                 style: TextStyle(
                                   fontSize: 13,
                                   color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
@@ -179,11 +179,11 @@ class _LoginViewState extends State<LoginView> {
                             onPressed: () {
                               CustomSnackBar.showSuccess(
                                 context,
-                                message: 'Password reset link sent to your registered email.',
+                                message: context.l10n.passwordResetSent,
                               );
                             },
                             child: Text(
-                              AppStrings.forgotPassword,
+                              context.l10n.forgotPassword,
                               style: TextStyle(
                                 color: theme.colorScheme.primary,
                                 fontWeight: FontWeight.w600,
@@ -197,7 +197,7 @@ class _LoginViewState extends State<LoginView> {
 
                       // Sign In Button
                       CustomButton(
-                        text: AppStrings.signIn,
+                        text: context.l10n.signIn,
                         isLoading: isLoading,
                         onPressed: () => _handleLogin(cubit),
                       ),
@@ -208,7 +208,7 @@ class _LoginViewState extends State<LoginView> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            AppStrings.dontHaveAccount,
+                            context.l10n.dontHaveAccount,
                             style: TextStyle(
                               fontSize: 14,
                               color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
@@ -218,11 +218,11 @@ class _LoginViewState extends State<LoginView> {
                           GestureDetector(
                             onTap: () => context.push(AppRoutes.signup),
                             child: Text(
-                              AppStrings.signUp,
+                              context.l10n.signUp,
                               style: TextStyle(
-                                color: theme.colorScheme.primary,
-                                fontWeight: FontWeight.w700,
                                 fontSize: 14,
+                                fontWeight: FontWeight.w700,
+                                color: theme.colorScheme.primary,
                               ),
                             ),
                           ),

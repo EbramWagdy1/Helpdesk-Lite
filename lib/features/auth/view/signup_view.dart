@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:helpdesk/core/extensions/localization_extension.dart';
 import 'package:helpdesk/core/routing/app_routes.dart';
 import 'package:helpdesk/core/utils/app_assets.dart';
-import 'package:helpdesk/core/utils/app_strings.dart';
 import 'package:helpdesk/core/utils/regexes.dart';
 import 'package:helpdesk/core/widgets/custom_button.dart';
 import 'package:helpdesk/core/widgets/custom_snackbar.dart';
@@ -98,7 +98,7 @@ class _SignUpViewState extends State<SignUpView> {
                       ),
                       const SizedBox(height: 12),
                       Text(
-                        AppStrings.createAccount,
+                        context.l10n.createAccount,
                         style: TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.w800,
@@ -108,7 +108,7 @@ class _SignUpViewState extends State<SignUpView> {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        'Join your team helpdesk workspace',
+                        context.l10n.registerSubtitle,
                         style: TextStyle(
                           fontSize: 14,
                           color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
@@ -119,7 +119,7 @@ class _SignUpViewState extends State<SignUpView> {
 
                       // User Role Selector
                       Text(
-                        'Workspace Role',
+                        context.l10n.workspaceRole,
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w700,
@@ -157,7 +157,7 @@ class _SignUpViewState extends State<SignUpView> {
                                       : [],
                                 ),
                                 child: Text(
-                                  role.displayName,
+                                  role.getLocalizedLabel(context),
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
                                     fontSize: 11,
@@ -178,7 +178,7 @@ class _SignUpViewState extends State<SignUpView> {
 
                       // Department Dropdown
                       Text(
-                        'Department',
+                        context.l10n.department,
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w700,
@@ -202,7 +202,10 @@ class _SignUpViewState extends State<SignUpView> {
                             items: cubit.departments.map((dept) {
                               return DropdownMenuItem<String>(
                                 value: dept,
-                                child: Text(dept, style: TextStyle(color: theme.colorScheme.onSurface)),
+                                child: Text(
+                                  context.getLocalizedDepartment(dept),
+                                  style: TextStyle(color: theme.colorScheme.onSurface),
+                                ),
                               );
                             }).toList(),
                             onChanged: (val) {
@@ -216,12 +219,12 @@ class _SignUpViewState extends State<SignUpView> {
                       // Full Name Field
                       CustomTextField(
                         controller: _nameController,
-                        labelText: AppStrings.fullName,
-                        hintText: AppStrings.fullNameHint,
+                        labelText: context.l10n.fullName,
+                        hintText: context.l10n.fullNameHint,
                         prefixIcon: Icon(Icons.person_outline_rounded, color: theme.colorScheme.primary),
                         validator: (value) {
                           if (value == null || value.trim().isEmpty) {
-                            return AppStrings.requiredField;
+                            return context.l10n.requiredField;
                           }
                           return null;
                         },
@@ -231,16 +234,16 @@ class _SignUpViewState extends State<SignUpView> {
                       // Email Field
                       CustomTextField(
                         controller: _emailController,
-                        labelText: AppStrings.email,
-                        hintText: AppStrings.emailHint,
+                        labelText: context.l10n.email,
+                        hintText: context.l10n.emailHint,
                         keyboardType: TextInputType.emailAddress,
                         prefixIcon: Icon(Icons.email_outlined, color: theme.colorScheme.primary),
                         validator: (value) {
                           if (value == null || value.trim().isEmpty) {
-                            return AppStrings.requiredField;
+                            return context.l10n.requiredField;
                           }
                           if (!AppRegex.isEmailValid(value.trim())) {
-                            return AppStrings.invalidEmail;
+                            return context.l10n.invalidEmail;
                           }
                           return null;
                         },
@@ -250,16 +253,16 @@ class _SignUpViewState extends State<SignUpView> {
                       // Phone Field
                       CustomTextField(
                         controller: _phoneController,
-                        labelText: AppStrings.phone,
-                        hintText: AppStrings.phoneHint,
+                        labelText: context.l10n.phone,
+                        hintText: context.l10n.phoneHint,
                         keyboardType: TextInputType.phone,
                         prefixIcon: Icon(Icons.phone_outlined, color: theme.colorScheme.primary),
                         validator: (value) {
                           if (value == null || value.trim().isEmpty) {
-                            return AppStrings.requiredField;
+                            return context.l10n.requiredField;
                           }
                           if (!AppRegex.isPhoneNumberValid(value.trim())) {
-                            return AppStrings.invalidPhone;
+                            return context.l10n.invalidPhone;
                           }
                           return null;
                         },
@@ -269,8 +272,8 @@ class _SignUpViewState extends State<SignUpView> {
                       // Password Field
                       CustomTextField(
                         controller: _passwordController,
-                        labelText: AppStrings.password,
-                        hintText: AppStrings.passwordHint,
+                        labelText: context.l10n.password,
+                        hintText: context.l10n.passwordHint,
                         obscureText: cubit.isPasswordHidden,
                         prefixIcon: Icon(Icons.lock_outline_rounded, color: theme.colorScheme.primary),
                         suffixIcon: IconButton(
@@ -284,10 +287,10 @@ class _SignUpViewState extends State<SignUpView> {
                         ),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return AppStrings.requiredField;
+                            return context.l10n.requiredField;
                           }
                           if (value.length < 6) {
-                            return AppStrings.invalidPassword;
+                            return context.l10n.invalidPassword;
                           }
                           return null;
                         },
@@ -297,8 +300,8 @@ class _SignUpViewState extends State<SignUpView> {
                       // Confirm Password Field
                       CustomTextField(
                         controller: _confirmPasswordController,
-                        labelText: AppStrings.confirmPassword,
-                        hintText: AppStrings.confirmPasswordHint,
+                        labelText: context.l10n.confirmPassword,
+                        hintText: context.l10n.confirmPasswordHint,
                         obscureText: cubit.isConfirmPasswordHidden,
                         prefixIcon: Icon(Icons.lock_reset_rounded, color: theme.colorScheme.primary),
                         suffixIcon: IconButton(
@@ -312,10 +315,10 @@ class _SignUpViewState extends State<SignUpView> {
                         ),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return AppStrings.requiredField;
+                            return context.l10n.requiredField;
                           }
                           if (value != _passwordController.text) {
-                            return AppStrings.passwordMismatch;
+                            return context.l10n.passwordMismatch;
                           }
                           return null;
                         },
@@ -324,7 +327,7 @@ class _SignUpViewState extends State<SignUpView> {
 
                       // Submit Button
                       CustomButton(
-                        text: AppStrings.signUp,
+                        text: context.l10n.signUp,
                         isLoading: isLoading,
                         onPressed: () => _handleSignUp(cubit),
                       ),
@@ -335,7 +338,7 @@ class _SignUpViewState extends State<SignUpView> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            AppStrings.alreadyHaveAccount,
+                            context.l10n.alreadyHaveAccount,
                             style: TextStyle(
                               fontSize: 14,
                               color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
@@ -345,7 +348,7 @@ class _SignUpViewState extends State<SignUpView> {
                           GestureDetector(
                             onTap: () => context.pop(),
                             child: Text(
-                              AppStrings.signIn,
+                              context.l10n.signIn,
                               style: TextStyle(
                                 color: theme.colorScheme.primary,
                                 fontWeight: FontWeight.w700,

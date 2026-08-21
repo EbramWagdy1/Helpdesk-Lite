@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:helpdesk/core/extensions/localization_extension.dart';
+import 'package:helpdesk/core/localization/locale_cubit.dart';
+import 'package:helpdesk/core/localization/locale_state.dart';
 import 'package:helpdesk/core/theme/theme_cubit.dart';
 import 'package:helpdesk/core/theme/theme_state.dart';
 import 'package:helpdesk/core/widgets/custom_snackbar.dart';
@@ -65,7 +68,7 @@ class _ProfileViewState extends State<ProfileView> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            'Edit Profile',
+                            context.l10n.editProfile,
                             style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.w700,
@@ -83,18 +86,18 @@ class _ProfileViewState extends State<ProfileView> {
                       // Full Name Field
                       CustomTextField(
                         controller: nameController,
-                        labelText: 'Full Name',
-                        hintText: 'Enter full name',
+                        labelText: context.l10n.fullName,
+                        hintText: context.l10n.enterFullName,
                         prefixIcon: Icon(Icons.person_outline_rounded, color: theme.colorScheme.onSurface.withValues(alpha: 0.6), size: 20),
-                        validator: (v) => (v == null || v.trim().isEmpty) ? 'Please enter your name' : null,
+                        validator: (v) => (v == null || v.trim().isEmpty) ? context.l10n.pleaseEnterName : null,
                       ),
                       const SizedBox(height: 14),
 
                       // Phone Field
                       CustomTextField(
                         controller: phoneController,
-                        labelText: 'Phone Number',
-                        hintText: 'e.g. +1 234 567 8900',
+                        labelText: context.l10n.phoneNumber,
+                        hintText: context.l10n.phoneHint,
                         prefixIcon: Icon(Icons.phone_outlined, color: theme.colorScheme.onSurface.withValues(alpha: 0.6), size: 20),
                         keyboardType: TextInputType.phone,
                       ),
@@ -102,7 +105,7 @@ class _ProfileViewState extends State<ProfileView> {
 
                       // Department Dropdown
                       Text(
-                        'Department',
+                        context.l10n.department,
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
@@ -125,7 +128,10 @@ class _ProfileViewState extends State<ProfileView> {
                             items: authCubit.departments.map((dept) {
                               return DropdownMenuItem(
                                 value: dept,
-                                child: Text(dept, style: TextStyle(fontSize: 14, color: theme.colorScheme.onSurface)),
+                                child: Text(
+                                  context.getLocalizedDepartment(dept),
+                                  style: TextStyle(fontSize: 14, color: theme.colorScheme.onSurface),
+                                ),
                               );
                             }).toList(),
                             onChanged: (val) {
@@ -161,7 +167,10 @@ class _ProfileViewState extends State<ProfileView> {
                               );
                             }
                           },
-                          child: const Text('Save Changes', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15)),
+                          child: Text(
+                            context.l10n.saveChanges,
+                            style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15),
+                          ),
                         ),
                       ),
                     ],
@@ -181,18 +190,18 @@ class _ProfileViewState extends State<ProfileView> {
       context: context,
       builder: (dialogCtx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text(
-          'Sign Out',
-          style: TextStyle(fontWeight: FontWeight.w700, fontSize: 18),
+        title: Text(
+          context.l10n.signOut,
+          style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 18),
         ),
         content: Text(
-          'Are you sure you want to sign out from your HelpDesk account?',
+          context.l10n.signOutPrompt,
           style: TextStyle(color: theme.colorScheme.onSurface.withValues(alpha: 0.7)),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogCtx),
-            child: Text('Cancel', style: TextStyle(color: theme.colorScheme.onSurface.withValues(alpha: 0.6))),
+            child: Text(context.l10n.cancel, style: TextStyle(color: theme.colorScheme.onSurface.withValues(alpha: 0.6))),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
@@ -205,7 +214,7 @@ class _ProfileViewState extends State<ProfileView> {
               Navigator.pop(dialogCtx);
               await authCubit.logout();
             },
-            child: const Text('Sign Out', style: TextStyle(fontWeight: FontWeight.w600)),
+            child: Text(context.l10n.signOut, style: const TextStyle(fontWeight: FontWeight.w600)),
           ),
         ],
       ),
@@ -242,7 +251,7 @@ class _ProfileViewState extends State<ProfileView> {
               onPressed: () => Navigator.pop(context),
             ),
             title: Text(
-              'Profile',
+              context.l10n.profile,
               style: TextStyle(
                 fontSize: 17,
                 fontWeight: FontWeight.w700,
@@ -329,7 +338,7 @@ class _ProfileViewState extends State<ProfileView> {
                               borderRadius: BorderRadius.circular(6),
                             ),
                             child: Text(
-                              current.role.displayName,
+                              current.role.getLocalizedLabel(context),
                               style: TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w600,
@@ -345,7 +354,7 @@ class _ProfileViewState extends State<ProfileView> {
                               borderRadius: BorderRadius.circular(6),
                             ),
                             child: Text(
-                              current.department,
+                              context.getLocalizedDepartment(current.department),
                               style: TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w600,
@@ -361,7 +370,7 @@ class _ProfileViewState extends State<ProfileView> {
                 const SizedBox(height: 20),
 
                 // Workspace Information Group
-                _buildSectionHeader('WORKSPACE DETAILS'),
+                _buildSectionHeader(context.l10n.workspaceDetails),
                 const SizedBox(height: 6),
                 Container(
                   decoration: BoxDecoration(
@@ -373,25 +382,25 @@ class _ProfileViewState extends State<ProfileView> {
                     children: [
                       _buildCleanTile(
                         context: context,
-                        label: 'Role',
-                        value: current.role.displayName,
+                        label: context.l10n.role,
+                        value: current.role.getLocalizedLabel(context),
                       ),
                       Divider(height: 1, indent: 16, color: theme.dividerColor),
                       _buildCleanTile(
                         context: context,
-                        label: 'Department',
-                        value: current.department,
+                        label: context.l10n.department,
+                        value: context.getLocalizedDepartment(current.department),
                       ),
                       Divider(height: 1, indent: 16, color: theme.dividerColor),
                       _buildCleanTile(
                         context: context,
-                        label: 'Phone',
-                        value: current.phone.isNotEmpty ? current.phone : 'Not provided',
+                        label: context.l10n.phone,
+                        value: current.phone.isNotEmpty ? current.phone : context.l10n.notProvided,
                       ),
                       Divider(height: 1, indent: 16, color: theme.dividerColor),
                       _buildCleanTile(
                         context: context,
-                        label: 'Member Since',
+                        label: context.l10n.memberSince,
                         value: '${current.createdAt.day}/${current.createdAt.month}/${current.createdAt.year}',
                       ),
                     ],
@@ -400,7 +409,7 @@ class _ProfileViewState extends State<ProfileView> {
                 const SizedBox(height: 24),
 
                 // Actions & Danger Group
-                _buildSectionHeader('SETTINGS & SECURITY'),
+                _buildSectionHeader(context.l10n.settingsAndSecurity),
                 const SizedBox(height: 6),
                 Container(
                   decoration: BoxDecoration(
@@ -410,6 +419,51 @@ class _ProfileViewState extends State<ProfileView> {
                   ),
                   child: Column(
                     children: [
+                      BlocBuilder<LocaleCubit, LocaleState>(
+                        builder: (context, localeState) {
+                          final isArabic = localeState.isArabic;
+                          return ListTile(
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
+                            leading: Icon(
+                              Icons.language_rounded,
+                              size: 20,
+                              color: theme.colorScheme.primary,
+                            ),
+                            title: Text(
+                              context.l10n.languageTitle,
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                color: theme.colorScheme.onSurface,
+                              ),
+                            ),
+                            subtitle: Text(
+                              isArabic ? 'العربية (RTL)' : 'English (LTR)',
+                              style: TextStyle(fontSize: 12, color: theme.colorScheme.onSurface.withValues(alpha: 0.6)),
+                            ),
+                            trailing: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: theme.colorScheme.primary.withValues(alpha: 0.12),
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(color: theme.colorScheme.primary.withValues(alpha: 0.25)),
+                              ),
+                              child: Text(
+                                isArabic ? 'English' : 'عربي',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w700,
+                                  color: theme.colorScheme.primary,
+                                ),
+                              ),
+                            ),
+                            onTap: () {
+                              context.read<LocaleCubit>().toggleLanguage();
+                            },
+                          );
+                        },
+                      ),
+                      Divider(height: 1, indent: 56, color: theme.dividerColor),
                       BlocBuilder<ThemeCubit, ThemeState>(
                         builder: (context, themeState) {
                           final isDark = themeState.themeMode == ThemeMode.dark;
@@ -421,7 +475,7 @@ class _ProfileViewState extends State<ProfileView> {
                               color: isDark ? const Color(0xFFFBBF24) : const Color(0xFF2563EB),
                             ),
                             title: Text(
-                              'Dark Theme',
+                              context.l10n.darkTheme,
                               style: TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w600,
@@ -429,7 +483,7 @@ class _ProfileViewState extends State<ProfileView> {
                               ),
                             ),
                             subtitle: Text(
-                              isDark ? 'Dark mode enabled' : 'Light mode enabled',
+                              isDark ? context.l10n.darkModeEnabled : context.l10n.lightModeEnabled,
                               style: TextStyle(fontSize: 12, color: theme.colorScheme.onSurface.withValues(alpha: 0.6)),
                             ),
                             value: isDark,
@@ -444,7 +498,7 @@ class _ProfileViewState extends State<ProfileView> {
                         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
                         leading: const Icon(Icons.edit_outlined, size: 20, color: Color(0xFF2563EB)),
                         title: Text(
-                          'Edit Profile Details',
+                          context.l10n.editProfileDetails,
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
@@ -459,7 +513,7 @@ class _ProfileViewState extends State<ProfileView> {
                         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
                         leading: Icon(Icons.info_outline_rounded, size: 20, color: theme.colorScheme.onSurface.withValues(alpha: 0.6)),
                         title: Text(
-                          'App Version',
+                          context.l10n.appVersion,
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w500,
@@ -490,9 +544,9 @@ class _ProfileViewState extends State<ProfileView> {
                       ),
                     ),
                     icon: const Icon(Icons.logout_rounded, size: 18),
-                    label: const Text(
-                      'Sign Out',
-                      style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
+                    label: Text(
+                      context.l10n.signOut,
+                      style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
                     ),
                     onPressed: () => _showLogoutDialog(context, authCubit),
                   ),
@@ -508,9 +562,9 @@ class _ProfileViewState extends State<ProfileView> {
 
   Widget _buildSectionHeader(String title) {
     return Align(
-      alignment: Alignment.centerLeft,
+      alignment: AlignmentDirectional.centerStart,
       child: Padding(
-        padding: const EdgeInsets.only(left: 4),
+        padding: const EdgeInsetsDirectional.only(start: 4),
         child: Text(
           title,
           style: const TextStyle(

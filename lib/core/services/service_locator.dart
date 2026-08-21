@@ -1,4 +1,5 @@
 import 'package:get_it/get_it.dart';
+import 'package:helpdesk/core/localization/locale_cubit.dart';
 import 'package:helpdesk/core/services/connectivity_service.dart';
 import 'package:helpdesk/core/services/storage_service.dart';
 import 'package:helpdesk/core/theme/theme_cubit.dart';
@@ -8,9 +9,13 @@ import 'package:helpdesk/features/tickets/data/ticket_repository.dart';
 final GetIt sl = GetIt.instance;
 
 void setupServiceLocator() {
-  // Theme & State
+  // Theme, Localization & State
   if (!sl.isRegistered<ThemeCubit>()) {
     sl.registerLazySingleton<ThemeCubit>(() => ThemeCubit());
+  }
+
+  if (!sl.isRegistered<LocaleCubit>()) {
+    sl.registerLazySingleton<LocaleCubit>(() => LocaleCubit());
   }
 
   // Services
@@ -31,4 +36,3 @@ void setupServiceLocator() {
     sl.registerLazySingleton<TicketRepository>(() => TicketRepository());
   }
 }
-

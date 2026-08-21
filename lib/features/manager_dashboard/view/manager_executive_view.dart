@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
+import 'package:helpdesk/core/extensions/localization_extension.dart';
 import 'package:helpdesk/core/utils/app_colors.dart';
 import 'package:helpdesk/core/widgets/connectivity_checker_wrapper.dart';
 import 'package:helpdesk/core/widgets/custom_snackbar.dart';
@@ -68,17 +69,17 @@ class _ManagerExecutiveViewState extends State<ManagerExecutiveView> {
                 NavigationDestination(
                   icon: Icon(Icons.insights_outlined, color: theme.colorScheme.onSurface.withValues(alpha: 0.6)),
                   selectedIcon: Icon(Icons.insights_rounded, color: theme.colorScheme.primary),
-                  label: 'Analytics',
+                  label: context.l10n.analytics,
                 ),
                 NavigationDestination(
                   icon: Icon(Icons.dashboard_outlined, color: theme.colorScheme.onSurface.withValues(alpha: 0.6)),
                   selectedIcon: Icon(Icons.dashboard_rounded, color: theme.colorScheme.primary),
-                  label: 'Tickets',
+                  label: context.l10n.tickets,
                 ),
                 NavigationDestination(
                   icon: Icon(Icons.badge_outlined, color: theme.colorScheme.onSurface.withValues(alpha: 0.6)),
                   selectedIcon: Icon(Icons.badge_rounded, color: theme.colorScheme.primary),
-                  label: 'Support Team',
+                  label: context.l10n.supportTeam,
                 ),
               ],
             ),
@@ -168,7 +169,9 @@ class _ManagerExecutiveViewState extends State<ManagerExecutiveView> {
                                     ),
                                     const SizedBox(height: 2),
                                     Text(
-                                      'Operations Manager • Executive',
+                                      widget.currentUser.role == UserRole.manager
+                                          ? context.l10n.operationsManagerExecutive
+                                          : widget.currentUser.role.getLocalizedLabel(context),
                                       style: TextStyle(
                                         fontSize: 11,
                                         color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
@@ -183,7 +186,7 @@ class _ManagerExecutiveViewState extends State<ManagerExecutiveView> {
                             ),
                             IconButton(
                               icon: Icon(Icons.add_rounded, color: theme.colorScheme.primary, size: 22),
-                              tooltip: 'Create Ticket',
+                              tooltip: context.l10n.newTicket,
                               onPressed: () {
                                 Navigator.push(
                                   context,
@@ -195,7 +198,7 @@ class _ManagerExecutiveViewState extends State<ManagerExecutiveView> {
                             ),
                             IconButton(
                               icon: Icon(Icons.person_outline_rounded, color: theme.colorScheme.onSurface, size: 20),
-                              tooltip: 'Profile',
+                              tooltip: context.l10n.profile,
                               onPressed: () {
                                 Navigator.push(
                                   context,
@@ -253,7 +256,7 @@ class _ManagerExecutiveViewState extends State<ManagerExecutiveView> {
     }
     final categoryData = categoryCounts.entries
         .where((e) => e.value > 0)
-        .map((e) => _ChartItem(e.key.label, e.value, theme.colorScheme.primary))
+        .map((e) => _ChartItem(e.key.getLocalizedLabel(context), e.value, theme.colorScheme.primary))
         .toList();
 
     // Priority Distribution Data
@@ -263,7 +266,7 @@ class _ManagerExecutiveViewState extends State<ManagerExecutiveView> {
     }
     final priorityData = priorityCounts.entries
         .where((e) => e.value > 0)
-        .map((e) => _ChartItem(e.key.label, e.value, e.key.color))
+        .map((e) => _ChartItem(e.key.getLocalizedLabel(context), e.value, e.key.color))
         .toList();
 
     return SingleChildScrollView(
@@ -277,7 +280,7 @@ class _ManagerExecutiveViewState extends State<ManagerExecutiveView> {
               Expanded(
                 child: _buildMetricTile(
                   context: context,
-                  title: 'Total Tickets',
+                  title: context.l10n.totalTickets,
                   value: '$total',
                   icon: Icons.receipt_long_rounded,
                   color: theme.colorScheme.primary,
@@ -287,7 +290,7 @@ class _ManagerExecutiveViewState extends State<ManagerExecutiveView> {
               Expanded(
                 child: _buildMetricTile(
                   context: context,
-                  title: 'Resolution Rate',
+                  title: context.l10n.resolutionRate,
                   value: '$resolutionRate%',
                   icon: Icons.trending_up_rounded,
                   color: AppColors.success,
@@ -301,7 +304,7 @@ class _ManagerExecutiveViewState extends State<ManagerExecutiveView> {
               Expanded(
                 child: _buildMetricTile(
                   context: context,
-                  title: 'Open / Pending',
+                  title: context.l10n.openPending,
                   value: '$open',
                   icon: Icons.mark_email_unread_outlined,
                   color: theme.colorScheme.primary,
@@ -311,7 +314,7 @@ class _ManagerExecutiveViewState extends State<ManagerExecutiveView> {
               Expanded(
                 child: _buildMetricTile(
                   context: context,
-                  title: 'In Progress',
+                  title: context.l10n.inProgress,
                   value: '$inProgress',
                   icon: Icons.hourglass_top_rounded,
                   color: AppColors.warning,
@@ -321,7 +324,7 @@ class _ManagerExecutiveViewState extends State<ManagerExecutiveView> {
               Expanded(
                 child: _buildMetricTile(
                   context: context,
-                  title: 'Unassigned',
+                  title: context.l10n.unassigned,
                   value: '$unassigned',
                   icon: Icons.person_off_outlined,
                   color: AppColors.error,
@@ -349,7 +352,7 @@ class _ManagerExecutiveViewState extends State<ManagerExecutiveView> {
                       Icon(Icons.bar_chart_rounded, size: 20, color: theme.colorScheme.primary),
                       const SizedBox(width: 8),
                       Text(
-                        'Tickets by Department',
+                        context.l10n.ticketsByDepartment,
                         style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: theme.colorScheme.onSurface),
                       ),
                     ],
@@ -358,7 +361,7 @@ class _ManagerExecutiveViewState extends State<ManagerExecutiveView> {
                   categoryData.isEmpty
                       ? SizedBox(
                           height: 150,
-                          child: Center(child: Text('No ticket data yet', style: TextStyle(color: theme.colorScheme.onSurface.withValues(alpha: 0.6)))),
+                          child: Center(child: Text(context.l10n.noSupportTicketsYet, style: TextStyle(color: theme.colorScheme.onSurface.withValues(alpha: 0.6)))),
                         )
                       : SizedBox(
                           height: 200,
@@ -406,7 +409,7 @@ class _ManagerExecutiveViewState extends State<ManagerExecutiveView> {
                       const Icon(Icons.pie_chart_outline_rounded, size: 20, color: AppColors.secondary),
                       const SizedBox(width: 8),
                       Text(
-                        'Priority Distribution',
+                        context.l10n.priorityDistribution,
                         style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: theme.colorScheme.onSurface),
                       ),
                     ],
@@ -415,7 +418,7 @@ class _ManagerExecutiveViewState extends State<ManagerExecutiveView> {
                   priorityData.isEmpty
                       ? SizedBox(
                           height: 150,
-                          child: Center(child: Text('No ticket data yet', style: TextStyle(color: theme.colorScheme.onSurface.withValues(alpha: 0.6)))),
+                          child: Center(child: Text(context.l10n.noSupportTicketsYet, style: TextStyle(color: theme.colorScheme.onSurface.withValues(alpha: 0.6)))),
                         )
                       : SizedBox(
                           height: 220,
@@ -473,7 +476,7 @@ class _ManagerExecutiveViewState extends State<ManagerExecutiveView> {
                   onChanged: (val) => cubit.search(val),
                   style: TextStyle(fontSize: 14, color: theme.colorScheme.onSurface),
                   decoration: InputDecoration(
-                    hintText: 'Search tickets across company...',
+                    hintText: context.l10n.searchDepartmentTicketsHint,
                     hintStyle: TextStyle(fontSize: 13, color: theme.colorScheme.onSurface.withValues(alpha: 0.5)),
                     prefixIcon: Icon(Icons.search, size: 20, color: theme.colorScheme.onSurface.withValues(alpha: 0.5)),
                     contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 16),
@@ -531,13 +534,13 @@ class _ManagerExecutiveViewState extends State<ManagerExecutiveView> {
                           Icon(Icons.inbox_outlined, size: 48, color: theme.colorScheme.onSurface.withValues(alpha: 0.4)),
                           const SizedBox(height: 12),
                           Text(
-                            'No tickets match your filters',
+                            context.l10n.noMatchingTickets,
                             style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: theme.colorScheme.onSurface.withValues(alpha: 0.6)),
                           ),
                           const SizedBox(height: 8),
                           TextButton(
                             onPressed: () => cubit.resetFilters(),
-                            child: const Text('Reset Filters'),
+                            child: Text(context.l10n.resetFilters),
                           ),
                         ],
                       ),
@@ -620,7 +623,7 @@ class _ManagerExecutiveViewState extends State<ManagerExecutiveView> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Total Agents', style: TextStyle(fontSize: 11, color: theme.colorScheme.onSurface.withValues(alpha: 0.5))),
+                        Text(context.l10n.totalAgents, style: TextStyle(fontSize: 11, color: theme.colorScheme.onSurface.withValues(alpha: 0.5))),
                         const SizedBox(height: 2),
                         Text(
                           '${agents.length}',
@@ -636,7 +639,7 @@ class _ManagerExecutiveViewState extends State<ManagerExecutiveView> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('Verified', style: TextStyle(fontSize: 11, color: theme.colorScheme.onSurface.withValues(alpha: 0.5))),
+                          Text(context.l10n.verified, style: TextStyle(fontSize: 11, color: theme.colorScheme.onSurface.withValues(alpha: 0.5))),
                           const SizedBox(height: 2),
                           Row(
                             children: [
@@ -659,7 +662,7 @@ class _ManagerExecutiveViewState extends State<ManagerExecutiveView> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('Pending', style: TextStyle(fontSize: 11, color: theme.colorScheme.onSurface.withValues(alpha: 0.5))),
+                          Text(context.l10n.pending, style: TextStyle(fontSize: 11, color: theme.colorScheme.onSurface.withValues(alpha: 0.5))),
                           const SizedBox(height: 2),
                           Text(
                             '$pendingCount',
@@ -681,7 +684,7 @@ class _ManagerExecutiveViewState extends State<ManagerExecutiveView> {
                 onChanged: (_) => setState(() {}),
                 style: TextStyle(fontSize: 14, color: theme.colorScheme.onSurface),
                 decoration: InputDecoration(
-                  hintText: 'Search support specialists...',
+                  hintText: context.l10n.searchAgentsHint,
                   hintStyle: TextStyle(fontSize: 13, color: theme.colorScheme.onSurface.withValues(alpha: 0.5)),
                   prefixIcon: Icon(Icons.search, size: 20, color: theme.colorScheme.onSurface.withValues(alpha: 0.5)),
                   contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 16),
@@ -704,11 +707,11 @@ class _ManagerExecutiveViewState extends State<ManagerExecutiveView> {
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: Row(
                 children: [
-                  _buildAgentFilterChip(context, 'all', 'All (${agents.length})'),
+                  _buildAgentFilterChip(context, 'all', '${context.l10n.all} (${agents.length})'),
                   const SizedBox(width: 8),
-                  _buildAgentFilterChip(context, 'verified', 'Verified ($verifiedCount)'),
+                  _buildAgentFilterChip(context, 'verified', '${context.l10n.verified} ($verifiedCount)'),
                   const SizedBox(width: 8),
-                  _buildAgentFilterChip(context, 'pending', 'Pending ($pendingCount)'),
+                  _buildAgentFilterChip(context, 'pending', '${context.l10n.pending} ($pendingCount)'),
                 ],
               ),
             ),
@@ -723,7 +726,7 @@ class _ManagerExecutiveViewState extends State<ManagerExecutiveView> {
                           Icon(Icons.people_outline_rounded, size: 48, color: theme.colorScheme.onSurface.withValues(alpha: 0.4)),
                           const SizedBox(height: 12),
                           Text(
-                            'No support agents found',
+                            context.l10n.noAgentsFound,
                             style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: theme.colorScheme.onSurface.withValues(alpha: 0.6)),
                           ),
                         ],
@@ -795,7 +798,7 @@ class _ManagerExecutiveViewState extends State<ManagerExecutiveView> {
                                         ),
                                         const SizedBox(height: 2),
                                         Text(
-                                          '${agent.department} • ${agent.email}',
+                                          '${context.getLocalizedDepartment(agent.department)} • ${agent.email}',
                                           style: TextStyle(fontSize: 12, color: theme.colorScheme.onSurface.withValues(alpha: 0.6)),
                                           maxLines: 1,
                                           overflow: TextOverflow.ellipsis,
@@ -848,7 +851,7 @@ class _ManagerExecutiveViewState extends State<ManagerExecutiveView> {
                                       border: Border.all(color: theme.colorScheme.outline.withValues(alpha: 0.4)),
                                     ),
                                     child: Text(
-                                      '$activeTicketsCount Active Tickets',
+                                      '$activeTicketsCount ${context.l10n.activeTickets}',
                                       style: TextStyle(
                                         fontSize: 11,
                                         fontWeight: FontWeight.w600,
@@ -857,11 +860,11 @@ class _ManagerExecutiveViewState extends State<ManagerExecutiveView> {
                                     ),
                                   ),
                                   if (agent.isVerified)
-                                    const VerifiedBadgeWidget(showLabel: true, label: 'Verified Specialist')
+                                    VerifiedBadgeWidget(showLabel: true, label: context.l10n.verifiedSpecialist)
                                   else
-                                    const Text(
-                                      'Pending Verification',
-                                      style: TextStyle(
+                                    Text(
+                                      context.l10n.pendingVerification,
+                                      style: const TextStyle(
                                         fontSize: 11,
                                         fontWeight: FontWeight.w600,
                                         color: Color(0xFFD97706),

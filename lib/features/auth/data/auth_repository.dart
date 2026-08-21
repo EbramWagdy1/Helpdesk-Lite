@@ -9,7 +9,9 @@ import 'package:helpdesk/features/auth/model/user_model.dart';
 class AuthRepository {
   final FirebaseAuth _auth = FirebaseService.auth;
   final FirebaseFirestore _firestore = FirebaseService.firestore;
-  final GoogleSignIn _googleSignIn = GoogleSignIn();
+  final GoogleSignIn _googleSignIn = GoogleSignIn(
+    serverClientId: '776646365405-9dblcp442cjkq1mgaegti9j19vraq40v.apps.googleusercontent.com',
+  );
 
   User? get currentFirebaseUser => _auth.currentUser;
 

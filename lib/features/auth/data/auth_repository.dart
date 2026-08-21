@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:helpdesk/core/database/cache/cache_helper.dart';
 import 'package:helpdesk/core/database/cache/cache_keys.dart';
 import 'package:helpdesk/core/services/firebase_service.dart';
@@ -8,10 +9,57 @@ import 'package:helpdesk/features/auth/model/user_model.dart';
 class AuthRepository {
   final FirebaseAuth _auth = FirebaseService.auth;
   final FirebaseFirestore _firestore = FirebaseService.firestore;
+  final GoogleSignIn _googleSignIn = GoogleSignIn();
 
   User? get currentFirebaseUser => _auth.currentUser;
 
   Stream<User?> get authStateChanges => _auth.authStateChanges();
+
+  Future<UserModel> signInWithGoogle() async {
+    final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+    if (googleUser == null) {
+      throw Exception('Google sign in cancelled');
+    }
+
+    final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+
+    final AuthCredential credential = GoogleAuthProvider.credential(
+      accessToken: googleAuth.accessToken,
+      idToken: googleAuth.idToken,
+    );
+
+    final UserCredential userCredential = await _auth.signInWithCredential(credential);
+    final User? user = userCredential.user;
+    if (user == null) {
+      throw Exception('Google sign in failed: User is null.');
+    }
+
+    final doc = await _firestore.collection('users').doc(user.uid).get();
+    if (!doc.exists || doc.data() == null) {
+      final newUser = UserModel(
+        uid: user.uid,
+        name: user.displayName ?? googleUser.displayName ?? 'Google User',
+        email: user.email ?? googleUser.email,
+        phone: user.phoneNumber ?? '',
+        avatarUrl: user.photoURL ?? googleUser.photoUrl,
+        role: UserRole.employee,
+        department: 'General',
+        isVerified: false,
+        createdAt: DateTime.now(),
+      );
+      await _firestore.collection('users').doc(user.uid).set(newUser.toMap());
+      await _cacheUserSession(newUser);
+      return newUser;
+    }
+
+    final userModel = UserModel.fromMap(doc.data()!, user.uid);
+    if ((userModel.avatarUrl == null || userModel.avatarUrl!.isEmpty) && (user.photoURL != null || googleUser.photoUrl != null)) {
+      final photo = user.photoURL ?? googleUser.photoUrl;
+      await _firestore.collection('users').doc(user.uid).update({'avatarUrl': photo});
+    }
+    await _cacheUserSession(userModel);
+    return userModel;
+  }
 
   Future<UserModel> signIn({
     required String email,
@@ -252,6 +300,9 @@ class AuthRepository {
 
   Future<void> signOut() async {
     await _auth.signOut();
+    try {
+      await _googleSignIn.signOut();
+    } catch (_) {}
     await CacheHelper.saveData(key: CacheKeys.isLoggedIn, value: false);
     await CacheHelper.removeData(key: CacheKeys.userId);
     await CacheHelper.removeData(key: CacheKeys.userEmail);

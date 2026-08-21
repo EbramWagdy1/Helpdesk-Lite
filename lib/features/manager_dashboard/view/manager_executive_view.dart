@@ -10,6 +10,7 @@ import 'package:helpdesk/features/auth/data/auth_repository.dart';
 import 'package:helpdesk/features/auth/model/user_model.dart';
 import 'package:helpdesk/features/profile/view/profile_view.dart';
 import 'package:helpdesk/features/tickets/model/ticket_model.dart';
+import 'package:helpdesk/features/tickets/services/sla_service.dart';
 import 'package:helpdesk/features/tickets/view/create_ticket_view.dart';
 import 'package:helpdesk/features/tickets/view/ticket_details_view.dart';
 import 'package:helpdesk/features/tickets/view_model/ticket_list_cubit.dart';
@@ -249,6 +250,14 @@ class _ManagerExecutiveViewState extends State<ManagerExecutiveView> {
 
     final resolutionRate = total > 0 ? ((resolved / total) * 100).toStringAsFixed(1) : '0';
 
+    // SLA Metrics (Active Open / In Progress tickets)
+    final activeTickets = allTickets.where((t) => t.status == TicketStatus.open || t.status == TicketStatus.inProgress).toList();
+    final breachedTickets = activeTickets.where((t) => SlaService.getSlaStatus(t) == SlaStatus.breached).length;
+    final atRiskTickets = activeTickets.where((t) => SlaService.getSlaStatus(t) == SlaStatus.warning).length;
+    final slaCompliance = activeTickets.isNotEmpty
+        ? (((activeTickets.length - breachedTickets) / activeTickets.length) * 100).toStringAsFixed(1)
+        : '100';
+
     // Category Distribution Data
     final Map<TicketCategory, int> categoryCounts = {};
     for (var cat in TicketCategory.values) {
@@ -294,6 +303,43 @@ class _ManagerExecutiveViewState extends State<ManagerExecutiveView> {
                   value: '$resolutionRate%',
                   icon: Icons.trending_up_rounded,
                   color: AppColors.success,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          // SLA Compliance & Health Row
+          Row(
+            children: [
+              Expanded(
+                child: _buildMetricTile(
+                  context: context,
+                  title: context.l10n.slaCompliance,
+                  value: '$slaCompliance%',
+                  icon: Icons.verified_user_outlined,
+                  color: double.tryParse(slaCompliance)! >= 90
+                      ? AppColors.success
+                      : (double.tryParse(slaCompliance)! >= 75 ? AppColors.warning : AppColors.error),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: _buildMetricTile(
+                  context: context,
+                  title: context.l10n.slaBreached,
+                  value: '$breachedTickets',
+                  icon: Icons.alarm_off_rounded,
+                  color: breachedTickets > 0 ? AppColors.error : AppColors.success,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: _buildMetricTile(
+                  context: context,
+                  title: context.l10n.slaAtRisk,
+                  value: '$atRiskTickets',
+                  icon: Icons.access_time_filled_rounded,
+                  color: atRiskTickets > 0 ? AppColors.warning : theme.colorScheme.primary,
                 ),
               ),
             ],

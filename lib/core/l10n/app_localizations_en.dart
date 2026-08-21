@@ -602,4 +602,70 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get roleUpdatedSuccess => 'User role updated successfully!';
+
+  @override
+  String get sla => 'SLA';
+
+  @override
+  String get slaTarget => 'SLA Target';
+
+  @override
+  String get slaCompliance => 'SLA Compliance';
+
+  @override
+  String get slaBreached => 'SLA Breached';
+
+  @override
+  String get slaAtRisk => 'At Risk';
+
+  @override
+  String get slaOnTrack => 'On Track';
+
+  @override
+  String get slaAchieved => 'SLA Met';
+
+  @override
+  String get slaEscalated => 'Escalated';
+
+  @override
+  String get slaRemaining => 'Time Left';
+
+  @override
+  String get slaOverdue => 'Overdue';
+
+  @override
+  String get slaTracking => 'SLA TIMELINE & ESCALATION';
+
+  @override
+  String get slaAutoEscalationNote =>
+      'Automatic priority escalation enabled based on SLA policy';
+
+  @override
+  String get slaFilterAll => 'All SLA';
+
+  @override
+  String slaHoursLeft(Object hours) {
+    return '${hours}h left';
+  }
+
+  @override
+  String slaMinutesLeft(Object minutes) {
+    return '${minutes}m left';
+  }
+
+  @override
+  String slaHoursOverdue(Object hours) {
+    return '${hours}h overdue';
+  }
+
+  @override
+  String slaMinutesOverdue(Object minutes) {
+    return '${minutes}m overdue';
+  }
+
+  @override
+  String get slaBreaches => 'SLA Breaches';
+
+  @override
+  String get continueWithGoogle => 'Continue with Google';
 }

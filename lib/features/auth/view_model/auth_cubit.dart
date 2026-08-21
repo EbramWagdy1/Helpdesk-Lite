@@ -143,6 +143,28 @@ class AuthCubit extends Cubit<AuthState> {
     }
   }
 
+  Future<void> loginWithGoogle() async {
+    emit(AuthLoadingState());
+
+    try {
+      final user = await _authRepository.signInWithGoogle();
+      currentUser = user;
+      listenToUserProfileUpdates();
+
+      emit(AuthSuccessState(
+        message: 'Welcome, ${user.name}!',
+        user: user,
+      ));
+    } catch (e) {
+      final msg = e.toString().replaceAll('Exception: ', '');
+      if (msg.toLowerCase().contains('cancelled') || msg.toLowerCase().contains('canceled')) {
+        emit(AuthInitialState()); // Silently return to initial state if user cancelled
+      } else {
+        emit(AuthErrorState(errorMessage: _formatAuthError(e)));
+      }
+    }
+  }
+
   Future<void> signUp({
     required String name,
     required String email,

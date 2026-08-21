@@ -163,6 +163,32 @@ class TicketRepository {
     );
   }
 
+  /// Automatically escalates ticket priority when SLA is breached
+  Future<void> escalateTicketPriority({
+    required String ticketId,
+    required TicketPriority newPriority,
+    required TicketPriority previousPriority,
+    required int slaHours,
+  }) async {
+    final now = DateTime.now();
+    await _ticketsCollection.doc(ticketId).update({
+      'priority': newPriority.name,
+      'updatedAt': Timestamp.fromDate(now),
+    });
+
+    final escalationMsg =
+        '⏰ SLA Escalation: Target time (${slaHours}h) exceeded. Priority automatically raised from ${previousPriority.label} to ${newPriority.label}.';
+
+    await addComment(
+      ticketId: ticketId,
+      senderId: 'system',
+      senderName: 'SLA Engine',
+      senderRole: 'System',
+      message: escalationMsg,
+      isInternal: false,
+    );
+  }
+
   /// Streams comments in chronological order for a ticket
   Stream<List<CommentModel>> streamComments(String ticketId) {
     return _ticketsCollection

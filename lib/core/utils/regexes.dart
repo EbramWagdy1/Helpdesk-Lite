@@ -1,6 +1,8 @@
 class AppRegex {
   static bool isEmailValid(String email) {
-    return RegExp(r'^.+@[a-zA-Z]+\.{1}[a-zA-Z]+(\.{0,1}[a-zA-Z]+)$').hasMatch(email);
+    final trimmed = email.trim();
+    if (trimmed.contains('..') || trimmed.startsWith('.') || trimmed.contains(' ')) return false;
+    return RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$').hasMatch(trimmed);
   }
 
   static bool isPasswordValid(String password) {
@@ -8,7 +10,7 @@ class AppRegex {
   }
 
   static bool isPhoneNumberValid(String phoneNumber) {
-    return RegExp(r'^(010|011|012|015)[0-9]{8}$').hasMatch(phoneNumber);
+    return RegExp(r'^(\+?20|0)?(10|11|12|15)[0-9]{8}$').hasMatch(phoneNumber.trim());
   }
 
   static bool hasLowerCase(String password) {

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:helpdesk/core/extensions/localization_extension.dart';
 import 'package:helpdesk/features/tickets/model/ticket_model.dart';
+import 'package:helpdesk/features/tickets/services/sla_service.dart';
 
 class TicketCardWidget extends StatelessWidget {
   final TicketModel ticket;
@@ -30,6 +31,83 @@ class TicketCardWidget extends StatelessWidget {
     }
   }
 
+  Widget _buildSlaBadge(BuildContext context, bool isDark) {
+    final slaStatus = SlaService.getSlaStatus(ticket);
+    final remaining = SlaService.getRemainingDuration(ticket);
+    final overdue = SlaService.getOverdueDuration(ticket);
+
+    String text;
+    IconData icon;
+    Color color;
+    Color bgColor;
+
+    switch (slaStatus) {
+      case SlaStatus.breached:
+        color = const Color(0xFFDC2626);
+        bgColor = const Color(0xFFFEE2E2);
+        icon = Icons.alarm_off_rounded;
+        if (ticket.status == TicketStatus.resolved || ticket.status == TicketStatus.closed) {
+          text = context.l10n.slaBreached;
+        } else {
+          final hours = overdue.inHours;
+          text = hours > 0
+              ? context.l10n.slaHoursOverdue(hours)
+              : context.l10n.slaMinutesOverdue(overdue.inMinutes.clamp(1, 59));
+        }
+        break;
+
+      case SlaStatus.warning:
+        color = const Color(0xFFD97706);
+        bgColor = const Color(0xFFFEF3C7);
+        icon = Icons.access_time_filled_rounded;
+        final hours = remaining.inHours;
+        text = hours > 0
+            ? context.l10n.slaHoursLeft(hours)
+            : context.l10n.slaMinutesLeft(remaining.inMinutes.clamp(1, 59));
+        break;
+
+      case SlaStatus.onTrack:
+        color = const Color(0xFF16A34A);
+        bgColor = const Color(0xFFDCFCE7);
+        icon = Icons.timer_outlined;
+        final hours = remaining.inHours;
+        text = hours > 0
+            ? context.l10n.slaHoursLeft(hours)
+            : context.l10n.slaMinutesLeft(remaining.inMinutes.clamp(1, 59));
+        break;
+
+      case SlaStatus.achieved:
+        color = const Color(0xFF0284C7);
+        bgColor = const Color(0xFFE0F2FE);
+        icon = Icons.check_circle_outline_rounded;
+        text = context.l10n.slaAchieved;
+        break;
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+      decoration: BoxDecoration(
+        color: isDark ? color.withValues(alpha: 0.18) : bgColor,
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 11, color: color),
+          const SizedBox(width: 3),
+          Text(
+            text,
+            style: TextStyle(
+              fontSize: 10.5,
+              fontWeight: FontWeight.w700,
+              color: color,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -56,7 +134,7 @@ class TicketCardWidget extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Top Row: Ticket ID, Category & Priority
+            // Top Row: Ticket ID, Category, SLA Badge & Priority
             Row(
               children: [
                 // Ticket Number Pill
@@ -94,6 +172,12 @@ class TicketCardWidget extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
+
+                // SLA Badge (Shown only on open / in-progress tickets)
+                if (ticket.status == TicketStatus.open || ticket.status == TicketStatus.inProgress) ...[
+                  _buildSlaBadge(context, isDark),
+                  const SizedBox(width: 6),
+                ],
 
                 // Priority Badge
                 Container(

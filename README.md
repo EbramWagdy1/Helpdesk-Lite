@@ -77,26 +77,61 @@ In modern workplaces, support requests often get scattered across emails, chat c
 
 ---
 
-## 🌟 Key Features by Role
+## 🌟 Key Features by Role & Engine
+
+### 🔑 Authentication & Access Control
+* **Google Authentication (Google Sign-In)**: Fast, frictionless one-tap sign-in with Google account, automatically populating and caching user profiles.
+* **Email & Password Authentication**: Secure registration and login with fortified RFC-compliant validation and regex sanitization.
+* **Role-Based Access Control (RBAC)**: Strict permission boundaries for `Employee`, `Support Agent`, and `Manager` roles.
+
+### ⏱️ SLA Management & Auto-Escalation Engine
+* **Target Deadlines by Priority**:
+  * 🔴 **Urgent**: 4 hours
+  * 🟠 **High**: 12 hours
+  * 🟡 **Medium**: 24 hours
+  * 🟢 **Low**: 48 hours
+* **Active Ticket SLA Monitoring**: Dynamic countdown timers, progress bars, and status badges (`On Track`, `Warning`, `Breached`, `SLA Met`) exclusively tracked on active open tickets.
+* **Automated Priority Escalation**: Overdue `Medium` tickets automatically escalate to `High` after 24 hours with automated system audit log notes.
+* **Intelligent Priority Sorting**: Active tickets are sorted by urgency (`Urgent` ➔ `High` ➔ `Medium` ➔ `Low`), followed by newest submission date.
 
 ### 👤 Employee Portal
-* **Intuitive Ticket Creation**: Submit support requests with title, description, category, and priority.
+* **Intuitive Ticket Creation**: Submit support requests with title, description, category, priority, and attachments.
 * **File & Image Attachments**: Attach photos, error screenshots, and documents directly to tickets.
 * **Real-time Status Tracking**: Monitor ticket progress through stages: `Open` ➔ `In Progress` ➔ `Resolved` ➔ `Closed`.
 * **Collaborative Timeline & Comments**: Real-time communication and updates directly within the ticket detail view.
-* **Personal Request Hub**: Easily filter, search, and manage your submitted requests.
+* **Personal Request Hub**: Easily filter, search, and manage submitted requests.
 
 ### 🎧 Support Agent Workspace
-* **Triage & Queue Management**: Filter tickets by category/department (`IT`, `HR`, `Facilities`, `Operations`, `Finance`).
-* **Ticket Assignment & Ownership**: Claim unassigned tickets or assign them across the support team.
+* **Triage & Department Matching**: Filter tickets by department (`IT`, `HR`, `Facilities`, `Operations`, `Finance`).
+* **Ticket Assignment & Ownership**: Claim unassigned tickets or assign them across the verified support team.
 * **Status Lifecycle Management**: Transition tickets seamlessly with resolution notes and timestamps.
 * **Audit & History Logs**: Full visibility into ticket updates, status changes, and collaborator interactions.
 
 ### 📊 Manager Executive Dashboard
 * **Workload & Queue Analytics**: Interactive charts and breakdown of active vs. resolved tickets powered by Syncfusion.
+* **SLA Health & Breach Metrics**: Real-time SLA compliance tracking (%) and breach counts across open workloads.
 * **Department Performance**: High-level visibility into team workloads, departmental distribution, and pending bottlenecks.
 * **User & Agent Verification**: Manage permissions and oversee agent assignments.
-* **Executive Summary**: Comprehensive metrics on resolution time, SLA health, and overall request volume.
+
+---
+
+## 🧪 Comprehensive Automated Testing & Security
+
+HelpDesk Lite includes a robust automated testing suite with **38 test suites** covering all critical business flows:
+
+* **SLA & Escalation Engine Tests**: Validates SLA deadline computations, breach calculations, and auto-escalation triggers.
+* **Security & Input Sanitization Tests**: Fortified against XSS, injection vectors, and malformed inputs.
+* **Role & Permissions Verification**: Ensures strict RBAC boundaries and secure fallbacks.
+* **Cubit & State Management Tests**: Full coverage for `TicketListCubit`, `TicketDetailsCubit`, and `AuthCubit`.
+* **Internationalization & RTL Tests**: Verifies complete bilingual support (`Arabic` and `English`) with correct RTL/LTR directionality.
+
+```bash
+# Run all automated unit and integration tests
+flutter test
+
+# Run static analysis
+flutter analyze
+```
 
 ---
 
@@ -104,17 +139,18 @@ In modern workplaces, support requests often get scattered across emails, chat c
 
 ### Core Technologies
 * **Framework**: [Flutter](https://flutter.dev/) (SDK `^3.10.7` / Dart 3.x)
-* **Design System**: Material 3 Design with custom typography, gradients, and micro-animations
+* **Design System**: Material 3 Design with custom typography, bilingual RTL/LTR support, gradients, and dark/light themes
 * **State Management**: [flutter_bloc](https://pub.dev/packages/flutter_bloc) (BLoC / Cubit Pattern)
 * **Dependency Injection**: [get_it](https://pub.dev/packages/get_it) (Service Locator)
 * **Connectivity & Network Check**: [connectivity_plus](https://pub.dev/packages/connectivity_plus) (Live connection monitoring & 404 handler)
 * **Routing**: [go_router](https://pub.dev/packages/go_router) (Declarative deep-linking)
 * **Backend & Cloud**:
-  * **Authentication**: [firebase_auth](https://pub.dev/packages/firebase_auth) (Email/Password & RBAC)
+  * **Authentication**: [firebase_auth](https://pub.dev/packages/firebase_auth) & [google_sign_in](https://pub.dev/packages/google_sign_in) (Google Auth + Email/Password)
   * **Database**: [cloud_firestore](https://pub.dev/packages/cloud_firestore) (Real-time NoSQL storage)
   * **Storage**: [firebase_storage](https://pub.dev/packages/firebase_storage) (Secure media and attachment uploads)
 * **Visualization & UI Components**:
   * [syncfusion_flutter_charts](https://pub.dev/packages/syncfusion_flutter_charts) for executive data visualization
+  * [font_awesome_flutter](https://pub.dev/packages/font_awesome_flutter) for branded vector icons
   * [lottie](https://pub.dev/packages/lottie) & [flutter_svg](https://pub.dev/packages/flutter_svg) for animations and vector assets
   * [qr_flutter](https://pub.dev/packages/qr_flutter) for ticket QR codes and quick sharing
   * [image_picker](https://pub.dev/packages/image_picker) for ticket attachment uploads
@@ -236,10 +272,13 @@ firebase deploy --only firestore:rules,storage:rules
 ## 🗺 Roadmap
 
 - [x] Role-Based Authentication (`Employee`, `Agent`, `Manager`)
+- [x] Google Authentication (One-tap Google Sign-In & Profile Sync)
+- [x] Priority-Based SLA Management & Auto-Escalation Engine
 - [x] Ticket Creation with attachments and priority tagging
 - [x] Departmental triage (`IT`, `HR`, `Facilities`, `Finance`, `Operations`)
 - [x] Interactive Comments & Status Timeline
 - [x] Manager Executive Analytics with visual chart summaries
+- [x] Comprehensive Automated Test Suite (Unit, RBAC, SLA & Security)
 - [x] Connectivity Monitoring with 404 No Internet Screen
 - [x] Centralized App-Wide Error Handling System
 - [ ] Push Notifications for ticket status updates (FCM)

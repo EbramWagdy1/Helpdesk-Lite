@@ -1,4 +1,5 @@
 import 'package:helpdesk/features/tickets/model/ticket_model.dart';
+import 'package:helpdesk/features/tickets/services/sla_service.dart';
 
 abstract class TicketListState {}
 
@@ -12,6 +13,7 @@ class TicketListLoadedState extends TicketListState {
   final TicketStatus? selectedStatus;
   final TicketCategory? selectedCategory;
   final TicketPriority? selectedPriority;
+  final SlaStatus? selectedSlaStatus;
   final String searchQuery;
 
   TicketListLoadedState({
@@ -20,6 +22,7 @@ class TicketListLoadedState extends TicketListState {
     this.selectedStatus,
     this.selectedCategory,
     this.selectedPriority,
+    this.selectedSlaStatus,
     this.searchQuery = '',
   });
 }

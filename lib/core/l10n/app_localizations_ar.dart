@@ -599,4 +599,70 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get roleUpdatedSuccess => 'تم تحديث دور المستخدم بنجاح!';
+
+  @override
+  String get sla => 'اتفاقية مستوى الخدمة';
+
+  @override
+  String get slaTarget => 'الهدف الزمني (SLA)';
+
+  @override
+  String get slaCompliance => 'الالتزام بالـ SLA';
+
+  @override
+  String get slaBreached => 'تجاوزت الـ SLA';
+
+  @override
+  String get slaAtRisk => 'معرّضة للتأخير';
+
+  @override
+  String get slaOnTrack => 'ضمن الوقت';
+
+  @override
+  String get slaAchieved => 'تم الإنجاز في الوقت';
+
+  @override
+  String get slaEscalated => 'تم التصعيد';
+
+  @override
+  String get slaRemaining => 'الوقت المتبقي';
+
+  @override
+  String get slaOverdue => 'متأخرة';
+
+  @override
+  String get slaTracking => 'تتبع اتفاقية مستوى الخدمة والتصعيد';
+
+  @override
+  String get slaAutoEscalationNote =>
+      'التصعيد التلقائي للأولوية مفعّل بناءً على معايير الـ SLA';
+
+  @override
+  String get slaFilterAll => 'كل الـ SLA';
+
+  @override
+  String slaHoursLeft(Object hours) {
+    return 'متبقي $hours س';
+  }
+
+  @override
+  String slaMinutesLeft(Object minutes) {
+    return 'متبقي $minutes د';
+  }
+
+  @override
+  String slaHoursOverdue(Object hours) {
+    return 'متأخرة $hours س';
+  }
+
+  @override
+  String slaMinutesOverdue(Object minutes) {
+    return 'متأخرة $minutes د';
+  }
+
+  @override
+  String get slaBreaches => 'تجاوزات الـ SLA';
+
+  @override
+  String get continueWithGoogle => 'المتابعة باستخدام Google';
 }

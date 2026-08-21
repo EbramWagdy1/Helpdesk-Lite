@@ -5,6 +5,7 @@ import 'package:helpdesk/core/widgets/custom_snackbar.dart';
 import 'package:helpdesk/core/widgets/verified_badge_widget.dart';
 import 'package:helpdesk/features/auth/model/user_model.dart';
 import 'package:helpdesk/features/tickets/model/ticket_model.dart';
+import 'package:helpdesk/features/tickets/services/sla_service.dart';
 import 'package:helpdesk/features/tickets/view_model/ticket_details_cubit.dart';
 import 'package:helpdesk/features/tickets/view_model/ticket_details_state.dart';
 import 'package:helpdesk/features/tickets/widgets/comment_thread_widget.dart';
@@ -553,7 +554,12 @@ class _TicketDetailsViewState extends State<TicketDetailsView> {
                             ],
                           ),
                         ),
-                        const SizedBox(height: 14),
+                        
+                        // SLA Tracking & Timeline Card (Only for active Open / In Progress tickets)
+                        if (ticket.status == TicketStatus.open || ticket.status == TicketStatus.inProgress) ...[
+                          _buildSlaCard(context, ticket),
+                          const SizedBox(height: 14),
+                        ],
 
                         // Modern Workflow Actions Section (for Agent, Manager, or Ticket Creator)
                         if (isStaff || widget.currentUser.uid == ticket.createdBy.uid) ...[
@@ -729,6 +735,188 @@ class _TicketDetailsViewState extends State<TicketDetailsView> {
           );
           },
         ),
+      ),
+    );
+  }
+
+  Widget _buildSlaCard(BuildContext context, TicketModel ticket) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final slaStatus = SlaService.getSlaStatus(ticket);
+    final slaDuration = SlaService.getSlaDuration(ticket.priority);
+    final deadline = SlaService.getTargetDeadline(ticket);
+    final progress = SlaService.getSlaProgress(ticket);
+    final remaining = SlaService.getRemainingDuration(ticket);
+    final overdue = SlaService.getOverdueDuration(ticket);
+
+    Color statusColor;
+    Color statusBgColor;
+    String statusLabel;
+    IconData statusIcon;
+
+    switch (slaStatus) {
+      case SlaStatus.breached:
+        statusColor = const Color(0xFFDC2626);
+        statusBgColor = const Color(0xFFFEE2E2);
+        statusLabel = context.l10n.slaBreached;
+        statusIcon = Icons.alarm_off_rounded;
+        break;
+      case SlaStatus.warning:
+        statusColor = const Color(0xFFD97706);
+        statusBgColor = const Color(0xFFFEF3C7);
+        statusLabel = context.l10n.slaAtRisk;
+        statusIcon = Icons.access_time_filled_rounded;
+        break;
+      case SlaStatus.onTrack:
+        statusColor = const Color(0xFF16A34A);
+        statusBgColor = const Color(0xFFDCFCE7);
+        statusLabel = context.l10n.slaOnTrack;
+        statusIcon = Icons.timer_outlined;
+        break;
+      case SlaStatus.achieved:
+        statusColor = const Color(0xFF0284C7);
+        statusBgColor = const Color(0xFFE0F2FE);
+        statusLabel = context.l10n.slaAchieved;
+        statusIcon = Icons.check_circle_outline_rounded;
+        break;
+    }
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: theme.cardColor,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: slaStatus == SlaStatus.breached
+              ? const Color(0xFFDC2626).withValues(alpha: 0.4)
+              : theme.colorScheme.outline.withValues(alpha: 0.5),
+          width: slaStatus == SlaStatus.breached ? 1.5 : 1,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header Row
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(6),
+                    decoration: BoxDecoration(
+                      color: statusColor.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Icon(statusIcon, size: 16, color: statusColor),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    context.l10n.slaTracking,
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w800,
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                      letterSpacing: 0.8,
+                    ),
+                  ),
+                ],
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: isDark ? statusColor.withValues(alpha: 0.2) : statusBgColor,
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: statusColor.withValues(alpha: 0.3)),
+                ),
+                child: Text(
+                  statusLabel,
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                    color: statusColor,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+
+          // Target Info & Countdown
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    context.l10n.slaTarget,
+                    style: TextStyle(fontSize: 11, color: theme.colorScheme.onSurface.withValues(alpha: 0.55)),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    '${slaDuration.inHours}h SLA (${ticket.priority.getLocalizedLabel(context)})',
+                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: theme.colorScheme.onSurface),
+                  ),
+                ],
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    slaStatus == SlaStatus.breached ? context.l10n.slaOverdue : context.l10n.slaRemaining,
+                    style: TextStyle(fontSize: 11, color: theme.colorScheme.onSurface.withValues(alpha: 0.55)),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    slaStatus == SlaStatus.breached
+                        ? (overdue.inHours > 0
+                            ? context.l10n.slaHoursOverdue(overdue.inHours)
+                            : context.l10n.slaMinutesOverdue(overdue.inMinutes.clamp(1, 59)))
+                        : (slaStatus == SlaStatus.achieved
+                            ? context.l10n.slaAchieved
+                            : (remaining.inHours > 0
+                                ? context.l10n.slaHoursLeft(remaining.inHours)
+                                : context.l10n.slaMinutesLeft(remaining.inMinutes.clamp(1, 59)))),
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w800,
+                      color: statusColor,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+
+          // Progress Bar
+          ClipRRect(
+            borderRadius: BorderRadius.circular(6),
+            child: LinearProgressIndicator(
+              value: progress,
+              minHeight: 8,
+              backgroundColor: theme.colorScheme.surfaceContainerHighest,
+              valueColor: AlwaysStoppedAnimation<Color>(statusColor),
+            ),
+          ),
+          const SizedBox(height: 8),
+
+          // Bottom due date info and percentage
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Due: ${deadline.day}/${deadline.month}/${deadline.year} • ${deadline.hour.toString().padLeft(2, '0')}:${deadline.minute.toString().padLeft(2, '0')}',
+                style: TextStyle(fontSize: 11, color: theme.colorScheme.onSurface.withValues(alpha: 0.5)),
+              ),
+              Text(
+                '${(progress * 100).toInt()}% elapsed',
+                style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: theme.colorScheme.onSurface.withValues(alpha: 0.6)),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }

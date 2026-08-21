@@ -6,6 +6,7 @@ import 'package:helpdesk/core/services/service_locator.dart';
 import 'package:helpdesk/features/auth/model/user_model.dart';
 import 'package:helpdesk/features/tickets/data/ticket_repository.dart';
 import 'package:helpdesk/features/tickets/model/ticket_model.dart';
+import 'package:helpdesk/features/tickets/services/sla_service.dart';
 import 'package:helpdesk/features/tickets/view_model/ticket_list_state.dart';
 
 class TicketListCubit extends Cubit<TicketListState> {
@@ -23,6 +24,7 @@ class TicketListCubit extends Cubit<TicketListState> {
   TicketStatus? selectedStatus;
   TicketCategory? selectedCategory;
   TicketPriority? selectedPriority;
+  SlaStatus? selectedSlaStatus;
   String searchQuery = '';
   bool showOnlyAssignedToMe = false;
 
@@ -44,6 +46,11 @@ class TicketListCubit extends Cubit<TicketListState> {
     _ticketsSubscription = stream.listen(
       (tickets) {
         _rawTickets = tickets;
+        // Check for any overdue tickets and auto-escalate in background
+        SlaService.checkAndEscalateTickets(
+          tickets: tickets,
+          repository: _ticketRepository,
+        );
         _applyFilters();
       },
       onError: (error) {
@@ -67,6 +74,11 @@ class TicketListCubit extends Cubit<TicketListState> {
     _applyFilters();
   }
 
+  void filterBySlaStatus(SlaStatus? slaStatus) {
+    selectedSlaStatus = slaStatus;
+    _applyFilters();
+  }
+
   void search(String query) {
     searchQuery = query;
     _applyFilters();
@@ -81,6 +93,7 @@ class TicketListCubit extends Cubit<TicketListState> {
     selectedStatus = null;
     selectedCategory = null;
     selectedPriority = null;
+    selectedSlaStatus = null;
     searchQuery = '';
     showOnlyAssignedToMe = false;
     _applyFilters();
@@ -117,6 +130,13 @@ class TicketListCubit extends Cubit<TicketListState> {
       filtered = filtered.where((t) => t.priority == selectedPriority).toList();
     }
 
+    if (selectedSlaStatus != null) {
+      filtered = filtered.where((t) {
+        final isActive = t.status == TicketStatus.open || t.status == TicketStatus.inProgress;
+        return isActive && SlaService.getSlaStatus(t) == selectedSlaStatus;
+      }).toList();
+    }
+
     if (searchQuery.trim().isNotEmpty) {
       final q = searchQuery.toLowerCase().trim();
       filtered = filtered.where((t) {
@@ -127,12 +147,30 @@ class TicketListCubit extends Cubit<TicketListState> {
       }).toList();
     }
 
+    // Sort tickets: Active first, then Urgent -> High -> Medium -> Low, then newest first
+    int priorityCompare(TicketModel a, TicketModel b) {
+      final aActive = (a.status == TicketStatus.open || a.status == TicketStatus.inProgress);
+      final bActive = (b.status == TicketStatus.open || b.status == TicketStatus.inProgress);
+      if (aActive != bActive) {
+        return aActive ? -1 : 1;
+      }
+      final priorityComparison = b.priority.index.compareTo(a.priority.index);
+      if (priorityComparison != 0) {
+        return priorityComparison;
+      }
+      return b.createdAt.compareTo(a.createdAt);
+    }
+
+    scopedTickets.sort(priorityCompare);
+    filtered.sort(priorityCompare);
+
     emit(TicketListLoadedState(
       allTickets: scopedTickets,
       filteredTickets: filtered,
       selectedStatus: selectedStatus,
       selectedCategory: selectedCategory,
       selectedPriority: selectedPriority,
+      selectedSlaStatus: selectedSlaStatus,
       searchQuery: searchQuery,
     ));
   }

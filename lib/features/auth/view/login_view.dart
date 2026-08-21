@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import 'package:helpdesk/core/extensions/localization_extension.dart';
 import 'package:helpdesk/core/routing/app_routes.dart';
@@ -200,6 +201,47 @@ class _LoginViewState extends State<LoginView> {
                         text: context.l10n.signIn,
                         isLoading: isLoading,
                         onPressed: () => _handleLogin(cubit),
+                      ),
+                      const SizedBox(height: 18),
+
+                      // Or continue with Divider
+                      Row(
+                        children: [
+                          Expanded(child: Divider(color: theme.dividerColor)),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 12),
+                            child: Text(
+                              context.l10n.orContinueWith,
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: theme.colorScheme.onSurface.withValues(alpha: 0.55),
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                          Expanded(child: Divider(color: theme.dividerColor)),
+                        ],
+                      ),
+                      const SizedBox(height: 18),
+
+                      // Google Sign In Button
+                      OutlinedButton.icon(
+                        style: OutlinedButton.styleFrom(
+                          minimumSize: const Size(double.infinity, 50),
+                          backgroundColor: theme.cardColor,
+                          side: BorderSide(color: theme.colorScheme.outline.withValues(alpha: 0.6)),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        ),
+                        icon: const FaIcon(FontAwesomeIcons.google, size: 18, color: Color(0xFFEA4335)),
+                        label: Text(
+                          context.l10n.continueWithGoogle,
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w700,
+                            color: theme.colorScheme.onSurface,
+                          ),
+                        ),
+                        onPressed: isLoading ? null : () => cubit.loginWithGoogle(),
                       ),
                       const SizedBox(height: 24),
 

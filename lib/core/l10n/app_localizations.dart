@@ -1249,6 +1249,120 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'User role updated successfully!'**
   String get roleUpdatedSuccess;
+
+  /// No description provided for @sla.
+  ///
+  /// In en, this message translates to:
+  /// **'SLA'**
+  String get sla;
+
+  /// No description provided for @slaTarget.
+  ///
+  /// In en, this message translates to:
+  /// **'SLA Target'**
+  String get slaTarget;
+
+  /// No description provided for @slaCompliance.
+  ///
+  /// In en, this message translates to:
+  /// **'SLA Compliance'**
+  String get slaCompliance;
+
+  /// No description provided for @slaBreached.
+  ///
+  /// In en, this message translates to:
+  /// **'SLA Breached'**
+  String get slaBreached;
+
+  /// No description provided for @slaAtRisk.
+  ///
+  /// In en, this message translates to:
+  /// **'At Risk'**
+  String get slaAtRisk;
+
+  /// No description provided for @slaOnTrack.
+  ///
+  /// In en, this message translates to:
+  /// **'On Track'**
+  String get slaOnTrack;
+
+  /// No description provided for @slaAchieved.
+  ///
+  /// In en, this message translates to:
+  /// **'SLA Met'**
+  String get slaAchieved;
+
+  /// No description provided for @slaEscalated.
+  ///
+  /// In en, this message translates to:
+  /// **'Escalated'**
+  String get slaEscalated;
+
+  /// No description provided for @slaRemaining.
+  ///
+  /// In en, this message translates to:
+  /// **'Time Left'**
+  String get slaRemaining;
+
+  /// No description provided for @slaOverdue.
+  ///
+  /// In en, this message translates to:
+  /// **'Overdue'**
+  String get slaOverdue;
+
+  /// No description provided for @slaTracking.
+  ///
+  /// In en, this message translates to:
+  /// **'SLA TIMELINE & ESCALATION'**
+  String get slaTracking;
+
+  /// No description provided for @slaAutoEscalationNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Automatic priority escalation enabled based on SLA policy'**
+  String get slaAutoEscalationNote;
+
+  /// No description provided for @slaFilterAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All SLA'**
+  String get slaFilterAll;
+
+  /// No description provided for @slaHoursLeft.
+  ///
+  /// In en, this message translates to:
+  /// **'{hours}h left'**
+  String slaHoursLeft(Object hours);
+
+  /// No description provided for @slaMinutesLeft.
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes}m left'**
+  String slaMinutesLeft(Object minutes);
+
+  /// No description provided for @slaHoursOverdue.
+  ///
+  /// In en, this message translates to:
+  /// **'{hours}h overdue'**
+  String slaHoursOverdue(Object hours);
+
+  /// No description provided for @slaMinutesOverdue.
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes}m overdue'**
+  String slaMinutesOverdue(Object minutes);
+
+  /// No description provided for @slaBreaches.
+  ///
+  /// In en, this message translates to:
+  /// **'SLA Breaches'**
+  String get slaBreaches;
+
+  /// No description provided for @continueWithGoogle.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue with Google'**
+  String get continueWithGoogle;
 }
 
 class _AppLocalizationsDelegate

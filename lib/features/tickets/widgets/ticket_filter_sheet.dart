@@ -3,6 +3,7 @@ import 'package:helpdesk/core/extensions/localization_extension.dart';
 import 'package:helpdesk/core/widgets/custom_button.dart';
 import 'package:helpdesk/features/auth/model/user_model.dart';
 import 'package:helpdesk/features/tickets/model/ticket_model.dart';
+import 'package:helpdesk/features/tickets/services/sla_service.dart';
 import 'package:helpdesk/features/tickets/view_model/ticket_list_cubit.dart';
 
 class TicketFilterSheet extends StatefulWidget {
@@ -22,6 +23,7 @@ class TicketFilterSheet extends StatefulWidget {
 class _TicketFilterSheetState extends State<TicketFilterSheet> {
   late TicketCategory? _selectedCategory;
   late TicketPriority? _selectedPriority;
+  late SlaStatus? _selectedSlaStatus;
   late bool _assignedToMe;
 
   @override
@@ -29,7 +31,21 @@ class _TicketFilterSheetState extends State<TicketFilterSheet> {
     super.initState();
     _selectedCategory = widget.cubit.selectedCategory;
     _selectedPriority = widget.cubit.selectedPriority;
+    _selectedSlaStatus = widget.cubit.selectedSlaStatus;
     _assignedToMe = widget.cubit.showOnlyAssignedToMe;
+  }
+
+  String _getSlaLabel(BuildContext context, SlaStatus status) {
+    switch (status) {
+      case SlaStatus.onTrack:
+        return context.l10n.slaOnTrack;
+      case SlaStatus.warning:
+        return context.l10n.slaAtRisk;
+      case SlaStatus.breached:
+        return context.l10n.slaBreached;
+      case SlaStatus.achieved:
+        return context.l10n.slaAchieved;
+    }
   }
 
   @override
@@ -63,6 +79,7 @@ class _TicketFilterSheetState extends State<TicketFilterSheet> {
                       setState(() {
                         _selectedCategory = null;
                         _selectedPriority = null;
+                        _selectedSlaStatus = null;
                         _assignedToMe = false;
                       });
                     },
@@ -96,6 +113,47 @@ class _TicketFilterSheetState extends State<TicketFilterSheet> {
                 ),
                 const SizedBox(height: 16),
               ],
+
+              // SLA Status Filter (Active tickets)
+              Text(
+                context.l10n.sla,
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: theme.colorScheme.onSurface),
+              ),
+              const SizedBox(height: 8),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  SlaStatus.onTrack,
+                  SlaStatus.warning,
+                  SlaStatus.breached,
+                ].map((status) {
+                  final isSelected = _selectedSlaStatus == status;
+                  return ChoiceChip(
+                    label: Text(_getSlaLabel(context, status)),
+                    selected: isSelected,
+                    selectedColor: isDark ? status.color.withValues(alpha: 0.25) : status.color.withValues(alpha: 0.15),
+                    backgroundColor: isDark ? const Color(0xFF1E293B) : theme.colorScheme.surfaceContainerHighest,
+                    side: BorderSide(
+                      color: isSelected
+                          ? status.color
+                          : (isDark ? const Color(0xFF334155) : theme.colorScheme.outline.withValues(alpha: 0.5)),
+                      width: isSelected ? 1.5 : 1,
+                    ),
+                    labelStyle: TextStyle(
+                      color: isSelected ? status.color : (isDark ? const Color(0xFFF1F5F9) : theme.colorScheme.onSurface),
+                      fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
+                      fontSize: 13,
+                    ),
+                    onSelected: (selected) {
+                      setState(() {
+                        _selectedSlaStatus = selected ? status : null;
+                      });
+                    },
+                  );
+                }).toList(),
+              ),
+              const SizedBox(height: 20),
 
               // Priority Filter
               Text(
@@ -182,6 +240,7 @@ class _TicketFilterSheetState extends State<TicketFilterSheet> {
                 onPressed: () {
                   widget.cubit.filterByCategory(_selectedCategory);
                   widget.cubit.filterByPriority(_selectedPriority);
+                  widget.cubit.filterBySlaStatus(_selectedSlaStatus);
                   if (isStaff) {
                     widget.cubit.toggleAssignedToMe(_assignedToMe, widget.currentUser.uid);
                   }

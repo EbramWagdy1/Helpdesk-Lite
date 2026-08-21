@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:helpdesk/core/errors/error_handler.dart';
@@ -8,14 +9,26 @@ import 'package:helpdesk/features/auth/view_model/auth_state.dart';
 
 class AuthCubit extends Cubit<AuthState> {
   final AuthRepository _authRepository;
+  StreamSubscription<UserModel?>? _userProfileSubscription;
 
   AuthCubit({AuthRepository? authRepository})
       : _authRepository = authRepository ?? sl<AuthRepository>(),
         super(AuthInitialState()) {
     // 1. Instantly populate currentUser from local cache (0ms delay)
     currentUser = _authRepository.getCachedUser();
-    // 2. Fetch latest data from Firestore in background
+    // 2. Fetch latest data from Firestore & attach real-time live stream
     checkCurrentUser();
+    listenToUserProfileUpdates();
+  }
+
+  void listenToUserProfileUpdates() {
+    _userProfileSubscription?.cancel();
+    _userProfileSubscription = _authRepository.streamCurrentUserProfile().listen((user) {
+      if (user != null) {
+        currentUser = user;
+        emit(AuthSuccessState(message: 'User profile synchronized', user: user));
+      }
+    });
   }
 
   static AuthCubit get(BuildContext context) => BlocProvider.of(context);
@@ -119,6 +132,7 @@ class AuthCubit extends Cubit<AuthState> {
       );
 
       currentUser = user;
+      listenToUserProfileUpdates();
 
       emit(AuthSuccessState(
         message: 'Welcome back, ${user.name}!',
@@ -148,6 +162,7 @@ class AuthCubit extends Cubit<AuthState> {
       );
 
       currentUser = user;
+      listenToUserProfileUpdates();
 
       emit(AuthSuccessState(
         message: 'Account created successfully!',
@@ -159,9 +174,17 @@ class AuthCubit extends Cubit<AuthState> {
   }
 
   Future<void> logout() async {
+    _userProfileSubscription?.cancel();
+    _userProfileSubscription = null;
     await _authRepository.signOut();
     currentUser = null;
     emit(AuthLoggedOutState());
+  }
+
+  @override
+  Future<void> close() {
+    _userProfileSubscription?.cancel();
+    return super.close();
   }
 
   String _formatAuthError(dynamic error) {

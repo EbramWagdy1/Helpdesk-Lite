@@ -575,34 +575,40 @@ class _ManagerExecutiveViewState extends State<ManagerExecutiveView> {
   }
 
   // -------------------------------------------------------------
-  // TAB 3: AGENTS SUPPORT & VERIFICATION MANAGEMENT
+  // TAB 3: TEAM & USER ROLE MANAGEMENT (PROMOTION & VERIFICATION)
   // -------------------------------------------------------------
   Widget _buildAgentsManagementTab(BuildContext context, List<TicketModel> allTickets) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
     return StreamBuilder<List<UserModel>>(
-      stream: AuthRepository().streamSupportAgents(),
+      stream: AuthRepository().streamAllUsers(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Center(child: CircularProgressIndicator(strokeWidth: 2, color: theme.colorScheme.primary));
         }
 
-        final agents = snapshot.data ?? [];
-        final verifiedCount = agents.where((a) => a.isVerified).length;
-        final pendingCount = agents.length - verifiedCount;
+        final users = snapshot.data ?? [];
+        final agents = users.where((u) => u.role == UserRole.agent).toList();
+        final employees = users.where((u) => u.role == UserRole.employee).toList();
+        final verifiedAgentsCount = agents.where((a) => a.isVerified).length;
+        final pendingAgentsCount = agents.length - verifiedAgentsCount;
 
-        // Filter agents by search and selected status
+        // Filter users by search and selected category
         final query = _agentSearchController.text.toLowerCase().trim();
-        final filteredAgents = agents.where((agent) {
+        final filteredUsers = users.where((user) {
           final matchesSearch = query.isEmpty ||
-              agent.name.toLowerCase().contains(query) ||
-              agent.email.toLowerCase().contains(query) ||
-              agent.department.toLowerCase().contains(query);
+              user.name.toLowerCase().contains(query) ||
+              user.email.toLowerCase().contains(query) ||
+              user.department.toLowerCase().contains(query) ||
+              user.role.name.toLowerCase().contains(query);
 
           if (!matchesSearch) return false;
 
-          if (_agentFilter == 'verified') return agent.isVerified;
-          if (_agentFilter == 'pending') return !agent.isVerified;
+          if (_agentFilter == 'agents') return user.role == UserRole.agent;
+          if (_agentFilter == 'employees') return user.role == UserRole.employee;
+          if (_agentFilter == 'verified') return user.role == UserRole.agent && user.isVerified;
+          if (_agentFilter == 'pending') return user.role == UserRole.agent && !user.isVerified;
           return true;
         }).toList();
 
@@ -623,11 +629,11 @@ class _ManagerExecutiveViewState extends State<ManagerExecutiveView> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(context.l10n.totalAgents, style: TextStyle(fontSize: 11, color: theme.colorScheme.onSurface.withValues(alpha: 0.5))),
+                        Text(context.l10n.allUsers, style: TextStyle(fontSize: 11, color: theme.colorScheme.onSurface.withValues(alpha: 0.55))),
                         const SizedBox(height: 2),
                         Text(
-                          '${agents.length}',
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: theme.colorScheme.onSurface),
+                          '${users.length}',
+                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: theme.colorScheme.onSurface),
                         ),
                       ],
                     ),
@@ -635,20 +641,20 @@ class _ManagerExecutiveViewState extends State<ManagerExecutiveView> {
                   Container(width: 1, height: 30, color: theme.dividerColor),
                   Expanded(
                     child: Padding(
-                      padding: const EdgeInsets.only(left: 12),
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(context.l10n.verified, style: TextStyle(fontSize: 11, color: theme.colorScheme.onSurface.withValues(alpha: 0.5))),
+                          Text(context.l10n.agents, style: TextStyle(fontSize: 11, color: theme.colorScheme.onSurface.withValues(alpha: 0.55))),
                           const SizedBox(height: 2),
                           Row(
                             children: [
                               Text(
-                                '$verifiedCount',
-                                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: theme.colorScheme.primary),
+                                '${agents.length}',
+                                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: theme.colorScheme.primary),
                               ),
                               const SizedBox(width: 4),
-                              const VerifiedBadgeWidget(size: 14),
+                              const VerifiedBadgeWidget(size: 13),
                             ],
                           ),
                         ],
@@ -658,15 +664,15 @@ class _ManagerExecutiveViewState extends State<ManagerExecutiveView> {
                   Container(width: 1, height: 30, color: theme.dividerColor),
                   Expanded(
                     child: Padding(
-                      padding: const EdgeInsets.only(left: 12),
+                      padding: const EdgeInsets.only(left: 10),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(context.l10n.pending, style: TextStyle(fontSize: 11, color: theme.colorScheme.onSurface.withValues(alpha: 0.5))),
+                          Text(context.l10n.employees, style: TextStyle(fontSize: 11, color: theme.colorScheme.onSurface.withValues(alpha: 0.55))),
                           const SizedBox(height: 2),
                           Text(
-                            '$pendingCount',
-                            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: Color(0xFFD97706)),
+                            '${employees.length}',
+                            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: Color(0xFF0284C7)),
                           ),
                         ],
                       ),
@@ -676,7 +682,7 @@ class _ManagerExecutiveViewState extends State<ManagerExecutiveView> {
               ),
             ),
 
-            // Search and Status Filter Row
+            // Search Bar
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
               child: TextField(
@@ -703,22 +709,27 @@ class _ManagerExecutiveViewState extends State<ManagerExecutiveView> {
             ),
 
             // Filter Chips
-            Padding(
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: Row(
                 children: [
-                  _buildAgentFilterChip(context, 'all', '${context.l10n.all} (${agents.length})'),
+                  _buildAgentFilterChip(context, 'all', '${context.l10n.all} (${users.length})'),
                   const SizedBox(width: 8),
-                  _buildAgentFilterChip(context, 'verified', '${context.l10n.verified} ($verifiedCount)'),
+                  _buildAgentFilterChip(context, 'agents', '${context.l10n.agents} (${agents.length})'),
                   const SizedBox(width: 8),
-                  _buildAgentFilterChip(context, 'pending', '${context.l10n.pending} ($pendingCount)'),
+                  _buildAgentFilterChip(context, 'employees', '${context.l10n.employees} (${employees.length})'),
+                  const SizedBox(width: 8),
+                  _buildAgentFilterChip(context, 'verified', '${context.l10n.verified} ($verifiedAgentsCount)'),
+                  const SizedBox(width: 8),
+                  _buildAgentFilterChip(context, 'pending', '${context.l10n.pending} ($pendingAgentsCount)'),
                 ],
               ),
             ),
 
-            // Agents List
+            // Users List
             Expanded(
-              child: filteredAgents.isEmpty
+              child: filteredUsers.isEmpty
                   ? Center(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -734,12 +745,18 @@ class _ManagerExecutiveViewState extends State<ManagerExecutiveView> {
                     )
                   : ListView.builder(
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                      itemCount: filteredAgents.length,
+                      itemCount: filteredUsers.length,
                       itemBuilder: (context, index) {
-                        final agent = filteredAgents[index];
-                        final activeTicketsCount = allTickets
-                            .where((t) => t.assignedTo?.uid == agent.uid && t.status != TicketStatus.closed)
-                            .length;
+                        final user = filteredUsers[index];
+                        final isAgent = user.role == UserRole.agent;
+                        final isEmployee = user.role == UserRole.employee;
+                        final isManager = user.role == UserRole.manager;
+
+                        final activeTicketsCount = isAgent
+                            ? allTickets
+                                .where((t) => t.assignedTo?.uid == user.uid && t.status != TicketStatus.closed)
+                                .length
+                            : 0;
 
                         return Container(
                           margin: const EdgeInsets.only(bottom: 10),
@@ -748,8 +765,12 @@ class _ManagerExecutiveViewState extends State<ManagerExecutiveView> {
                             color: theme.cardColor,
                             borderRadius: BorderRadius.circular(16),
                             border: Border.all(
-                              color: agent.isVerified ? theme.colorScheme.primary.withValues(alpha: 0.4) : theme.colorScheme.outline.withValues(alpha: 0.5),
-                              width: agent.isVerified ? 1.5 : 1,
+                              color: isAgent && user.isVerified
+                                  ? theme.colorScheme.primary.withValues(alpha: 0.4)
+                                  : (isManager
+                                      ? const Color(0xFF8B5CF6).withValues(alpha: 0.4)
+                                      : theme.colorScheme.outline.withValues(alpha: 0.5)),
+                              width: isAgent && user.isVerified ? 1.5 : 1,
                             ),
                           ),
                           child: Column(
@@ -759,14 +780,20 @@ class _ManagerExecutiveViewState extends State<ManagerExecutiveView> {
                                 children: [
                                   CircleAvatar(
                                     radius: 20,
-                                    backgroundColor: agent.isVerified
+                                    backgroundColor: isAgent
                                         ? theme.colorScheme.primary.withValues(alpha: 0.15)
-                                        : theme.colorScheme.surfaceContainerHighest,
+                                        : (isManager
+                                            ? const Color(0xFF8B5CF6).withValues(alpha: 0.15)
+                                            : (isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0))),
                                     child: Text(
-                                      agent.name.isNotEmpty ? agent.name[0].toUpperCase() : 'A',
+                                      user.name.isNotEmpty ? user.name[0].toUpperCase() : 'U',
                                       style: TextStyle(
                                         fontWeight: FontWeight.bold,
-                                        color: agent.isVerified ? theme.colorScheme.primary : theme.colorScheme.onSurface,
+                                        color: isAgent
+                                            ? theme.colorScheme.primary
+                                            : (isManager
+                                                ? const Color(0xFF8B5CF6)
+                                                : theme.colorScheme.onSurface),
                                         fontSize: 14,
                                       ),
                                     ),
@@ -780,7 +807,7 @@ class _ManagerExecutiveViewState extends State<ManagerExecutiveView> {
                                           children: [
                                             Flexible(
                                               child: Text(
-                                                agent.name,
+                                                user.name,
                                                 style: TextStyle(
                                                   fontSize: 15,
                                                   fontWeight: FontWeight.w700,
@@ -790,7 +817,7 @@ class _ManagerExecutiveViewState extends State<ManagerExecutiveView> {
                                                 overflow: TextOverflow.ellipsis,
                                               ),
                                             ),
-                                            if (agent.isVerified) ...[
+                                            if (isAgent && user.isVerified) ...[
                                               const SizedBox(width: 5),
                                               const VerifiedBadgeWidget(size: 15),
                                             ],
@@ -798,7 +825,7 @@ class _ManagerExecutiveViewState extends State<ManagerExecutiveView> {
                                         ),
                                         const SizedBox(height: 2),
                                         Text(
-                                          '${context.getLocalizedDepartment(agent.department)} • ${agent.email}',
+                                          '${context.getLocalizedDepartment(user.department)} • ${user.email}',
                                           style: TextStyle(fontSize: 12, color: theme.colorScheme.onSurface.withValues(alpha: 0.6)),
                                           maxLines: 1,
                                           overflow: TextOverflow.ellipsis,
@@ -806,35 +833,65 @@ class _ManagerExecutiveViewState extends State<ManagerExecutiveView> {
                                       ],
                                     ),
                                   ),
-                                  // Verification Toggle
-                                  Switch.adaptive(
-                                    value: agent.isVerified,
-                                    activeTrackColor: theme.colorScheme.primary,
-                                    activeThumbColor: Colors.white,
-                                    onChanged: (newValue) async {
-                                      try {
-                                        await AuthRepository().updateAgentVerification(
-                                          agentUid: agent.uid,
-                                          isVerified: newValue,
-                                        );
-                                        if (context.mounted) {
-                                          CustomSnackBar.showSuccess(
-                                            context,
-                                            message: newValue
-                                              ? '${agent.name} is now a Verified Agent ✓'
-                                              : '${agent.name} verification revoked.',
-                                          );
-                                        }
-                                      } catch (e) {
-                                        if (context.mounted) {
-                                          CustomSnackBar.showError(
-                                            context,
-                                            message: e.toString().replaceAll('Exception: ', ''),
-                                          );
-                                        }
-                                      }
-                                    },
-                                  ),
+                                  // Agent Verification Toggle OR Role Menu
+                                  if (isAgent)
+                                    Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Text(
+                                          user.isVerified ? context.l10n.verified : context.l10n.pending,
+                                          style: TextStyle(
+                                            fontSize: 11,
+                                            fontWeight: FontWeight.w700,
+                                            color: user.isVerified
+                                                ? (isDark ? const Color(0xFF60A5FA) : theme.colorScheme.primary)
+                                                : const Color(0xFFF59E0B),
+                                          ),
+                                        ),
+                                        const SizedBox(width: 6),
+                                        Switch.adaptive(
+                                          value: user.isVerified,
+                                          activeTrackColor: theme.colorScheme.primary,
+                                          activeThumbColor: Colors.white,
+                                          inactiveThumbColor: isDark ? const Color(0xFFE2E8F0) : const Color(0xFF64748B),
+                                          inactiveTrackColor: isDark ? const Color(0xFF334155) : const Color(0xFFCBD5E1),
+                                          trackOutlineColor: WidgetStateProperty.all(isDark ? const Color(0xFF475569) : const Color(0xFF94A3B8)),
+                                          onChanged: (newValue) async {
+                                            try {
+                                              await AuthRepository().updateAgentVerification(
+                                                agentUid: user.uid,
+                                                isVerified: newValue,
+                                              );
+                                              if (context.mounted) {
+                                                CustomSnackBar.showSuccess(
+                                                  context,
+                                                  message: newValue
+                                                      ? '${user.name} is now a Verified Agent ✓'
+                                                      : '${user.name} verification revoked.',
+                                                );
+                                              }
+                                            } catch (e) {
+                                              if (context.mounted) {
+                                                CustomSnackBar.showError(
+                                                  context,
+                                                  message: e.toString().replaceAll('Exception: ', ''),
+                                                );
+                                              }
+                                            }
+                                          },
+                                        ),
+                                      ],
+                                    )
+                                  else
+                                    IconButton(
+                                      icon: Icon(
+                                        Icons.manage_accounts_rounded,
+                                        color: isDark ? const Color(0xFF38BDF8) : theme.colorScheme.primary,
+                                        size: 24,
+                                      ),
+                                      tooltip: context.l10n.manageUserRole,
+                                      onPressed: () => _showRoleManagementDialog(context, user),
+                                    ),
                                 ],
                               ),
                               const SizedBox(height: 10),
@@ -843,33 +900,115 @@ class _ManagerExecutiveViewState extends State<ManagerExecutiveView> {
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
+                                  // Role Tag
                                   Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                                     decoration: BoxDecoration(
-                                      color: theme.colorScheme.surfaceContainerHighest,
+                                      color: isAgent
+                                          ? (isDark ? const Color(0xFF1E3A8A).withValues(alpha: 0.4) : theme.colorScheme.primary.withValues(alpha: 0.12))
+                                          : (isManager
+                                              ? (isDark ? const Color(0xFF5B21B6).withValues(alpha: 0.4) : const Color(0xFF8B5CF6).withValues(alpha: 0.12))
+                                              : (isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9))),
                                       borderRadius: BorderRadius.circular(6),
-                                      border: Border.all(color: theme.colorScheme.outline.withValues(alpha: 0.4)),
-                                    ),
-                                    child: Text(
-                                      '$activeTicketsCount ${context.l10n.activeTickets}',
-                                      style: TextStyle(
-                                        fontSize: 11,
-                                        fontWeight: FontWeight.w600,
-                                        color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
+                                      border: Border.all(
+                                        color: isAgent
+                                            ? (isDark ? const Color(0xFF3B82F6).withValues(alpha: 0.5) : theme.colorScheme.primary.withValues(alpha: 0.3))
+                                            : (isManager
+                                                ? (isDark ? const Color(0xFFA78BFA).withValues(alpha: 0.5) : const Color(0xFF8B5CF6).withValues(alpha: 0.3))
+                                                : (isDark ? const Color(0xFF475569) : theme.colorScheme.outline.withValues(alpha: 0.3))),
                                       ),
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(
+                                          isAgent
+                                              ? Icons.support_agent_rounded
+                                              : (isManager ? Icons.security_rounded : Icons.person_outline_rounded),
+                                          size: 13,
+                                          color: isAgent
+                                              ? (isDark ? const Color(0xFF60A5FA) : theme.colorScheme.primary)
+                                              : (isManager
+                                                  ? const Color(0xFFA78BFA)
+                                                  : (isDark ? const Color(0xFFCBD5E1) : theme.colorScheme.onSurface.withValues(alpha: 0.7))),
+                                        ),
+                                        const SizedBox(width: 4),
+                                        Text(
+                                          user.role.getLocalizedLabel(context),
+                                          style: TextStyle(
+                                            fontSize: 11,
+                                            fontWeight: FontWeight.w700,
+                                            color: isAgent
+                                                ? (isDark ? const Color(0xFF93C5FD) : theme.colorScheme.primary)
+                                                : (isManager
+                                                    ? (isDark ? const Color(0xFFDDD6FE) : const Color(0xFF8B5CF6))
+                                                    : (isDark ? const Color(0xFFF1F5F9) : theme.colorScheme.onSurface)),
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
-                                  if (agent.isVerified)
-                                    VerifiedBadgeWidget(showLabel: true, label: context.l10n.verifiedSpecialist)
-                                  else
-                                    Text(
-                                      context.l10n.pendingVerification,
-                                      style: const TextStyle(
-                                        fontSize: 11,
-                                        fontWeight: FontWeight.w600,
-                                        color: Color(0xFFD97706),
+
+                                  // Quick Action button for Employees & Agents
+                                  if (isEmployee)
+                                    TextButton.icon(
+                                      onPressed: () => _showRoleManagementDialog(context, user),
+                                      icon: Icon(
+                                        Icons.arrow_upward_rounded,
+                                        size: 16,
+                                        color: isDark ? const Color(0xFF38BDF8) : const Color(0xFF0284C7),
                                       ),
-                                    ),
+                                      label: Text(
+                                        context.l10n.promoteToAgent,
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w700,
+                                          color: isDark ? const Color(0xFF38BDF8) : const Color(0xFF0284C7),
+                                        ),
+                                      ),
+                                      style: TextButton.styleFrom(
+                                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                        backgroundColor: isDark
+                                            ? const Color(0xFF0284C7).withValues(alpha: 0.25)
+                                            : const Color(0xFF0284C7).withValues(alpha: 0.1),
+                                        side: isDark
+                                            ? BorderSide(color: const Color(0xFF38BDF8).withValues(alpha: 0.4), width: 1.2)
+                                            : null,
+                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                      ),
+                                    )
+                                  else if (isAgent)
+                                    Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                          decoration: BoxDecoration(
+                                            color: theme.colorScheme.surfaceContainerHighest,
+                                            borderRadius: BorderRadius.circular(6),
+                                            border: Border.all(color: theme.colorScheme.outline.withValues(alpha: 0.4)),
+                                          ),
+                                          child: Text(
+                                            '$activeTicketsCount ${context.l10n.activeTickets}',
+                                            style: TextStyle(
+                                              fontSize: 11,
+                                              fontWeight: FontWeight.w600,
+                                              color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
+                                            ),
+                                          ),
+                                        ),
+                                        const SizedBox(width: 8),
+                                        IconButton(
+                                          icon: Icon(Icons.edit_outlined, size: 16, color: theme.colorScheme.onSurface.withValues(alpha: 0.6)),
+                                          tooltip: context.l10n.changeRole,
+                                          constraints: const BoxConstraints(),
+                                          padding: EdgeInsets.zero,
+                                          onPressed: () => _showRoleManagementDialog(context, user),
+                                        ),
+                                      ],
+                                    )
+                                  else
+                                    const SizedBox.shrink(),
                                 ],
                               ),
                             ],
@@ -879,6 +1018,236 @@ class _ManagerExecutiveViewState extends State<ManagerExecutiveView> {
                     ),
             ),
           ],
+        );
+      },
+    );
+  }
+
+  void _showRoleManagementDialog(BuildContext context, UserModel targetUser) {
+    final theme = Theme.of(context);
+    final departments = [
+      'IT & Systems',
+      'Human Resources',
+      'Facilities & Office',
+      'Operations',
+      'Finance & Payroll',
+      'Other Support',
+    ];
+
+    UserRole selectedRole = targetUser.role == UserRole.employee ? UserRole.agent : targetUser.role;
+    String selectedDepartment = targetUser.department;
+    bool isVerified = targetUser.role == UserRole.employee ? true : targetUser.isVerified;
+    bool isSaving = false;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: theme.cardColor,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (modalContext) {
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            return Padding(
+              padding: EdgeInsets.only(
+                left: 20,
+                right: 20,
+                top: 20,
+                bottom: MediaQuery.of(modalContext).viewInsets.bottom + 24,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        context.l10n.manageUserRole,
+                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: theme.colorScheme.onSurface),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.close_rounded),
+                        onPressed: () => Navigator.pop(modalContext),
+                      ),
+                    ],
+                  ),
+                  Text(
+                    '${targetUser.name} (${targetUser.email})',
+                    style: TextStyle(fontSize: 13, color: theme.colorScheme.onSurface.withValues(alpha: 0.6)),
+                  ),
+                  const SizedBox(height: 16),
+                  Divider(color: theme.dividerColor),
+                  const SizedBox(height: 12),
+
+                  // Role Selection
+                  Text(
+                    context.l10n.workspaceRole,
+                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: theme.colorScheme.onSurface),
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: UserRole.values.map((role) {
+                      final isSelected = selectedRole == role;
+                      return Expanded(
+                        child: GestureDetector(
+                          onTap: () {
+                            setModalState(() {
+                              selectedRole = role;
+                            });
+                          },
+                          child: Container(
+                            margin: const EdgeInsets.symmetric(horizontal: 3),
+                            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 4),
+                            decoration: BoxDecoration(
+                              color: isSelected
+                                  ? theme.colorScheme.primary
+                                  : theme.colorScheme.surfaceContainerHighest,
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(
+                                color: isSelected
+                                    ? theme.colorScheme.primary
+                                    : theme.colorScheme.outline.withValues(alpha: 0.5),
+                              ),
+                            ),
+                            child: Text(
+                              role.getLocalizedLabel(context),
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 11,
+                                color: isSelected ? Colors.white : theme.colorScheme.onSurface,
+                                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Department Selection
+                  Text(
+                    context.l10n.department,
+                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: theme.colorScheme.onSurface),
+                  ),
+                  const SizedBox(height: 8),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 14),
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.surfaceContainerHighest,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: theme.colorScheme.outline.withValues(alpha: 0.5)),
+                    ),
+                    child: DropdownButtonHideUnderline(
+                      child: DropdownButton<String>(
+                        value: departments.contains(selectedDepartment) ? selectedDepartment : departments.first,
+                        dropdownColor: theme.cardColor,
+                        isExpanded: true,
+                        icon: Icon(Icons.keyboard_arrow_down_rounded, color: theme.colorScheme.primary),
+                        items: departments.map((dept) {
+                          return DropdownMenuItem<String>(
+                            value: dept,
+                            child: Text(
+                              context.getLocalizedDepartment(dept),
+                              style: TextStyle(color: theme.colorScheme.onSurface),
+                            ),
+                          );
+                        }).toList(),
+                        onChanged: (val) {
+                          if (val != null) {
+                            setModalState(() {
+                              selectedDepartment = val;
+                            });
+                          }
+                        },
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Verification Switch (for Agents)
+                  if (selectedRole == UserRole.agent) ...[
+                    SwitchListTile.adaptive(
+                      contentPadding: EdgeInsets.zero,
+                      title: Text(
+                        context.l10n.verifiedSpecialist,
+                        style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: theme.colorScheme.onSurface),
+                      ),
+                      subtitle: Text(
+                        context.l10n.verified,
+                        style: TextStyle(fontSize: 12, color: theme.colorScheme.onSurface.withValues(alpha: 0.6)),
+                      ),
+                      value: isVerified,
+                      activeTrackColor: theme.colorScheme.primary,
+                      activeThumbColor: Colors.white,
+                      onChanged: (val) {
+                        setModalState(() {
+                          isVerified = val;
+                        });
+                      },
+                    ),
+                    const SizedBox(height: 8),
+                  ],
+
+                  const SizedBox(height: 16),
+
+                  // Save / Promote Button
+                  SizedBox(
+                    width: double.infinity,
+                    height: 48,
+                    child: ElevatedButton(
+                      onPressed: isSaving
+                          ? null
+                          : () async {
+                              setModalState(() => isSaving = true);
+                              try {
+                                await AuthRepository().updateUserRole(
+                                  uid: targetUser.uid,
+                                  newRole: selectedRole,
+                                  department: selectedDepartment,
+                                  isVerified: selectedRole == UserRole.employee ? false : isVerified,
+                                );
+                                if (context.mounted) {
+                                  Navigator.pop(modalContext);
+                                  CustomSnackBar.showSuccess(
+                                    context,
+                                    message: context.l10n.roleUpdatedSuccess,
+                                  );
+                                }
+                              } catch (e) {
+                                setModalState(() => isSaving = false);
+                                if (context.mounted) {
+                                  CustomSnackBar.showError(
+                                    context,
+                                    message: e.toString().replaceAll('Exception: ', ''),
+                                  );
+                                }
+                              }
+                            },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: theme.colorScheme.primary,
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        elevation: 0,
+                      ),
+                      child: isSaving
+                          ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                            )
+                          : Text(
+                              context.l10n.saveChanges,
+                              style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
+                            ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
         );
       },
     );

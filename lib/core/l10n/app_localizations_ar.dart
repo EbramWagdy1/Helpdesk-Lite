@@ -569,4 +569,34 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get deptGeneral => 'عام';
+
+  @override
+  String get promoteToAgent => 'ترقية إلى أخصائي دعم';
+
+  @override
+  String get promote => 'ترقية';
+
+  @override
+  String get employees => 'الموظفين';
+
+  @override
+  String get agents => 'الأخصائيين';
+
+  @override
+  String get changeRole => 'تغيير الدور';
+
+  @override
+  String get manageUserRole => 'إدارة دور المستخدم';
+
+  @override
+  String get promoteUserPrompt => 'حدد الدور والقسم الجديد لهذا المستخدم:';
+
+  @override
+  String get demoteToEmployee => 'تحويل إلى موظف';
+
+  @override
+  String get allUsers => 'جميع الأعضاء';
+
+  @override
+  String get roleUpdatedSuccess => 'تم تحديث دور المستخدم بنجاح!';
 }

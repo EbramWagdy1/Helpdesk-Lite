@@ -209,5 +209,15 @@
   "deptSales": "Sales & Marketing",
   "deptCustomerSupport": "Customer Support",
   "deptFacilities": "Facilities",
-  "deptGeneral": "General"
+  "deptGeneral": "General",
+  "promoteToAgent": "Promote to Support Agent",
+  "promote": "Promote",
+  "employees": "Employees",
+  "agents": "Agents",
+  "changeRole": "Change Role",
+  "manageUserRole": "Manage User Role",
+  "promoteUserPrompt": "Select a new role and department for this user:",
+  "demoteToEmployee": "Change to Employee",
+  "allUsers": "All Members",
+  "roleUpdatedSuccess": "User role updated successfully!"
 }

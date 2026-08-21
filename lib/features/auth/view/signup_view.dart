@@ -39,6 +39,7 @@ class _SignUpViewState extends State<SignUpView> {
 
   void _handleSignUp(AuthCubit cubit) {
     if (_formKey.currentState?.validate() ?? false) {
+      cubit.selectRole(UserRole.employee);
       cubit.signUp(
         name: _nameController.text.trim(),
         email: _emailController.text.trim(),
@@ -116,65 +117,6 @@ class _SignUpViewState extends State<SignUpView> {
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 20),
-
-                      // User Role Selector
-                      Text(
-                        context.l10n.workspaceRole,
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w700,
-                          color: theme.colorScheme.onSurface,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Row(
-                        children: UserRole.values.map((role) {
-                          final isSelected = cubit.selectedRole == role;
-                          return Expanded(
-                            child: GestureDetector(
-                              onTap: () => cubit.selectRole(role),
-                              child: Container(
-                                margin: const EdgeInsets.symmetric(horizontal: 3),
-                                padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 4),
-                                decoration: BoxDecoration(
-                                  color: isSelected
-                                      ? theme.colorScheme.primary
-                                      : theme.cardColor,
-                                  borderRadius: BorderRadius.circular(10),
-                                  border: Border.all(
-                                    color: isSelected
-                                        ? theme.colorScheme.primary
-                                        : theme.colorScheme.outline.withValues(alpha: 0.5),
-                                  ),
-                                  boxShadow: isSelected
-                                      ? [
-                                          BoxShadow(
-                                            color: theme.colorScheme.primary.withValues(alpha: 0.25),
-                                            blurRadius: 8,
-                                            offset: const Offset(0, 3),
-                                          )
-                                        ]
-                                      : [],
-                                ),
-                                child: Text(
-                                  role.getLocalizedLabel(context),
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    fontSize: 11,
-                                    color: isSelected
-                                        ? Colors.white
-                                        : theme.colorScheme.onSurface,
-                                    fontWeight: isSelected
-                                        ? FontWeight.w700
-                                        : FontWeight.w500,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          );
-                        }).toList(),
-                      ),
-                      const SizedBox(height: 16),
 
                       // Department Dropdown
                       Text(

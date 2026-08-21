@@ -94,6 +94,24 @@ class AuthRepository {
     return null;
   }
 
+  Stream<UserModel?> streamCurrentUserProfile() {
+    final user = _auth.currentUser;
+    if (user == null) return Stream.value(null);
+
+    return _firestore
+        .collection('users')
+        .doc(user.uid)
+        .snapshots()
+        .map((doc) {
+      if (doc.exists && doc.data() != null) {
+        final userModel = UserModel.fromMap(doc.data()!, doc.id);
+        _cacheUserSession(userModel);
+        return userModel;
+      }
+      return null;
+    });
+  }
+
   /// Instantly returns cached user data from local storage with zero delay
   UserModel? getCachedUser() {
     final uid = CacheHelper.getString(key: CacheKeys.userId);
@@ -176,6 +194,45 @@ class AuthRepository {
           .map((doc) => UserModel.fromMap(doc.data(), doc.id))
           .toList();
     });
+  }
+
+  Stream<List<UserModel>> streamAllUsers() {
+    return _firestore
+        .collection('users')
+        .snapshots()
+        .map((snapshot) {
+      return snapshot.docs
+          .map((doc) => UserModel.fromMap(doc.data(), doc.id))
+          .toList();
+    });
+  }
+
+  Future<void> updateUserRole({
+    required String uid,
+    required UserRole newRole,
+    bool? isVerified,
+    String? department,
+  }) async {
+    try {
+      final data = <String, dynamic>{
+        'role': newRole.name,
+      };
+      if (isVerified != null) {
+        data['isVerified'] = isVerified;
+      } else if (newRole == UserRole.agent) {
+        data['isVerified'] = true;
+      } else if (newRole == UserRole.manager) {
+        data['isVerified'] = true;
+      }
+      if (department != null) {
+        data['department'] = department;
+      }
+      await _firestore.collection('users').doc(uid).update(data);
+    } on FirebaseException catch (e) {
+      throw Exception(e.message ?? 'Permission denied to update user role.');
+    } catch (e) {
+      throw Exception('Failed to update user role: $e');
+    }
   }
 
   Future<void> updateAgentVerification({

@@ -209,5 +209,15 @@
   "deptSales": "المبيعات والتسويق",
   "deptCustomerSupport": "خدمة العملاء والدعم",
   "deptFacilities": "المرافق والخدمات",
-  "deptGeneral": "عام"
+  "deptGeneral": "عام",
+  "promoteToAgent": "ترقية إلى أخصائي دعم",
+  "promote": "ترقية",
+  "employees": "الموظفين",
+  "agents": "الأخصائيين",
+  "changeRole": "تغيير الدور",
+  "manageUserRole": "إدارة دور المستخدم",
+  "promoteUserPrompt": "حدد الدور والقسم الجديد لهذا المستخدم:",
+  "demoteToEmployee": "تحويل إلى موظف",
+  "allUsers": "جميع الأعضاء",
+  "roleUpdatedSuccess": "تم تحديث دور المستخدم بنجاح!"
 }

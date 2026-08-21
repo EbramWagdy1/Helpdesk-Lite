@@ -1189,6 +1189,66 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'General'**
   String get deptGeneral;
+
+  /// No description provided for @promoteToAgent.
+  ///
+  /// In en, this message translates to:
+  /// **'Promote to Support Agent'**
+  String get promoteToAgent;
+
+  /// No description provided for @promote.
+  ///
+  /// In en, this message translates to:
+  /// **'Promote'**
+  String get promote;
+
+  /// No description provided for @employees.
+  ///
+  /// In en, this message translates to:
+  /// **'Employees'**
+  String get employees;
+
+  /// No description provided for @agents.
+  ///
+  /// In en, this message translates to:
+  /// **'Agents'**
+  String get agents;
+
+  /// No description provided for @changeRole.
+  ///
+  /// In en, this message translates to:
+  /// **'Change Role'**
+  String get changeRole;
+
+  /// No description provided for @manageUserRole.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage User Role'**
+  String get manageUserRole;
+
+  /// No description provided for @promoteUserPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Select a new role and department for this user:'**
+  String get promoteUserPrompt;
+
+  /// No description provided for @demoteToEmployee.
+  ///
+  /// In en, this message translates to:
+  /// **'Change to Employee'**
+  String get demoteToEmployee;
+
+  /// No description provided for @allUsers.
+  ///
+  /// In en, this message translates to:
+  /// **'All Members'**
+  String get allUsers;
+
+  /// No description provided for @roleUpdatedSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'User role updated successfully!'**
+  String get roleUpdatedSuccess;
 }
 
 class _AppLocalizationsDelegate

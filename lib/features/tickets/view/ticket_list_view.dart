@@ -54,13 +54,22 @@ class _TicketListViewState extends State<TicketListView> {
         // Intelligently render the tailored view according to user role
         switch (currentUser.role) {
           case UserRole.employee:
-            return EmployeePortalView(currentUser: currentUser);
+            return EmployeePortalView(
+              key: ValueKey('view_employee_${currentUser.uid}_${currentUser.role.name}'),
+              currentUser: currentUser,
+            );
 
           case UserRole.agent:
-            return AgentDashboardView(currentUser: currentUser);
+            return AgentDashboardView(
+              key: ValueKey('view_agent_${currentUser.uid}_${currentUser.role.name}'),
+              currentUser: currentUser,
+            );
 
           case UserRole.manager:
-            return ManagerExecutiveView(currentUser: currentUser);
+            return ManagerExecutiveView(
+              key: ValueKey('view_manager_${currentUser.uid}_${currentUser.role.name}'),
+              currentUser: currentUser,
+            );
         }
       },
     );

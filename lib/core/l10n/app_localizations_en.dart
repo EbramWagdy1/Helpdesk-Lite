@@ -571,4 +571,35 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get deptGeneral => 'General';
+
+  @override
+  String get promoteToAgent => 'Promote to Support Agent';
+
+  @override
+  String get promote => 'Promote';
+
+  @override
+  String get employees => 'Employees';
+
+  @override
+  String get agents => 'Agents';
+
+  @override
+  String get changeRole => 'Change Role';
+
+  @override
+  String get manageUserRole => 'Manage User Role';
+
+  @override
+  String get promoteUserPrompt =>
+      'Select a new role and department for this user:';
+
+  @override
+  String get demoteToEmployee => 'Change to Employee';
+
+  @override
+  String get allUsers => 'All Members';
+
+  @override
+  String get roleUpdatedSuccess => 'User role updated successfully!';
 }

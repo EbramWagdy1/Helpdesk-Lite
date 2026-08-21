@@ -130,6 +130,33 @@ class AppTheme {
       iconTheme: const IconThemeData(
         color: AppColors.textPrimary,
       ),
+      chipTheme: ChipThemeData(
+        backgroundColor: AppColors.surfaceVariant,
+        selectedColor: AppColors.primary.withValues(alpha: 0.15),
+        labelStyle: AppTextStyles.bodyMedium.copyWith(color: AppColors.textPrimary, fontWeight: FontWeight.w600),
+        secondaryLabelStyle: AppTextStyles.bodyMedium.copyWith(color: AppColors.primary, fontWeight: FontWeight.w700),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+          side: const BorderSide(color: AppColors.border),
+        ),
+      ),
+      navigationBarTheme: NavigationBarThemeData(
+        backgroundColor: AppColors.surface,
+        indicatorColor: AppColors.primary.withValues(alpha: 0.12),
+        labelTextStyle: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.primary);
+          }
+          return const TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: AppColors.textSecondary);
+        }),
+        iconTheme: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return const IconThemeData(color: AppColors.primary, size: 24);
+          }
+          return const IconThemeData(color: AppColors.textSecondary, size: 24);
+        }),
+      ),
       textTheme: const TextTheme(
         headlineLarge: AppTextStyles.headlineLarge,
         headlineMedium: AppTextStyles.headlineMedium,
@@ -302,6 +329,41 @@ class AppTheme {
       ),
       iconTheme: const IconThemeData(
         color: DarkAppColors.textPrimary,
+      ),
+      chipTheme: ChipThemeData(
+        backgroundColor: DarkAppColors.surfaceVariant,
+        selectedColor: DarkAppColors.primary.withValues(alpha: 0.25),
+        labelStyle: const TextStyle(
+          color: DarkAppColors.textPrimary,
+          fontWeight: FontWeight.w600,
+          fontSize: 13,
+        ),
+        secondaryLabelStyle: const TextStyle(
+          color: DarkAppColors.primaryLight,
+          fontWeight: FontWeight.w700,
+          fontSize: 13,
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+          side: const BorderSide(color: DarkAppColors.border),
+        ),
+      ),
+      navigationBarTheme: NavigationBarThemeData(
+        backgroundColor: DarkAppColors.surface,
+        indicatorColor: DarkAppColors.primary.withValues(alpha: 0.25),
+        labelTextStyle: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: DarkAppColors.primaryLight);
+          }
+          return const TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: DarkAppColors.textSecondary);
+        }),
+        iconTheme: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return const IconThemeData(color: DarkAppColors.primaryLight, size: 24);
+          }
+          return const IconThemeData(color: DarkAppColors.textSecondary, size: 24);
+        }),
       ),
       textTheme: const TextTheme(
         headlineLarge: TextStyle(

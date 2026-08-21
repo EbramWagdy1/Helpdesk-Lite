@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:helpdesk/core/extensions/localization_extension.dart';
-import 'package:helpdesk/core/utils/app_colors.dart';
 import 'package:helpdesk/core/widgets/custom_button.dart';
 import 'package:helpdesk/features/auth/model/user_model.dart';
 import 'package:helpdesk/features/tickets/model/ticket_model.dart';
@@ -37,6 +36,7 @@ class _TicketFilterSheetState extends State<TicketFilterSheet> {
   Widget build(BuildContext context) {
     final isStaff = widget.currentUser.role != UserRole.employee;
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
@@ -68,7 +68,7 @@ class _TicketFilterSheetState extends State<TicketFilterSheet> {
                     },
                     child: Text(
                       context.l10n.resetAll,
-                      style: const TextStyle(fontWeight: FontWeight.w600, color: AppColors.error),
+                      style: const TextStyle(fontWeight: FontWeight.w700, color: Color(0xFFEF4444)),
                     ),
                   ),
                 ],
@@ -78,15 +78,18 @@ class _TicketFilterSheetState extends State<TicketFilterSheet> {
 
               // Staff Filter: Assigned to me switch
               if (isStaff) ...[
-                SwitchListTile(
+                SwitchListTile.adaptive(
                   contentPadding: EdgeInsets.zero,
-                  title: Text(context.l10n.assignedToMe, style: TextStyle(fontSize: 14, color: theme.colorScheme.onSurface)),
+                  title: Text(context.l10n.assignedToMe, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: theme.colorScheme.onSurface)),
                   subtitle: Text(
                     context.l10n.showOnlyOwnedRequests,
-                    style: TextStyle(fontSize: 12, color: theme.colorScheme.onSurface.withValues(alpha: 0.6)),
+                    style: TextStyle(fontSize: 12, color: theme.colorScheme.onSurface.withValues(alpha: 0.65)),
                   ),
                   value: _assignedToMe,
                   activeTrackColor: theme.colorScheme.primary,
+                  activeThumbColor: Colors.white,
+                  inactiveThumbColor: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                  inactiveTrackColor: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
                   onChanged: (val) {
                     setState(() => _assignedToMe = val);
                   },
@@ -108,11 +111,18 @@ class _TicketFilterSheetState extends State<TicketFilterSheet> {
                   return ChoiceChip(
                     label: Text(priority.getLocalizedLabel(context)),
                     selected: isSelected,
-                    selectedColor: priority.color.withValues(alpha: 0.2),
-                    backgroundColor: theme.colorScheme.surfaceContainerHighest,
+                    selectedColor: isDark ? priority.color.withValues(alpha: 0.25) : priority.color.withValues(alpha: 0.15),
+                    backgroundColor: isDark ? const Color(0xFF1E293B) : theme.colorScheme.surfaceContainerHighest,
+                    side: BorderSide(
+                      color: isSelected
+                          ? priority.color
+                          : (isDark ? const Color(0xFF334155) : theme.colorScheme.outline.withValues(alpha: 0.5)),
+                      width: isSelected ? 1.5 : 1,
+                    ),
                     labelStyle: TextStyle(
-                      color: isSelected ? priority.color : theme.colorScheme.onSurface.withValues(alpha: 0.7),
-                      fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                      color: isSelected ? priority.color : (isDark ? const Color(0xFFF1F5F9) : theme.colorScheme.onSurface),
+                      fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
+                      fontSize: 13,
                     ),
                     onSelected: (selected) {
                       setState(() {
@@ -136,14 +146,25 @@ class _TicketFilterSheetState extends State<TicketFilterSheet> {
                 children: TicketCategory.values.map((cat) {
                   final isSelected = _selectedCategory == cat;
                   return ChoiceChip(
-                    avatar: Icon(cat.icon, size: 16, color: isSelected ? theme.colorScheme.primary : theme.colorScheme.onSurface.withValues(alpha: 0.6)),
+                    avatar: Icon(
+                      cat.icon,
+                      size: 16,
+                      color: isSelected ? theme.colorScheme.primary : (isDark ? const Color(0xFF94A3B8) : theme.colorScheme.onSurface.withValues(alpha: 0.7)),
+                    ),
                     label: Text(cat.getLocalizedLabel(context)),
                     selected: isSelected,
-                    selectedColor: theme.colorScheme.primary.withValues(alpha: 0.2),
-                    backgroundColor: theme.colorScheme.surfaceContainerHighest,
+                    selectedColor: isDark ? theme.colorScheme.primary.withValues(alpha: 0.25) : theme.colorScheme.primary.withValues(alpha: 0.15),
+                    backgroundColor: isDark ? const Color(0xFF1E293B) : theme.colorScheme.surfaceContainerHighest,
+                    side: BorderSide(
+                      color: isSelected
+                          ? theme.colorScheme.primary
+                          : (isDark ? const Color(0xFF334155) : theme.colorScheme.outline.withValues(alpha: 0.5)),
+                      width: isSelected ? 1.5 : 1,
+                    ),
                     labelStyle: TextStyle(
-                      color: isSelected ? theme.colorScheme.primary : theme.colorScheme.onSurface.withValues(alpha: 0.7),
-                      fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                      color: isSelected ? theme.colorScheme.primary : (isDark ? const Color(0xFFF1F5F9) : theme.colorScheme.onSurface),
+                      fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
+                      fontSize: 13,
                     ),
                     onSelected: (selected) {
                       setState(() {

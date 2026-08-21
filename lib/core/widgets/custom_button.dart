@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:helpdesk/core/theme/dark_app_colors.dart';
 import 'package:helpdesk/core/utils/app_colors.dart';
-import 'package:helpdesk/core/utils/app_text_style.dart';
-
 class CustomButton extends StatelessWidget {
   const CustomButton({
     super.key,
@@ -32,23 +31,28 @@ class CustomButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     final effectiveGradient = backgroundColor == null && borderColor == null
-        ? (gradient ?? AppColors.primaryGradient)
+        ? (gradient ?? (isDark ? DarkAppColors.primaryGradient : AppColors.primaryGradient))
         : null;
+
+    final effectiveBgColor = backgroundColor ?? (effectiveGradient == null ? theme.colorScheme.primary : null);
 
     return Container(
       width: width ?? double.infinity,
       height: height,
       decoration: BoxDecoration(
         gradient: effectiveGradient,
-        color: backgroundColor ?? (effectiveGradient == null ? AppColors.primary : null),
+        color: effectiveBgColor,
         borderRadius: BorderRadius.circular(borderRadius),
         border: borderColor != null ? Border.all(color: borderColor!, width: 1.5) : null,
         boxShadow: (backgroundColor == Colors.transparent || borderColor != null)
             ? null
             : [
                 BoxShadow(
-                  color: (backgroundColor ?? AppColors.primary).withValues(alpha: 0.25),
+                  color: (effectiveBgColor ?? theme.colorScheme.primary).withValues(alpha: 0.25),
                   blurRadius: 10,
                   offset: const Offset(0, 4),
                 ),
@@ -79,8 +83,11 @@ class CustomButton extends StatelessWidget {
                       ],
                       Text(
                         text,
-                        style: AppTextStyles.labelLarge.copyWith(
-                          color: textColor ?? (borderColor != null ? AppColors.primary : AppColors.white),
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w700,
+                          color: textColor ?? (borderColor != null ? theme.colorScheme.primary : Colors.white),
+                          letterSpacing: 0.2,
                         ),
                       ),
                     ],
